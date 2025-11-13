@@ -1,0 +1,46 @@
+[
+  {
+    "question": "What is TideGuard?",
+    "answer": "TideGuard is an app to monitor weather and user profiles."
+  },
+  {
+    "question": "How do I update my profile?",
+    "answer": "Go to the Profile screen and tap 'Edit Profile'."
+  },
+  {
+    "question": "How do I contact support?",
+    "answer": "Use the 'Contact Us' option in the Profile screen."
+  },
+  {
+    "question": "How do I sign up for TideGuard?",
+    "answer": "To sign up, download the app, tap 'Register' on the login screen, enter your email and a password, and follow the setup instructions to create your account."
+  },
+  {
+    "question": "Why can’t I log in?",
+    "answer": "If you can’t log in, ensure your email and password are correct. If forgotten, use the 'Forgot Password' option to reset it. Check your internet connection too."
+  },
+  {
+    "question": "How do I get weather alerts?",
+    "answer": "Weather alerts are automatically sent to your app’s main screen when severe conditions are detected. Ensure your location services are enabled for accurate updates."
+  },
+  {
+    "question": "What should I do during a flood alert?",
+    "answer": "During a flood alert, check the Flood Areas section for affected zones, follow evacuation instructions, and contact local authorities if needed."
+  },
+  {
+    "question": "How do I update the app?",
+    "answer": "Update TideGuard via your app store (e.g., App Store or Google Play). Go to your updates section and install the latest version for new features and fixes."
+  },
+  {
+    "question": "Can I change my account email?",
+    "answer": "Currently, you cannot change your email directly. Contact support via the 'Contact Us' option to request an email update."
+  },
+  {
+    "question": "Why is the app slow?",
+    "answer": "The app may be slow due to a poor internet connection or an outdated version. Try restarting the app or updating it to the latest version."
+  },
+  {
+    "question": "How do I delete my account?",
+    "answer": "To delete your account, go to the Profile screen, tap 'Delete Account', and confirm the action. This will remove all your data permanently."
+  }
+]

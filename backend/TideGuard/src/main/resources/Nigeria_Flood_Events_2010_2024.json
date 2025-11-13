@@ -1,0 +1,703 @@
+[
+    {
+        "year": 2012,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 400000,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Anambra",
+                "people_affected": 150000,
+                "latitude": 6.1637,
+                "longitude": 6.9232
+            },
+            {
+                "state": "Bayelsa",
+                "people_affected": 200000,
+                "latitude": 4.5406,
+                "longitude": 6.0760
+            },
+            {
+                "state": "Benue",
+                "people_affected": 1500000,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Delta",
+                "people_affected": 200000,
+                "latitude": 5.5480,
+                "longitude": 5.7370
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 800000,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Lagos",
+                "people_affected": 100000,
+                "latitude": 6.5244,
+                "longitude": 3.3792
+            },
+            {
+                "state": "Niger",
+                "people_affected": 500000,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Rivers",
+                "people_affected": 100000,
+                "latitude": 4.8156,
+                "longitude": 7.0498
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 300000,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            }
+        ]
+    },
+    {
+        "year": 2013,
+        "events": [
+            {
+                "state": "Benue",
+                "people_affected": 80000,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 50000,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Niger",
+                "people_affected": 10000,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            }
+        ]
+    },
+    {
+        "year": 2014,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 30000,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Borno",
+                "people_affected": 40000,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 30000,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            }
+        ]
+    },
+    {
+        "year": 2015,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 80000,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Benue",
+                "people_affected": 200000,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 150000,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Niger",
+                "people_affected": 100000,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 36000,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            }
+        ]
+    },
+    {
+        "year": 2016,
+        "events": [
+            {
+                "state": "Benue",
+                "people_affected": 80000,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Cross River",
+                "people_affected": 20000,
+                "latitude": 5.9960,
+                "longitude": 8.4790
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 60000,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Niger",
+                "people_affected": 40000,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            }
+        ]
+    },
+    {
+        "year": 2017,
+        "events": [
+            {
+                "state": "Abia",
+                "people_affected": 500,
+                "latitude": 5.5320,
+                "longitude": 7.4967
+            },
+            {
+                "state": "Akwa Ibom",
+                "people_affected": 500,
+                "latitude": 4.9650,
+                "longitude": 7.9080
+            },
+            {
+                "state": "Bayelsa",
+                "people_affected": 500,
+                "latitude": 4.5406,
+                "longitude": 6.0760
+            },
+            {
+                "state": "Benue",
+                "people_affected": 10000,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Ebonyi",
+                "people_affected": 500,
+                "latitude": 6.2667,
+                "longitude": 8.0833
+            },
+            {
+                "state": "Ekiti",
+                "people_affected": 500,
+                "latitude": 7.6300,
+                "longitude": 5.2200
+            },
+            {
+                "state": "Enugu",
+                "people_affected": 500,
+                "latitude": 6.4400,
+                "longitude": 7.5000
+            },
+            {
+                "state": "Kebbi",
+                "people_affected": 500,
+                "latitude": 12.4534,
+                "longitude": 4.2022
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 10000,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Kwara",
+                "people_affected": 500,
+                "latitude": 8.4870,
+                "longitude": 4.5419
+            },
+            {
+                "state": "Lagos",
+                "people_affected": 500,
+                "latitude": 6.5244,
+                "longitude": 3.3792
+            },
+            {
+                "state": "Niger",
+                "people_affected": 500,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Osun",
+                "people_affected": 500,
+                "latitude": 7.6333,
+                "longitude": 4.1833
+            },
+            {
+                "state": "Oyo",
+                "people_affected": 500,
+                "latitude": 7.3775,
+                "longitude": 3.9475
+            },
+            {
+                "state": "Plateau",
+                "people_affected": 500,
+                "latitude": 9.9300,
+                "longitude": 8.8900
+            },
+            {
+                "state": "Sokoto",
+                "people_affected": 500,
+                "latitude": 13.0625,
+                "longitude": 5.2425
+            }
+        ]
+    },
+    {
+        "year": 2018,
+        "events": [
+            {
+                "state": "Abuja",
+                "people_affected": 15872,
+                "latitude": 9.0579,
+                "longitude": 7.4951
+            },
+            {
+                "state": "Bauchi",
+                "people_affected": 15872,
+                "latitude": 10.2964,
+                "longitude": 9.8270
+            },
+            {
+                "state": "Edo",
+                "people_affected": 15872,
+                "latitude": 6.3350,
+                "longitude": 5.6220
+            },
+            {
+                "state": "Katsina",
+                "people_affected": 15872,
+                "latitude": 12.9870,
+                "longitude": 7.6200
+            },
+            {
+                "state": "Kebbi",
+                "people_affected": 15872,
+                "latitude": 12.4534,
+                "longitude": 4.2022
+            },
+            {
+                "state": "Niger",
+                "people_affected": 15872,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Ondo",
+                "people_affected": 15872,
+                "latitude": 7.2500,
+                "longitude": 5.2000
+            },
+            {
+                "state": "Ogun",
+                "people_affected": 15872,
+                "latitude": 7.1500,
+                "longitude": 3.3500
+            },
+            {
+                "state": "Yobe",
+                "people_affected": 15872,
+                "latitude": 12.1800,
+                "longitude": 11.8600
+            },
+            {
+                "state": "Anambra",
+                "people_affected": 1922332,
+                "latitude": 6.1637,
+                "longitude": 6.9232
+            },
+            {
+                "state": "Delta",
+                "people_affected": 1922332,
+                "latitude": 5.5480,
+                "longitude": 5.7370
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 1922332,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Niger",
+                "people_affected": 1922332,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            }
+        ]
+    },
+    {
+        "year": 2019,
+        "events": [
+            {
+                "state": "Cross River",
+                "people_affected": 18640,
+                "latitude": 5.9960,
+                "longitude": 8.4790
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 18640,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Niger",
+                "people_affected": 18640,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 18640,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            },
+            {
+                "state": "Adamawa",
+                "people_affected": 52500,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Borno",
+                "people_affected": 52500,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            },
+            {
+                "state": "Jigawa",
+                "people_affected": 52500,
+                "latitude": 12.3645,
+                "longitude": 9.6625
+            },
+            {
+                "state": "Kano",
+                "people_affected": 52500,
+                "latitude": 12.0022,
+                "longitude": 8.5920
+            },
+            {
+                "state": "Yobe",
+                "people_affected": 52500,
+                "latitude": 12.1800,
+                "longitude": 11.8600
+            }
+        ]
+    },
+    {
+        "year": 2020,
+        "events": [
+            {
+                "state": "Akwa Ibom",
+                "people_affected": 300,
+                "latitude": 4.9650,
+                "longitude": 7.9080
+            },
+            {
+                "state": "Kwara",
+                "people_affected": 300,
+                "latitude": 8.4870,
+                "longitude": 4.5419
+            },
+            {
+                "state": "Abuja",
+                "people_affected": 300,
+                "latitude": 9.0579,
+                "longitude": 7.4951
+            },
+            {
+                "state": "Jigawa",
+                "people_affected": 193425,
+                "latitude": 12.3645,
+                "longitude": 9.6625
+            },
+            {
+                "state": "Kebbi",
+                "people_affected": 193425,
+                "latitude": 12.4534,
+                "longitude": 4.2022
+            },
+            {
+                "state": "Kwara",
+                "people_affected": 193425,
+                "latitude": 8.4870,
+                "longitude": 4.5419
+            },
+            {
+                "state": "Sokoto",
+                "people_affected": 193425,
+                "latitude": 13.0625,
+                "longitude": 5.2425
+            },
+            {
+                "state": "Zamfara",
+                "people_affected": 193425,
+                "latitude": 12.1640,
+                "longitude": 6.6710
+            }
+        ]
+    },
+    {
+        "year": 2021,
+        "events": [
+            {
+                "state": "Abuja",
+                "people_affected": 830,
+                "latitude": 9.0579,
+                "longitude": 7.4951
+            },
+            {
+                "state": "Adamawa",
+                "people_affected": 7500,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Bauchi",
+                "people_affected": 7500,
+                "latitude": 10.2964,
+                "longitude": 9.8270
+            },
+            {
+                "state": "Borno",
+                "people_affected": 7500,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            },
+            {
+                "state": "Jigawa",
+                "people_affected": 7500,
+                "latitude": 12.3645,
+                "longitude": 9.6625
+            },
+            {
+                "state": "Lagos",
+                "people_affected": 7500,
+                "latitude": 6.5244,
+                "longitude": 3.3792
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 7500,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            }
+        ]
+    },
+    {
+        "year": 2022,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 2802500,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Akwa Ibom",
+                "people_affected": 2802500,
+                "latitude": 4.9650,
+                "longitude": 7.9080
+            },
+            {
+                "state": "Anambra",
+                "people_affected": 2802500,
+                "latitude": 6.1637,
+                "longitude": 6.9232
+            },
+            {
+                "state": "Bayelsa",
+                "people_affected": 2802500,
+                "latitude": 4.5406,
+                "longitude": 6.0760
+            },
+            {
+                "state": "Benue",
+                "people_affected": 2802500,
+                "latitude": 7.7233,
+                "longitude": 8.5258
+            },
+            {
+                "state": "Borno",
+                "people_affected": 2802500,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            },
+            {
+                "state": "Cross River",
+                "people_affected": 2802500,
+                "latitude": 5.9960,
+                "longitude": 8.4790
+            },
+            {
+                "state": "Delta",
+                "people_affected": 2802500,
+                "latitude": 5.5480,
+                "longitude": 5.7370
+            },
+            {
+                "state": "Enugu",
+                "people_affected": 2802500,
+                "latitude": 6.4400,
+                "longitude": 7.5000
+            },
+            {
+                "state": "Imo",
+                "people_affected": 2802500,
+                "latitude": 5.4870,
+                "longitude": 7.0280
+            },
+            {
+                "state": "Jigawa",
+                "people_affected": 2802500,
+                "latitude": 12.3645,
+                "longitude": 9.6625
+            },
+            {
+                "state": "Kebbi",
+                "people_affected": 2802500,
+                "latitude": 12.4534,
+                "longitude": 4.2022
+            },
+            {
+                "state": "Kogi",
+                "people_affected": 2802500,
+                "latitude": 7.7337,
+                "longitude": 6.6906
+            },
+            {
+                "state": "Lagos",
+                "people_affected": 2802500,
+                "latitude": 6.5244,
+                "longitude": 3.3792
+            },
+            {
+                "state": "Nassarawa",
+                "people_affected": 2802500,
+                "latitude": 8.5320,
+                "longitude": 7.7100
+            },
+            {
+                "state": "Niger",
+                "people_affected": 2802500,
+                "latitude": 9.9300,
+                "longitude": 6.2700
+            },
+            {
+                "state": "Rivers",
+                "people_affected": 2802500,
+                "latitude": 4.8156,
+                "longitude": 7.0498
+            },
+            {
+                "state": "Taraba",
+                "people_affected": 2802500,
+                "latitude": 8.9000,
+                "longitude": 11.1800
+            },
+            {
+                "state": "Yobe",
+                "people_affected": 2802500,
+                "latitude": 12.1800,
+                "longitude": 11.8600
+            }
+        ]
+    },
+    {
+        "year": 2023,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 30000,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Gombe",
+                "people_affected": 1336,
+                "latitude": 10.2890,
+                "longitude": 11.1730
+            }
+        ]
+    },
+    {
+        "year": 2024,
+        "events": [
+            {
+                "state": "Adamawa",
+                "people_affected": 1377411,
+                "latitude": 9.3260,
+                "longitude": 12.4917
+            },
+            {
+                "state": "Bauchi",
+                "people_affected": 1377411,
+                "latitude": 10.2964,
+                "longitude": 9.8270
+            },
+            {
+                "state": "Borno",
+                "people_affected": 1377411,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            },
+            {
+                "state": "Jigawa",
+                "people_affected": 1377411,
+                "latitude": 12.3645,
+                "longitude": 9.6625
+            },
+            {
+                "state": "Sokoto",
+                "people_affected": 1377411,
+                "latitude": 13.0625,
+                "longitude": 5.2425
+            },
+            {
+                "state": "Zamfara",
+                "people_affected": 1377411,
+                "latitude": 12.1640,
+                "longitude": 6.6710
+            },
+            {
+                "state": "Borno",
+                "people_affected": 414058,
+                "latitude": 11.8398,
+                "longitude": 13.1590
+            }
+        ]
+    }
+]

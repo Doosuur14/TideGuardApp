@@ -1,0 +1,188 @@
+
+[
+  {
+    "city": "Abia",
+    "shelters": "Umuahia Township Stadium, Stadium Rd, Umuahia\nMichael Okpara University, Umudike",
+    "routes": "From Aba: Take Aba-Owerri Rd to Umuahia Township Stadium (35 km, ~1 hr).\nFrom Ohafia: Head south on Arochukwu Rd to Michael Okpara University (40 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Adamawa",
+    "shelters": "Mahmud Ribadu Square, Ahmadu Bello Way, Yola\nFederal Government College, Girei",
+    "routes": "From Jimeta: Take Atiku Abubakar Way to Mahmud Ribadu Square (5 km, ~10 mins).\nFrom Numan: Head north on Numan-Yola Rd to Federal Government College (60 km, ~1 hr 20 mins)."
+  },
+  {
+    "city": "Akwa Ibom",
+    "shelters": "Godswill Akpabio Stadium, Stadium Rd, Uyo\nUyo Township Hall, Oron Rd, Uyo",
+    "routes": "From Ikot Ekpene: Take Umuahia Rd to Godswill Akpabio Stadium (30 km, ~45 mins).\nFrom Eket: Head north on Eket-Oron Rd to Uyo Township Hall (50 km, ~1 hr 15 mins)."
+  },
+  {
+    "city": "Anambra",
+    "shelters": "Alex Ekwueme Square, Agu Awka, Awka\nChukwuemeka Odumegwu Ojukwu University, Igbariam",
+    "routes": "From Onitsha: Take Enugu-Onitsha Expressway to Alex Ekwueme Square (35 km, ~50 mins).\nFrom Nnewi: Head north on Nnewi-Ozubulu Rd to Chukwuemeka Odumegwu Ojukwu University (60 km, ~1 hr 30 mins)."
+  },
+  {
+    "city": "Bauchi",
+    "shelters": "Abubakar Tafawa Balewa Stadium, Stadium Rd, Bauchi\nGovernment Girls College, Gwallaga",
+    "routes": "From Bauchi Central: Take Kano Rd to Abubakar Tafawa Balewa Stadium (3 km, ~5 mins).\nFrom Azare: Head south on Bauchi-Azare Rd to Government Girls College (100 km, ~2 hrs)."
+  },
+  {
+    "city": "Bayelsa",
+    "shelters": "Samson Siasia Stadium, Ovom, Yenagoa\nYenagoa City Hall, Mbiama-Yenagoa Rd",
+    "routes": "From Amassoma: Take Mbiama-Yenagoa Rd to Samson Siasia Stadium (15 km, ~25 mins).\nFrom Sagbama: Head east on Sagbama-Ekeremor Rd to Yenagoa City Hall (50 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Benue",
+    "shelters": "Makurdi Town Hall, Jonah Jang Cres, Makurdi\nAper Aku Stadium, Kashim Ibrahim Rd, Makurdi",
+    "routes": "From Makurdi: Head east on Otukpo Rd to Aper Aku Stadium (5 km, ~10 mins).\nFrom North Bank: Cross Benue River via Makurdi Bridge, head to Town Hall (8 km, ~15 mins)."
+  },
+  {
+    "city": "Borno",
+    "shelters": "Maiduguri Township Stadium, Baga Rd, Maiduguri\nEl-Kanemi College, Damboa Rd, Maiduguri",
+    "routes": "From Jere: Take Maiduguri-Damaturu Rd to Maiduguri Township Stadium (10 km, ~20 mins).\nFrom Bama: Head west on Bama-Maiduguri Rd to El-Kanemi College (75 km, ~1 hr 45 mins)."
+  },
+  {
+    "city": "Cross River",
+    "shelters": "U.J. Esuene Stadium, Stadium Rd, Calabar\nHope Waddell Training Institution, Diamond Hill, Calabar",
+    "routes": "From Calabar South: Take MCC Rd to U.J. Esuene Stadium (3 km, ~5 mins).\nFrom Ikom: Head south on Calabar-Ikom Hwy to Hope Waddell Training Institution (180 km, ~3 hrs)."
+  },
+  {
+    "city": "Delta",
+    "shelters": "Stephen Keshi Stadium, Nnebisi Rd, Asaba\nWarri City Hall, Airport Rd, Warri",
+    "routes": "From Okpanam: Take Okpanam Rd to Stephen Keshi Stadium (5 km, ~10 mins).\nFrom Effurun: Head south on Warri-Sapele Rd to Warri City Hall (10 km, ~20 mins)."
+  },
+  {
+    "city": "Ebonyi",
+    "shelters": "Pa Ngele Oruta Stadium, Ntezi Rd, Abakaliki\nEbonyi State University, Ishieke Campus",
+    "routes": "From Afikpo: Take Abakaliki-Afikpo Rd to Pa Ngele Oruta Stadium (50 km, ~1 hr 10 mins).\nFrom Ezzamgbo: Head east on Abakaliki-Enugu Rd to Ebonyi State University (30 km, ~45 mins)."
+  },
+  {
+    "city": "Edo",
+    "shelters": "Samuel Ogbemudia Stadium, Stadium Rd, Benin City\nBenin City Hall, Ring Rd, Benin City",
+    "routes": "From Ekenwan: Take Ekenwan Rd to Samuel Ogbemudia Stadium (5 km, ~10 mins).\nFrom Ugbowo: Head south on Ugbowo-Lagos Rd to Benin City Hall (7 km, ~15 mins)."
+  },
+  {
+    "city": "Ekiti",
+    "shelters": "Oluyemi Kayode Stadium, Poly Rd, Ado-Ekiti\nEkiti State University, Iworoko Rd",
+    "routes": "From Ikere: Take Ikere Rd to Oluyemi Kayode Stadium (15 km, ~25 mins).\nFrom Iyin: Head south on Iyin Rd to Ekiti State University (10 km, ~20 mins)."
+  },
+  {
+    "city": "Enugu",
+    "shelters": "Nnamdi Azikiwe Stadium, Ogui Rd, Enugu\nUniversity of Nigeria, Nsukka Campus",
+    "routes": "From Emene: Take Enugu-Abakaliki Rd to Nnamdi Azikiwe Stadium (10 km, ~20 mins).\nFrom Nsukka: Head south on Nsukka-Enugu Rd to University of Nigeria (5 km, ~10 mins)."
+  },
+  {
+    "city": "Gombe",
+    "shelters": "Pantami Stadium, Pantami Rd, Gombe\nGovernment Science Secondary School, Tumfure",
+    "routes": "From Gombe Central: Take Ashaka Rd to Pantami Stadium (3 km, ~5 mins).\nFrom Billiri: Head north on Gombe-Billiri Rd to Government Science Secondary School (40 km, ~1 hr)."
+  },
+  {
+    "city": "Imo",
+    "shelters": "Dan Anyiam Stadium, Wetheral Rd, Owerri\nImo State University, Okigwe Rd",
+    "routes": "From Orlu: Take Orlu Rd to Dan Anyiam Stadium (40 km, ~1 hr).\nFrom Okigwe: Head south on Okigwe-Owerri Rd to Imo State University (50 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Jigawa",
+    "shelters": "Hadejia Township Stadium, Hadejia-Kano Rd, Dutse\nGovernment Girls College, Old Kano Rd, Dutse",
+    "routes": "From Hadejia: Take Hadejia-Dutse Rd to Hadejia Township Stadium (70 km, ~1 hr 30 mins).\nFrom Gumel: Head south on Gumel-Dutse Rd to Government Girls College (80 km, ~1 hr 45 mins)."
+  },
+  {
+    "city": "Kaduna",
+    "shelters": "Ahmadu Bello Stadium, Stadium Rd, Kaduna\nGovernment College, Kano Rd, Kaduna",
+    "routes": "From Zaria: Take Kaduna-Zaria Rd to Ahmadu Bello Stadium (60 km, ~1 hr 20 mins).\nFrom Rigasa: Head east on Kano Rd to Government College (5 km, ~10 mins)."
+  },
+  {
+    "city": "Kano",
+    "shelters": "Kano Pillars Stadium, Ibrahim Taiwo Rd\nGovernment House Kano, Lodge Rd",
+    "routes": "From Sabon Gari: Head east on Zaria Rd to Kano Pillars Stadium (6 km, ~15 mins).\nFrom Fagge: Take Ibrahim Taiwo Rd to Government House (4 km, ~10 mins)."
+  },
+  {
+    "city": "Katsina",
+    "shelters": "Muhammad Dikko Stadium, Mani Rd, Katsina\nGovernment Girls College, Daura Rd, Katsina",
+    "routes": "From Daura: Take Daura-Katsina Rd to Muhammad Dikko Stadium (70 km, ~1 hr 30 mins).\nFrom Funtua: Head north on Funtua-Katsina Rd to Government Girls College (50 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Kebbi",
+    "shelters": "Haliru Abdu Stadium, Ahmadu Bello Way, Birnin Kebbi\nGovernment Science College, Aliero",
+    "routes": "From Argungu: Take Argungu-Birnin Kebbi Rd to Haliru Abdu Stadium (50 km, ~1 hr 10 mins).\nFrom Aliero: Head west on Aliero-Birnin Kebbi Rd to Government Science College (30 km, ~45 mins)."
+  },
+  {
+    "city": "Kogi",
+    "shelters": "Confluence Stadium, Ganaja Rd, Lokoja\nGovernment Secondary School, Kabba",
+    "routes": "From Okene: Take Okene-Lokoja Rd to Confluence Stadium (50 km, ~1 hr 10 mins).\nFrom Kabba: Head east on Kabba-Lokoja Rd to Government Secondary School (5 km, ~10 mins)."
+  },
+  {
+    "city": "Kwara",
+    "shelters": "Kwara State Stadium, Ibrahim Taiwo Rd, Ilorin\nUniversity of Ilorin, Main Campus",
+    "routes": "From Offa: Take Offa-Ilorin Rd to Kwara State Stadium (50 km, ~1 hr 10 mins).\nFrom Tanke: Head west on University Rd to University of Ilorin (5 km, ~10 mins)."
+  },
+  {
+    "city": "Lagos",
+    "shelters": "Eko Hotel, Adetokunbo Ademola St, Victoria Island\nIkeja Community Center, Oba Akinjobi Way, Ikeja\nLekki Conservation Centre, Lekki-Epe Expressway",
+    "routes": "From Victoria Island: Head north on Eko Bridge, continue to Ikeja (15 km, ~30 mins in traffic).\nFrom Surulere: Take Western Ave to Ikorodu Rd, proceed to Lekki (20 km, ~40 mins)."
+  },
+  {
+    "city": "Nasarawa",
+    "shelters": "Lafia City Stadium, Jos Rd, Lafia\nFederal University, Keffi Campus",
+    "routes": "From Mararaba: Take Keffi-Abuja Rd to Federal University (30 km, ~45 mins).\nFrom Akwanga: Head south on Akwanga-Lafia Rd to Lafia City Stadium (60 km, ~1 hr 20 mins)."
+  },
+  {
+    "city": "Niger",
+    "shelters": "Bako Kontagora Stadium, Kontagora Rd, Minna\nGovernment Girls College, Bosso, Minna",
+    "routes": "From Suleja: Take Minna-Suleja Rd to Bako Kontagora Stadium (120 km, ~2 hrs 30 mins).\nFrom Bosso: Head west on Bosso Rd to Government Girls College (3 km, ~5 mins)."
+  },
+  {
+    "city": "Ogun",
+    "shelters": "MKO Abiola Stadium, Stadium Rd, Abeokuta\nOlabisi Onabanjo University, Ago-Iwoye",
+    "routes": "From Ijebu-Ode: Take Ijebu-Ode-Ago-Iwoye Rd to Olabisi Onabanjo University (30 km, ~45 mins).\nFrom Sagamu: Head west on Sagamu-Abeokuta Rd to MKO Abiola Stadium (50 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Ondo",
+    "shelters": "Akure Township Stadium, Oba Adesida Rd, Akure\nFederal University of Technology, Akure",
+    "routes": "From Ondo Town: Take Ondo-Akure Rd to Akure Township Stadium (40 km, ~1 hr).\nFrom Owo: Head south on Owo-Akure Rd to Federal University of Technology (50 km, ~1 hr 10 mins)."
+  },
+  {
+    "city": "Osun",
+    "shelters": "Osogbo City Stadium, Oke Baale, Osogbo\nObafemi Awolowo University, Ile-Ife",
+    "routes": "From Ilesa: Take Ilesa-Osogbo Rd to Osogbo City Stadium (35 km, ~50 mins).\nFrom Ede: Head south on Ede-Ife Rd to Obafemi Awolowo University (40 km, ~1 hr)."
+  },
+  {
+    "city": "Oyo",
+    "shelters": "Lekan Salami Stadium, Adamasingba, Ibadan\nUniversity of Ibadan, Main Campus",
+    "routes": "From Ogbomoso: Take Ogbomoso-Ibadan Rd to Lekan Salami Stadium (100 km, ~2 hrs).\nFrom Iseyin: Head south on Iseyin-Ibadan Rd to University of Ibadan (80 km, ~1 hr 45 mins)."
+  },
+  {
+    "city": "Plateau",
+    "shelters": "Rwang Pam Stadium, Zaria Rd, Jos\nGovernment Science School, Kuru",
+    "routes": "From Bukuru: Take Bukuru-Jos Rd to Rwang Pam Stadium (10 km, ~20 mins).\nFrom Shendam: Head north on Shendam-Jos Rd to Government Science School (120 km, ~2 hrs 30 mins)."
+  },
+  {
+    "city": "Rivers",
+    "shelters": "Port Harcourt City Hall, Aba Rd, Port Harcourt\nLiberation Stadium, Elekahia",
+    "routes": "From Old GRA: Take Aba Rd north to Port Harcourt City Hall (5 km, ~10 mins).\nFrom Diobu: Head east on Ikwerre Rd to Liberation Stadium (7 km, ~15 mins)."
+  },
+  {
+    "city": "Sokoto",
+    "shelters": "Giginya Memorial Stadium, Arkilla, Sokoto\nUsmanu Danfodiyo University, Main Campus",
+    "routes": "From Wamakko: Take Sokoto-Wamakko Rd to Giginya Memorial Stadium (10 km, ~20 mins).\nFrom Tambuwal: Head north on Tambuwal-Sokoto Rd to Usmanu Danfodiyo University (100 km, ~2 hrs)."
+  },
+  {
+    "city": "Taraba",
+    "shelters": "Jolly Nyame Stadium, Stadium Rd, Jalingo\nGovernment Day Secondary School, Wukari",
+    "routes": "From Wukari: Take Wukari-Jalingo Rd to Jolly Nyame Stadium (120 km, ~2 hrs 30 mins).\nFrom Sunkani: Head south on Sunkani-Jalingo Rd to Government Day Secondary School (80 km, ~1 hr 45 mins)."
+  },
+  {
+    "city": "Yobe",
+    "shelters": "August 27 Stadium, Damaturu-Gashua Rd, Damaturu\nGovernment Girls College, Potiskum",
+    "routes": "From Gashua: Take Gashua-Damaturu Rd to August 27 Stadium (120 km, ~2 hrs 30 mins).\nFrom Potiskum: Head west on Potiskum-Damaturu Rd to Government Girls College (5 km, ~10 mins)."
+  },
+  {
+    "city": "Zamfara",
+    "shelters": "Sardauna Memorial Stadium, Tudun Wada, Gusau\nGovernment Secondary School, Talata Mafara",
+    "routes": "From Kaura Namoda: Take Kaura Namoda-Gusau Rd to Sardauna Memorial Stadium (60 km, ~1 hr 20 mins).\nFrom Talata Mafara: Head east on Talata Mafara-Gusau Rd to Government Secondary School (5 km, ~10 mins)."
+  },
+  {
+    "city": "FCT",
+    "shelters": "National Stadium, Constitution Ave, Garki\nGarki Model School, Area 10, Garki",
+    "routes": "From Garki: Head west on Airport Rd to National Stadium (10 km, ~20 mins).\nFrom Wuse: Take IBB Way to Area 10 for Garki Model School (7 km, ~15 mins)."
+  }
+]
