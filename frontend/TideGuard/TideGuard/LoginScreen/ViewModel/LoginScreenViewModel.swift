@@ -59,5 +59,4 @@ final class LoginScreenViewModel: LoginMainViewModelProtocol {
     func goToSignUpController() {
         delegate?.goToSignUpController()
     }
-
 }

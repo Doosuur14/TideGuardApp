@@ -27,7 +27,8 @@
 		DE0EDDAE2DA1E53600D21C74 /* UICustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0EDDAD2DA1E53600D21C74 /* UICustomTextField.swift */; };
 		DE0EDDB12DA4726900D21C74 /* RegistrationScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0EDDB02DA4726900D21C74 /* RegistrationScreenView.swift */; };
 		DE0EDDB32DA4728100D21C74 /* RegistrationScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0EDDB22DA4728100D21C74 /* RegistrationScreenViewController.swift */; };
-		DE141A062EC6928500D8B491 /* FloodRiskPredictor.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = DE141A052EC6928500D8B491 /* FloodRiskPredictor.mlpackage */; };
+		DE141A082EC7709E00D8B491 /* LgaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE141A072EC7709E00D8B491 /* LgaModel.swift */; };
+		DE141A0A2EC772EB00D8B491 /* LgaAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE141A092EC772EB00D8B491 /* LgaAPIService.swift */; };
 		DE2883A82DBED77C0013B156 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883A72DBED77C0013B156 /* WeatherService.swift */; };
 		DE2883AA2DBEDE170013B156 /* Evacuation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883A92DBEDE170013B156 /* Evacuation.swift */; };
 		DE2883AC2DC597520013B156 /* FloodArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883AB2DC597520013B156 /* FloodArea.swift */; };
@@ -44,6 +45,7 @@
 		DE6709A72DD20A3200C19369 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A52DD20A3200C19369 /* User+CoreDataClass.swift */; };
 		DE6709A82DD20A3200C19369 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A62DD20A3200C19369 /* User+CoreDataProperties.swift */; };
 		DE7DBD952DD1FE5C0003EC62 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7DBD942DD1FE5C0003EC62 /* UserService.swift */; };
+		DE82EBD42ED5000E00E6707F /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE82EBD32ED5000E00E6707F /* LocationService.swift */; };
 		DE9A6FDE2D9499CF00B93655 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FDD2D9499CF00B93655 /* AppDelegate.swift */; };
 		DE9A6FE02D9499CF00B93655 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FDF2D9499CF00B93655 /* SceneDelegate.swift */; };
 		DE9A6FE22D9499CF00B93655 /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FE12D9499CF00B93655 /* HomeScreenViewController.swift */; };
@@ -64,6 +66,7 @@
 		DED99AEF2EA99710001ECFF8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DED99AEE2EA99710001ECFF8 /* Alamofire */; };
 		DEDF01EB2EB04E0100AF8744 /* Shelter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDF01EA2EB04E0000AF8744 /* Shelter.swift */; };
 		DEDF01ED2EB04E4200AF8744 /* FloodRiskResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */; };
+		DEE8D3EB2EC94D7300438FEA /* FloodRiskPredictor.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */; };
 		DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C12DF19AE900497C21 /* FAQ.swift */; };
 		DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */; };
 		DEF3F4C72DF19C3F00497C21 /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C62DF19C3F00497C21 /* FAQView.swift */; };
@@ -116,7 +119,8 @@
 		DE0EDDAD2DA1E53600D21C74 /* UICustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICustomTextField.swift; sourceTree = "<group>"; };
 		DE0EDDB02DA4726900D21C74 /* RegistrationScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationScreenView.swift; sourceTree = "<group>"; };
 		DE0EDDB22DA4728100D21C74 /* RegistrationScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationScreenViewController.swift; sourceTree = "<group>"; };
-		DE141A052EC6928500D8B491 /* FloodRiskPredictor.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = FloodRiskPredictor.mlpackage; sourceTree = "<group>"; };
+		DE141A072EC7709E00D8B491 /* LgaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LgaModel.swift; sourceTree = "<group>"; };
+		DE141A092EC772EB00D8B491 /* LgaAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LgaAPIService.swift; sourceTree = "<group>"; };
 		DE2883A72DBED77C0013B156 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		DE2883A92DBEDE170013B156 /* Evacuation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evacuation.swift; sourceTree = "<group>"; };
 		DE2883AB2DC597520013B156 /* FloodArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodArea.swift; sourceTree = "<group>"; };
@@ -132,6 +136,7 @@
 		DE6709A52DD20A3200C19369 /* User+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		DE6709A62DD20A3200C19369 /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		DE7DBD942DD1FE5C0003EC62 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		DE82EBD32ED5000E00E6707F /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		DE9A6FDA2D9499CF00B93655 /* TideGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TideGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9A6FDD2D9499CF00B93655 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DE9A6FDF2D9499CF00B93655 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -153,6 +158,7 @@
 		DE9A94992DD0B8EC0087581F /* ImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageService.swift; sourceTree = "<group>"; };
 		DEDF01EA2EB04E0000AF8744 /* Shelter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelter.swift; sourceTree = "<group>"; };
 		DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodRiskResponse.swift; sourceTree = "<group>"; };
+		DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodRiskPredictor.mlmodel; sourceTree = "<group>"; };
 		DEF3F4C12DF19AE900497C21 /* FAQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQ.swift; sourceTree = "<group>"; };
 		DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
 		DEF3F4C62DF19C3F00497C21 /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
@@ -267,6 +273,8 @@
 				DE7DBD942DD1FE5C0003EC62 /* UserService.swift */,
 				DEF3F4E02DF6F9FB00497C21 /* ReportService.swift */,
 				DEF3F4EF2DFA055D00497C21 /* NewsService.swift */,
+				DE141A092EC772EB00D8B491 /* LgaAPIService.swift */,
+				DE82EBD32ED5000E00E6707F /* LocationService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -311,6 +319,7 @@
 				DEF3F4F12DFA0F2C00497C21 /* News.swift */,
 				DEDF01EA2EB04E0000AF8744 /* Shelter.swift */,
 				DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */,
+				DE141A072EC7709E00D8B491 /* LgaModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -434,7 +443,7 @@
 				DE9A6FE62D9499D100B93655 /* Assets.xcassets */,
 				DE9A6FE82D9499D100B93655 /* LaunchScreen.storyboard */,
 				DE9A6FEB2D9499D100B93655 /* Info.plist */,
-				DE141A052EC6928500D8B491 /* FloodRiskPredictor.mlpackage */,
+				DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */,
 			);
 			path = TideGuard;
 			sourceTree = "<group>";
@@ -649,7 +658,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					DE9A6FD92D9499CF00B93655 = {
 						CreatedOnToolsVersion = 15.4;
@@ -764,6 +773,7 @@
 				DE0EDDAE2DA1E53600D21C74 /* UICustomTextField.swift in Sources */,
 				DE03591D2DAC48AC00178E1D /* LoginViewIntent.swift in Sources */,
 				DE03591B2DAC489D00178E1D /* LoginViewState.swift in Sources */,
+				DE141A0A2EC772EB00D8B491 /* LgaAPIService.swift in Sources */,
 				DEF3F4EA2DFA053100497C21 /* NewsView.swift in Sources */,
 				DE9A94792DCD0DFE0087581F /* Profile.swift in Sources */,
 				DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */,
@@ -786,7 +796,6 @@
 				DEF3F4CA2DF19DCB00497C21 /* FAQTableViewCell.swift in Sources */,
 				DEF7D9222D95763B000B4C01 /* Coordinator.swift in Sources */,
 				DE0359112DAC431400178E1D /* LoginModuleBuilder.swift in Sources */,
-				DE141A062EC6928500D8B491 /* FloodRiskPredictor.mlpackage in Sources */,
 				DE62C7B22DB0CF5B00A8BDF6 /* SafetyViewModel.swift in Sources */,
 				DE9A6FE22D9499CF00B93655 /* HomeScreenViewController.swift in Sources */,
 				DE2883AA2DBEDE170013B156 /* Evacuation.swift in Sources */,
@@ -807,10 +816,13 @@
 				DE9A949A2DD0B8EC0087581F /* ImageService.swift in Sources */,
 				DEF3F4E32DF76EFC00497C21 /* ReportModuleBuilder.swift in Sources */,
 				DE409EAF2EB617EE00B6F2B7 /* FloodAreaLoader.swift in Sources */,
+				DE82EBD42ED5000E00E6707F /* LocationService.swift in Sources */,
+				DE141A082EC7709E00D8B491 /* LgaModel.swift in Sources */,
 				DE0359282DAC655800178E1D /* RegisterViewModel.swift in Sources */,
 				DEF3F4E12DF6F9FB00497C21 /* ReportService.swift in Sources */,
 				DE03592A2DAC656F00178E1D /* RegisterViewModelProtocol.swift in Sources */,
 				DE0EDDAB2DA158BE00D21C74 /* SplashView.swift in Sources */,
+				DEE8D3EB2EC94D7300438FEA /* FloodRiskPredictor.mlmodel in Sources */,
 				DE62C7B82DB0CF9B00A8BDF6 /* SafetyModuleBuilder.swift in Sources */,
 				DE0EDDB32DA4728100D21C74 /* RegistrationScreenViewController.swift in Sources */,
 				DE62C7AD2DB0C58600A8BDF6 /* MainFLowCoordinator.swift in Sources */,

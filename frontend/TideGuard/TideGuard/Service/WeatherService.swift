@@ -28,35 +28,35 @@ final class WeatherService {
             }
        }
 
-    func fetchFloodAreas(for city: String, completion: @escaping (Result<FloodArea, Error>) -> Void) {
-        let url = "\(baseURL)/api/flood-areas/\(city)"
-        AF.request(url)
-            .validate()
-            .responseDecodable(of: FloodArea.self) { response in
-                switch response.result {
-                case .success(let floodArea):
-                    completion(.success(floodArea))
-                case .failure(let error):
-                    print("Failed to fetch flood areas: \(error.localizedDescription)")
-                    completion(.failure(error))
-                }
-            }
-    }
-
-    func fetchFloodRisk(for city: String, completion: @escaping (Result<FloodRiskResponse, Error>) -> Void) {
-        let url = "\(baseURL)/api/risk/\(city)"
-        AF.request(url)
-            .validate()
-            .responseDecodable(of: FloodRiskResponse.self) { response in
-                switch response.result {
-                case .success(let data):
-                    completion(.success(data))
-                case .failure(let error):
-                    print(error.localizedDescription)
-                    completion(.failure(error))
-                }
-            }
-    }
+//    func fetchFloodAreas(for city: String, completion: @escaping (Result<FloodArea, Error>) -> Void) {
+//        let url = "\(baseURL)/api/flood-areas/\(city)"
+//        AF.request(url)
+//            .validate()
+//            .responseDecodable(of: FloodArea.self) { response in
+//                switch response.result {
+//                case .success(let floodArea):
+//                    completion(.success(floodArea))
+//                case .failure(let error):
+//                    print("Failed to fetch flood areas: \(error.localizedDescription)")
+//                    completion(.failure(error))
+//                }
+//            }
+//    }
+//
+//    func fetchFloodRisk(for city: String, completion: @escaping (Result<FloodRiskResponse, Error>) -> Void) {
+//        let url = "\(baseURL)/api/risk/\(city)"
+//        AF.request(url)
+//            .validate()
+//            .responseDecodable(of: FloodRiskResponse.self) { response in
+//                switch response.result {
+//                case .success(let data):
+//                    completion(.success(data))
+//                case .failure(let error):
+//                    print(error.localizedDescription)
+//                    completion(.failure(error))
+//                }
+//            }
+//    }
 
     func fetchWeather(for city: String, completion: @escaping (Result<WeatherData, Error>) -> Void) {
 

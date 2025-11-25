@@ -17,7 +17,9 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         setUpFunc()
         configureIO()
+        viewModel.loadStateMap()
         viewModel.loadMap()
+        viewModel.loadFullFloodMap()
         viewModel.loadEvacuationData()
         viewModel.fetchWeather()
     }
@@ -26,7 +28,7 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -39,24 +41,79 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func configureIO() {
-        print("calling evacuation")
-//        viewModel.onEvacuationUpdate = { [weak self] text in
-//            self?.safetyView?.evacuationLabel.text = text
-//            print("success")
+
+
+        if viewModel.onFloodLgaUpdate == nil {
+            print("❌ CRITICAL: onFloodLgaUpdate callback is NIL")
+        } else {
+            print("✅ onFloodLgaUpdate callback is connected")
+        }
+
+        if viewModel.onGeoJsonPolygonsReady == nil {
+            print("❌ CRITICAL: onGeoJsonPolygonsReady callback is NIL")
+        } else {
+            print("✅ onGeoJsonPolygonsReady callback is connected")
+        }
+
+//        viewModel.onMapUpdate = { [weak self] region in
+//            self?.safetyView?.mapView.setRegion(region, animated: true)
 //        }
-
-        viewModel.onMapUpdate = { [weak self] center in
-            let region = MKCoordinateRegion(center: center, latitudinalMeters: 50000, longitudinalMeters: 50000)
-            print("The center(location gotten) is \(center)")
+        viewModel.onMapUpdate = { [weak self] region in
+            print("🗺️ MAP UPDATE CALLBACK FIRED")
+            print("   Center: \(region.center.latitude), \(region.center.longitude)")
+            print("   Span: \(region.span.latitudeDelta), \(region.span.longitudeDelta)")
             self?.safetyView?.mapView.setRegion(region, animated: true)
+            print("✅ MAP REGION SET SUCCESSFULLY")
         }
 
-        viewModel.onFloodAreasUpdate = { [weak self] floodAreas in
-            guard let mapView = self?.safetyView?.mapView else { return }
-            mapView.addOverlays(floodAreas)
+        viewModel.onGeoJsonPolygonsReady = { [weak self] polygonsWithRisk in
 //            guard let mapView = self?.safetyView?.mapView else { return }
-//            floodAreas.forEach { mapView.addOverlay($0) }
+//
+//            for (polygon, risk) in polygonsWithRisk {
+//                mapView.addOverlay(polygon)
+//            }
+
+            guard let mapView = self?.safetyView?.mapView else { return }
+
+            print("🎯 ADDING \(polygonsWithRisk.count) POLYGONS TO MAP")
+
+            for (polygon, risk) in polygonsWithRisk {
+                print("   🟦 Adding polygon with risk: \(risk)")
+                mapView.addOverlay(polygon)
+            }
+
+            print("✅ ALL POLYGONS ADDED TO MAP")
+
         }
+
+
+        viewModel.onFloodLgaUpdate = { [weak self] lgas in
+            print("Received \(lgas.count) LGAs")
+            guard let mapView = self?.safetyView?.mapView else { return }
+
+            print("calling lga flood")
+
+            for lga in lgas {
+                let risk = self?.viewModel.predictFloodRisk(for: lga) ?? 0
+                print("Adding circle for \(lga.lgaName): risk \(risk), coord \(lga.latitude),\(lga.longitude)")
+
+                let color: UIColor
+                switch risk {
+                case 0: color = .green
+                case 1: color = .orange
+                case 2: color = .red
+                default: color = .gray
+                }
+
+                let center = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
+                let circle = MKCircle(center: center, radius: 7000)
+                circle.title = "\(risk)"
+
+                mapView.addOverlay(circle)
+            }
+        }
+
+
         viewModel.onSheltersUpdate = { [weak self]  annotations in
             guard let mapView = self?.safetyView?.mapView else { return }
             mapView.addAnnotations(annotations)
@@ -71,63 +128,64 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         }
     }
 
-//    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-//        if let polygon = overlay as? MKPolygon {
-//            let renderer = MKPolygonRenderer(polygon: polygon)
-//            renderer.fillColor = UIColor.red.withAlphaComponent(0.5)
-//            renderer.strokeColor = UIColor.red
-//            renderer.lineWidth = 2
-//            return renderer
-//        }
-//        return MKOverlayRenderer(overlay: overlay)
-//    }
+
 
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if let circle = overlay as? MKCircle {
+
+
+
+        // Handle Polygons (from GeoJSON)
+        if let polygon = overlay as? MKPolygon,
+           let riskString = polygon.title,
+           let risk = Int(riskString) {
+            print("Renderer called for overlay: \(String(describing: overlay.title ?? "unknown")) with risk \(risk)")
+
+            let renderer = MKPolygonRenderer(polygon: polygon)
+
+            switch risk {
+            case 2: renderer.fillColor = UIColor.red.withAlphaComponent(0.7)
+            case 1: renderer.fillColor = UIColor.orange.withAlphaComponent(0.7)
+            default: renderer.fillColor = UIColor.green.withAlphaComponent(0.7)
+            }
+
+            renderer.lineWidth = 1
+            return renderer
+        }
+
+      
+        if let circle = overlay as? MKCircle,
+           let riskString = circle.title,
+           let risk = Int(riskString) {
+
             let renderer = MKCircleRenderer(circle: circle)
 
-            // Color based on flood risk level
-            if let risk = circle.title {
-                switch risk {
-                case "HIGH":
-                    renderer.fillColor = UIColor.red.withAlphaComponent(0.3)
-                    renderer.strokeColor = .red
-                case "MEDIUM":
-                    renderer.fillColor = UIColor.orange.withAlphaComponent(0.3)
-                    renderer.strokeColor = .orange
-                default:
-                    renderer.fillColor = UIColor.green.withAlphaComponent(0.3)
-                    renderer.strokeColor = .green
-                }
-            } else {
-                renderer.fillColor = UIColor.blue.withAlphaComponent(0.2)
-                renderer.strokeColor = .blue
+            switch risk {
+            case 2:
+                renderer.fillColor = UIColor.red.withAlphaComponent(0.3)
+                renderer.strokeColor = UIColor.red
+            case 1:
+                renderer.fillColor = UIColor.orange.withAlphaComponent(0.3)
+                renderer.strokeColor = UIColor.orange
+            default:
+                renderer.fillColor = UIColor.green.withAlphaComponent(0.3)
+                renderer.strokeColor = UIColor.green
             }
 
             renderer.lineWidth = 2
             return renderer
         }
+
         return MKOverlayRenderer(overlay: overlay)
+    }
 
 
-//        if let polygon = overlay as? MKPolygon {
-//                let renderer = MKPolygonRenderer(polygon: polygon)
-//
-//                switch polygon.title ?? "" {
-//                case "HIGH":
-//                    renderer.fillColor = UIColor.red.withAlphaComponent(0.4)
-//                    renderer.strokeColor = .red
-//                case "MEDIUM":
-//                    renderer.fillColor = UIColor.orange.withAlphaComponent(0.4)
-//                    renderer.strokeColor = .orange
-//                default:
-//                    renderer.fillColor = UIColor.green.withAlphaComponent(0.4)
-//                    renderer.strokeColor = .green
-//                }
-//
-//                renderer.lineWidth = 2
-//                return renderer
-//            }
-//            return MKOverlayRenderer(overlay: overlay)
-   }
+    private func addTestOverlay() {
+        print("🧪 ADDING TEST OVERLAY")
+        let testCoordinate = CLLocationCoordinate2D(latitude: 6.5244, longitude: 3.3792)
+        let testCircle = MKCircle(center: testCoordinate, radius: 10000) // 10km radius
+        testCircle.title = "2" // High risk
+        safetyView?.mapView.addOverlay(testCircle)
+        print("✅ TEST OVERLAY ADDED - Should see a red circle in Lagos")
+    }
 }
+
