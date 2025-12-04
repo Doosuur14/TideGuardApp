@@ -1,12 +1,14 @@
 package com.example.tideguard.Services;
 
 
+import com.example.tideguard.Models.EnvData;
 import com.example.tideguard.Models.User;
 import com.example.tideguard.Models.WeatherData;
 import com.example.tideguard.Repositories.UserRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -50,7 +52,6 @@ public class WeatherServiceImpl implements WeatherService {
             double latitude = geocodeResult.getDouble("lat");
             double longitude = geocodeResult.getDouble("lon");
 
-            // Step 3: Fetch weather from Open-Meteo
             String weatherUrl = String.format("https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f&current_weather=true&hourly=relativehumidity_2m", latitude, longitude);
             String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
             System.out.println("Weather Response: " + weatherResponse); // Debug
@@ -72,11 +73,11 @@ public class WeatherServiceImpl implements WeatherService {
                 }
             }
 
-            // Step 4: Map weather code to description and image URL
+
             String description = mapWeatherCodeToDescription(weatherCode);
             String imageUrl = mapWeatherCodeToImageUrl(weatherCode);
 
-            // Step 5: Return the weather data
+
             WeatherData weatherData = new WeatherData();
             weatherData.setDescription(description);
             weatherData.setTemperature(temperature);
@@ -89,6 +90,158 @@ public class WeatherServiceImpl implements WeatherService {
             return createDefaultWeatherData();
         }
     }
+
+    @Override
+    public WeatherData fetchWeatherForLga(String lgaName) {
+        return fetchWeatherForCity(lgaName);
+    }
+
+
+    @Override
+    @Cacheable(value = "envDataCache", key = "#lgaName")
+    public EnvData fetchEnvironmentalData(String lgaName) {
+        try {
+
+            String geocodeUrl = "https://nominatim.openstreetmap.org/search?format=json&q=" + lgaName.replace(" ", "+");
+            String geocodeResponse = restTemplate.getForObject(geocodeUrl, String.class);
+
+            if (geocodeResponse == null || geocodeResponse.trim().isEmpty()) {
+                return createDefaultEnvData();
+            }
+
+            JSONArray geocodeArray = new JSONArray(geocodeResponse);
+            if (geocodeArray.length() == 0) {
+                return createDefaultEnvData();
+            }
+
+            JSONObject geocodeResult = geocodeArray.getJSONObject(0);
+            double latitude = geocodeResult.getDouble("lat");
+            double longitude = geocodeResult.getDouble("lon");
+
+            // Fetch comprehensive weather data with historical data
+            String weatherUrl = String.format(
+                    "https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f&current_weather=true&hourly=precipitation&daily=precipitation_sum&past_days=7&timezone=auto",
+                    latitude, longitude
+            );
+
+            String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
+            if (weatherResponse == null || weatherResponse.trim().isEmpty()) {
+                return createDefaultEnvData();
+            }
+
+            return parseEnvData(weatherResponse);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createDefaultEnvData();
+        }
+    }
+
+    private EnvData parseEnvData(String weatherResponse) {
+        JSONObject weatherJson = new JSONObject(weatherResponse);
+        EnvData data = new EnvData();
+
+        try {
+
+            JSONObject currentWeather = weatherJson.getJSONObject("current_weather");
+            data.setAirTemp(currentWeather.getDouble("temperature"));
+
+
+            if (weatherJson.has("daily")) {
+                JSONObject daily = weatherJson.getJSONObject("daily");
+                JSONArray precipitationSum = daily.getJSONArray("precipitation_sum");
+
+                data.setRainfall(getCurrentRainfall(weatherJson));
+                data.setRainfallLast3Days(sumLastNDays(precipitationSum, 3));
+                data.setRainfallLast7Days(sumLastNDays(precipitationSum, 7));
+            } else {
+                setDefaultRainfallData(data);
+            }
+
+
+            data.setRunoff(calculateRunoff(data.getRainfall(), data.getRainfallLast7Days()));
+            data.setRunoffMaxLast3Days(calculateMaxRunoff(data.getRainfallLast3Days()));
+            data.setSoilMoisture(calculateSoilMoisture(data.getRainfallLast7Days(), data.getAirTemp()));
+            data.setSoilMoistureChange7Days(calculateSoilMoistureChange(data));
+            data.setEvaporation(calculateEvaporation(data.getAirTemp(), data.getRainfall()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return createDefaultEnvData();
+        }
+
+        return data;
+    }
+
+    private double getCurrentRainfall(JSONObject weatherJson) {
+        try {
+            if (weatherJson.has("hourly")) {
+                JSONObject hourly = weatherJson.getJSONObject("hourly");
+                JSONArray precipitation = hourly.getJSONArray("precipitation");
+                // Sum last 6 hours of precipitation
+                return sumLastNHours(precipitation, 6);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
+    private double sumLastNHours(JSONArray hourlyData, int hours) {
+        double sum = 0;
+        int actualHours = Math.min(hours, hourlyData.length());
+        for (int i = 0; i < actualHours; i++) {
+            sum += hourlyData.getDouble(i);
+        }
+        return sum;
+    }
+
+    private double sumLastNDays(JSONArray dailyData, int days) {
+        double sum = 0;
+        int actualDays = Math.min(days, dailyData.length());
+        for (int i = 0; i < actualDays; i++) {
+            sum += dailyData.getDouble(i);
+        }
+        return sum;
+    }
+
+    private double calculateRunoff(double currentRainfall, double rainfall7Days) {
+        double baseRunoff = currentRainfall * 0.3;
+        double antecedentRunoff = rainfall7Days > 50 ? currentRainfall * 0.2 : 0;
+        return Math.max(0, baseRunoff + antecedentRunoff);
+    }
+
+    private double calculateMaxRunoff(double rainfall3Days) {
+        return rainfall3Days * 0.6;
+    }
+
+    private double calculateSoilMoisture(double rainfall7Days, double temperature) {
+        double baseMoisture = Math.min(100, rainfall7Days * 2);
+        double tempEffect = temperature > 30 ? -15 : 0;
+        return Math.max(0, Math.min(100, baseMoisture + tempEffect + 30));
+    }
+
+    private double calculateSoilMoistureChange(EnvData data) {
+        return data.getRainfallLast7Days() - data.getEvaporation();
+    }
+
+    private double calculateEvaporation(double temperature, double rainfall) {
+
+        double baseEvap = temperature * 0.1;
+        return rainfall > 0 ? baseEvap * 0.5 : baseEvap;
+    }
+
+    private void setDefaultRainfallData(EnvData data) {
+        data.setRainfall(0);
+        data.setRainfallLast3Days(0);
+        data.setRainfallLast7Days(0);
+    }
+
+    private EnvData createDefaultEnvData() {
+        return new EnvData(0, 0, 0, 0, 0, 50, 0, 25, 0);
+    }
+
+
 
 
 
@@ -117,7 +270,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     private String mapWeatherCodeToImageUrl(int code) {
         switch (code) {
-            // Clear sky
+           // Clear sky
             case 0: return "https://openweathermap.org/img/wn/01d@2x.png";
             // Partly cloudy
             case 1: case 2: case 3: return "https://openweathermap.org/img/wn/02d@2x.png";

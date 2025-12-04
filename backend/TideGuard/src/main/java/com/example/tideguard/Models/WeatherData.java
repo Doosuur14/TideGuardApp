@@ -8,4 +8,5 @@ public class WeatherData {
     private Double temperature;
     private Double humidity;
     private String imageUrl;
+    private Double precipitation;
 }
