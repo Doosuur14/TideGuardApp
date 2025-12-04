@@ -16,7 +16,7 @@ class SafetyViewModel {
     private var shelters: [String] = []
     private var routes: [String] = []
     private let model = FloodRiskPredictor()
-    private let locationService = LocationService.shared // Add this
+    private let locationService = LocationService.shared
 
     var onEvacuationUpdate: ((String) -> Void)?
     var onSheltersUpdate: (([MKAnnotation]) -> Void)?
@@ -24,27 +24,6 @@ class SafetyViewModel {
     var onMapUpdate: ((MKCoordinateRegion) -> Void)?
     var onFloodLgaUpdate: (([LgaModel]) -> Void)?
     var onWeatherUpdate: ((String, Double, Double, String?) -> Void)?
-
-
-    func loadEvacuationData() {
-        print("gooooooo")
-        let user = AuthService.shared.getCurrentUser()
-        let userCity = user?.city
-        print("User Details for evacuationdata: \(String(describing: user))")
-        print("User city for evacuationdata: \(String(describing: userCity))")
-
-        WeatherService.shared.fetchEvacuationData (for: userCity ?? "") { [weak self] result in
-            switch result {
-            case .success(let evacuation):
-                let displayText = "Shelters in \(evacuation.city):\n\(evacuation.shelters)\nRoute:\n\(evacuation.routes)"
-                self?.evacuationData = displayText
-                UserDefaults.standard.set(displayText, forKey: "evacuationData")
-                self?.onEvacuationUpdate?(displayText)
-            case .failure(let error):
-                self?.onEvacuationUpdate?("Failed to load evacuation data: \(error.localizedDescription)")
-            }
-        }
-    }
 
 
 
@@ -95,24 +74,22 @@ class SafetyViewModel {
 
 
     func loadFullFloodMap() {
-        print("🌍 Loading Nigeria LGA GeoJSON + Env Data…")
+        print("Loading Nigeria LGA GeoJSON + Env Data…")
 
-        // 1️⃣ Fetch environmental data
         LgaAPIService.shared.getAllLgas { [weak self] lgaData in
             guard let self = self, let lgaData = lgaData else { return }
 
-            // 2️⃣ Fetch the geojson
+
             LgaAPIService.shared.getNigeriaGeoJSON { geoJson in
                 guard let geoJson = geoJson else { return }
 
-                // 3️⃣ Decode GeoJSON
+
                 let decoder = MKGeoJSONDecoder()
 
                 do {
                     let features = try decoder.decode(geoJson)
                         .compactMap { $0 as? MKGeoJSONFeature }
 
-                    // 4️⃣ Process polygons + match flood data
                     let results = self.processFloodMap(features: features, lgaData: lgaData)
 
                     DispatchQueue.main.async {
@@ -120,7 +97,7 @@ class SafetyViewModel {
                     }
 
                 } catch {
-                    print("❌ Failed to decode GeoJSON: \(error)")
+                    print("Failed to decode GeoJSON: \(error)")
                 }
             }
         }
@@ -138,7 +115,7 @@ class SafetyViewModel {
                   let lgaName = propertiesJSON["lga_name"] as? String else {
                 continue
             }
-            print("⚠️ Missing lga_name in feature properties: \(propertiesJSON)")
+            print("Missing lga_name in feature properties: \(propertiesJSON)")
 
             if let lga = lgaData.first(where: { $0.lgaName.caseInsensitiveCompare(lgaName) == .orderedSame }) {
 
@@ -147,7 +124,7 @@ class SafetyViewModel {
 
                 for geometry in feature.geometry {
                     if let polygon = geometry as? MKPolygon {
-                        polygon.title = "\(risk)"  // attach risk
+                        polygon.title = "\(risk)"
                         results.append((polygon, risk))
                     }
                 }
@@ -189,10 +166,10 @@ class SafetyViewModel {
 
 
     func loadStateMap() {
-        print("🗺️ Loading map region using LocationService")
+        print("Loading map region using LocationService")
         let user = AuthService.shared.getCurrentUser()
         guard let state = user?.city else {
-            print("❌ No user state, using Nigeria region")
+            print("No user state, using Nigeria region")
             let nigeriaRegion = locationService.getNigeriaRegion()
             DispatchQueue.main.async {
                 self.onMapUpdate?(nigeriaRegion)
@@ -200,25 +177,11 @@ class SafetyViewModel {
             return
         }
 
-        print("📍 User state: \(state)")
+        print("User state: \(state)")
 
-        // Use hardcoded Lagos coordinates
-//        if state.lowercased() == "lagos" {
-//            print("🎯 USING HARDCODED LAGOS COORDINATES")
-//            let lagosCoordinate = CLLocationCoordinate2D(latitude: 6.5244, longitude: 3.3792)
-//            let lagosRegion = MKCoordinateRegion(
-//                center: lagosCoordinate,
-//                latitudinalMeters: 50000,
-//                longitudinalMeters: 50000
-//            )
-//            DispatchQueue.main.async {
-//                self.onMapUpdate?(lagosRegion) // ✅ Fixed
-//            }
-//            return
-//        }
 
-        // For other states, try geocoding
-        print("📍 Getting coordinates for state: \(state)")
+
+        print("Getting coordinates for state: \(state)")
         locationService.getCoordinate(for: state) { [weak self] result in
             switch result {
             case .success(let coordinate):

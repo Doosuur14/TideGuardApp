@@ -125,6 +125,7 @@ final class LoginScreenView: UIView {
 
     private func setupGoogle() {
         addSubview(continueWithGoogle)
+//        continueWithGoogle.addSubview(continueWithGoogle)
         continueWithGoogle.setTitle("Continue With Google", for: .normal)
         continueWithGoogle.setTitleColor(.subtitle, for: .normal)
         continueWithGoogle.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .light)
@@ -171,14 +172,22 @@ final class LoginScreenView: UIView {
 
 
     private func setupGoogleImage() {
-        addSubview(googleImage)
+       // addSubview(googleImage)
+        continueWithGoogle.addSubview(googleImage)
         googleImage.image = UIImage(named: "googleimage")
+        googleImage.contentMode = .scaleAspectFit
         googleImage.alpha = 0.5
         googleImage.contentMode = .scaleAspectFit
+//        googleImage.snp.makeConstraints { make in
+//            make.edges.equalTo(continueWithGoogle).inset(15)
+//            make.leading.equalToSuperview().offset(-200)
+//        }
         googleImage.snp.makeConstraints { make in
-            make.edges.equalTo(continueWithGoogle).inset(15)
-            make.leading.equalToSuperview().offset(-200)
+            make.leading.equalToSuperview().offset(20)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(CGSize(width: 28, height: 28))
         }
+        continueWithGoogle.titleEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: -16)
     }
 
 

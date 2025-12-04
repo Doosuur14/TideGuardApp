@@ -17,10 +17,10 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         setUpFunc()
         configureIO()
+
         viewModel.loadStateMap()
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
-        viewModel.loadEvacuationData()
         viewModel.fetchWeather()
     }
 
@@ -42,74 +42,73 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
     private func configureIO() {
 
-
         if viewModel.onFloodLgaUpdate == nil {
-            print("❌ CRITICAL: onFloodLgaUpdate callback is NIL")
+            print("CRITICAL: onFloodLgaUpdate callback is NIL")
         } else {
-            print("✅ onFloodLgaUpdate callback is connected")
+            print("onFloodLgaUpdate callback is connected")
         }
 
         if viewModel.onGeoJsonPolygonsReady == nil {
-            print("❌ CRITICAL: onGeoJsonPolygonsReady callback is NIL")
+            print("CRITICAL: onGeoJsonPolygonsReady callback is NIL")
         } else {
-            print("✅ onGeoJsonPolygonsReady callback is connected")
+            print("onGeoJsonPolygonsReady callback is connected")
         }
 
-//        viewModel.onMapUpdate = { [weak self] region in
-//            self?.safetyView?.mapView.setRegion(region, animated: true)
-//        }
+
         viewModel.onMapUpdate = { [weak self] region in
-            print("🗺️ MAP UPDATE CALLBACK FIRED")
-            print("   Center: \(region.center.latitude), \(region.center.longitude)")
-            print("   Span: \(region.span.latitudeDelta), \(region.span.longitudeDelta)")
+            print("MAP UPDATE CALLBACK FIRED")
+            print("Center: \(region.center.latitude), \(region.center.longitude)")
+            print("Span: \(region.span.latitudeDelta), \(region.span.longitudeDelta)")
             self?.safetyView?.mapView.setRegion(region, animated: true)
-            print("✅ MAP REGION SET SUCCESSFULLY")
+            print("MAP REGION SET SUCCESSFULLY")
         }
 
         viewModel.onGeoJsonPolygonsReady = { [weak self] polygonsWithRisk in
-//            guard let mapView = self?.safetyView?.mapView else { return }
-//
-//            for (polygon, risk) in polygonsWithRisk {
-//                mapView.addOverlay(polygon)
-//            }
 
             guard let mapView = self?.safetyView?.mapView else { return }
 
-            print("🎯 ADDING \(polygonsWithRisk.count) POLYGONS TO MAP")
+            print("ADDING \(polygonsWithRisk.count) POLYGONS TO MAP")
 
             for (polygon, risk) in polygonsWithRisk {
-                print("   🟦 Adding polygon with risk: \(risk)")
+                print("Adding polygon with risk: \(risk)")
                 mapView.addOverlay(polygon)
             }
 
-            print("✅ ALL POLYGONS ADDED TO MAP")
+            print("ALL POLYGONS ADDED TO MAP")
 
         }
 
 
         viewModel.onFloodLgaUpdate = { [weak self] lgas in
-            print("Received \(lgas.count) LGAs")
+            print("Received \(lgas.count) LGAs with flood risk")
             guard let mapView = self?.safetyView?.mapView else { return }
 
-            print("calling lga flood")
+            mapView.removeAnnotations(mapView.annotations)
+
+            var annotations: [MKPointAnnotation] = []
 
             for lga in lgas {
                 let risk = self?.viewModel.predictFloodRisk(for: lga) ?? 0
-                print("Adding circle for \(lga.lgaName): risk \(risk), coord \(lga.latitude),\(lga.longitude)")
 
-                let color: UIColor
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
+                annotation.title = lga.lgaName
+
+
                 switch risk {
-                case 0: color = .green
-                case 1: color = .orange
-                case 2: color = .red
-                default: color = .gray
+                case 2:
+                    annotation.subtitle = "high"
+                case 1:
+                    annotation.subtitle = "medium"
+                default:
+                    annotation.subtitle = "low"
                 }
 
-                let center = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
-                let circle = MKCircle(center: center, radius: 7000)
-                circle.title = "\(risk)"
+                annotations.append(annotation)
+            }
 
-                mapView.addOverlay(circle)
+            DispatchQueue.main.async {
+                mapView.addAnnotations(annotations)
             }
         }
 
@@ -129,63 +128,51 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     }
 
 
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
 
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        guard !(annotation is MKUserLocation) else { return nil }
 
+        let identifier = "floodRiskDot"
 
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
-        // Handle Polygons (from GeoJSON)
-        if let polygon = overlay as? MKPolygon,
-           let riskString = polygon.title,
-           let risk = Int(riskString) {
-            print("Renderer called for overlay: \(String(describing: overlay.title ?? "unknown")) with risk \(risk)")
-
-            let renderer = MKPolygonRenderer(polygon: polygon)
-
-            switch risk {
-            case 2: renderer.fillColor = UIColor.red.withAlphaComponent(0.7)
-            case 1: renderer.fillColor = UIColor.orange.withAlphaComponent(0.7)
-            default: renderer.fillColor = UIColor.green.withAlphaComponent(0.7)
-            }
-
-            renderer.lineWidth = 1
-            return renderer
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            annotationView?.canShowCallout = true
+        } else {
+            annotationView?.annotation = annotation
         }
 
-      
-        if let circle = overlay as? MKCircle,
-           let riskString = circle.title,
-           let risk = Int(riskString) {
 
-            let renderer = MKCircleRenderer(circle: circle)
-
-            switch risk {
-            case 2:
-                renderer.fillColor = UIColor.red.withAlphaComponent(0.3)
-                renderer.strokeColor = UIColor.red
-            case 1:
-                renderer.fillColor = UIColor.orange.withAlphaComponent(0.3)
-                renderer.strokeColor = UIColor.orange
-            default:
-                renderer.fillColor = UIColor.green.withAlphaComponent(0.3)
-                renderer.strokeColor = UIColor.green
-            }
-
-            renderer.lineWidth = 2
-            return renderer
+        let risk = annotation.subtitle ?? "low"
+        let color: UIColor
+        switch risk {
+        case "high":
+            color = UIColor(red: 0.85, green: 0.05, blue: 0.05, alpha: 1.0)
+        case "medium":
+            color = UIColor.orange
+        default:
+            color = UIColor(red: 0.05, green: 0.75, blue: 0.05, alpha: 1.0)
         }
 
-        return MKOverlayRenderer(overlay: overlay)
-    }
+
+        let size = CGSize(width: 20, height: 20)
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        let context = UIGraphicsGetCurrentContext()!
 
 
-    private func addTestOverlay() {
-        print("🧪 ADDING TEST OVERLAY")
-        let testCoordinate = CLLocationCoordinate2D(latitude: 6.5244, longitude: 3.3792)
-        let testCircle = MKCircle(center: testCoordinate, radius: 10000) // 10km radius
-        testCircle.title = "2" // High risk
-        safetyView?.mapView.addOverlay(testCircle)
-        print("✅ TEST OVERLAY ADDED - Should see a red circle in Lagos")
+        context.setFillColor(UIColor.white.cgColor)
+        context.fillEllipse(in: CGRect(origin: .zero, size: size))
+
+
+        context.setFillColor(color.cgColor)
+        context.fillEllipse(in: CGRect(x: 3, y: 3, width: 14, height: 14))
+
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+
+        annotationView?.image = image
+
+        return annotationView
     }
 }
-

@@ -11,7 +11,8 @@ import CoreData
 
 final class AuthService {
     static let shared = AuthService()
-    private let baseURL = "http://localhost:8080/api"
+    private let baseURL = "http://192.168.31.202:8080/api"
+//    private let baseURL = "http://127.0.0.1:8080/api"
     private var context: NSManagedObjectContext {
         return CoreDataManager.shared.persistentContainer.viewContext
     }
@@ -124,29 +125,78 @@ final class AuthService {
     }
 }
 
+//
+//private func saveUserToCoreData(id: Int64,
+//                                firstName: String,
+//                                lastName: String,
+//                                email: String,
+//                                password: String,
+//                                city: String,
+//                                completion: @escaping((Result<User, Error>) -> Void)) {
+//    let context = CoreDataManager.shared.persistentContainer.viewContext
+//    let user = User(context: context)
+//    user.userId = id
+//    user.firstName = firstName
+//    user.lastName = lastName
+//    user.email = email
+//    user.password = password
+//    user.city = city
+//
+//    do {
+//        try context.save()
+//        print("User successfully added to Core Data!")
+//        completion(.success(user))
+//    } catch {
+//        print("Failed to save user to Core Data: \(error)")
+//        completion(.failure(error))
+//    }
+//}
 
-private func saveUserToCoreData(id: Int64,
-                                firstName: String,
-                                lastName: String,
-                                email: String,
-                                password: String,
-                                city: String,
-                                completion: @escaping((Result<User, Error>) -> Void)) {
+
+
+private func saveUserToCoreData(
+    id: Int64,
+    firstName: String,
+    lastName: String,
+    email: String,
+    password: String,
+    city: String,
+    completion: @escaping (Result<User, Error>) -> Void
+) {
     let context = CoreDataManager.shared.persistentContainer.viewContext
-    let user = User(context: context)
-    user.userId = id
-    user.firstName = firstName
-    user.lastName = lastName
-    user.email = email
-    user.password = password
-    user.city = city
+
+    let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
+    fetchRequest.predicate = NSPredicate(format: "email ==[c] %@", email.lowercased())
+    fetchRequest.fetchLimit = 1
 
     do {
+        let results = try context.fetch(fetchRequest)
+
+        let user: User
+        if let existingUser = results.first {
+            // User already exists → just UPDATE it (no delete, no duplicate)
+            print("User already in Core Data → updating details")
+            user = existingUser
+        } else {
+            // First time → create new
+            print("First time saving user to Core Data")
+            user = User(context: context)
+            user.email = email.lowercased()
+        }
+
+        // Always update these fields (in case city/name changed)
+        user.userId = id
+        user.firstName = firstName
+        user.lastName = lastName
+        user.password = password
+        user.city = city
+
         try context.save()
-        print("User successfully added to Core Data!")
+        print("User synced to Core Data successfully")
         completion(.success(user))
+
     } catch {
-        print("Failed to save user to Core Data: \(error)")
+        print("Failed to sync user to Core Data: \(error)")
         completion(.failure(error))
     }
 }

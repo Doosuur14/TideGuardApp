@@ -10,10 +10,9 @@ import MapKit
 import SnapKit
 
 class SafetyView: UIView {
-    lazy var segmentedControl: UISegmentedControl = UISegmentedControl(items: ["Map", "Evacuation", "Weather"])
+    lazy var segmentedControl: UISegmentedControl = UISegmentedControl(items: ["Map","Weather"])
     lazy var containerView: UIView = UIView()
     lazy var mapView: MKMapView = MKMapView()
-//    lazy var evacuationLabel: UILabel = UILabel()
     lazy var weatherContainer: UIView = UIView()
     lazy var weatherImageView: UIImageView = UIImageView()
     lazy var weatherDescriptionLabel: UILabel = UILabel()
@@ -33,8 +32,8 @@ class SafetyView: UIView {
         setUpSegments()
         setUpContainer()
         setUpMap()
+        addLegend(to:mapView)
         setUpLegendView()
-//        setUpEvacuationLabel()
         setUpWeatherContainer()
 
     }
@@ -112,21 +111,6 @@ class SafetyView: UIView {
         }
     }
 
-
-//    private func setUpEvacuationLabel() {
-//        containerView.addSubview(evacuationLabel)
-//        evacuationLabel.font = .systemFont(ofSize: 15, weight: .bold)
-//        evacuationLabel.textColor = UIColor(named: "MainColor")
-//        evacuationLabel.numberOfLines = 0
-//        evacuationLabel.isHidden = true
-//        evacuationLabel.snp.makeConstraints { make in
-//            make.top.equalTo(containerView.snp.top).offset(20)
-//            make.leading.trailing.equalTo(containerView).inset(16)
-//            make.bottom.lessThanOrEqualTo(containerView.snp.bottom).inset(16)
-//        }
-//    }
-
-
     private func setUpWeatherContainer() {
         containerView.addSubview(weatherContainer)
         weatherContainer.backgroundColor = UIColor(named: "BackgroundColor")?.withAlphaComponent(0.9)
@@ -174,18 +158,8 @@ class SafetyView: UIView {
     }
 
     @objc private func switchSection(_ sender: UISegmentedControl) {
-        //        mapView.isHidden = true
-        //        evacuationLabel.isHidden = true
-        //        weatherContainer.isHidden = true
-        //
-        //        switch sender.selectedSegmentIndex {
-        //        case 0: mapView.isHidden = false
-        //        case 1: evacuationLabel.isHidden = false
-        //        case 2: weatherContainer.isHidden = false
-        //        default: break
-        //        }
+
         mapView.isHidden = true
-//        evacuationLabel.isHidden = true
         weatherContainer.isHidden = true
         subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = true } }
 
@@ -194,10 +168,7 @@ class SafetyView: UIView {
             mapView.isHidden = false
             subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = false } }
         case 1:
-//            evacuationLabel.isHidden = false
             weatherContainer.isHidden = false
-//        case 2:
-//            weatherContainer.isHidden = false
         default: break
         }
     }
@@ -216,5 +187,55 @@ class SafetyView: UIView {
                 print("Failed to load weather image: \(error?.localizedDescription ?? "No error")")
             }
         }.resume()
+    }
+
+    private func addLegend(to mapView: MKMapView) {
+        let legend = UIStackView()
+        legend.axis = .vertical
+        legend.spacing = 8
+        legend.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        legend.layer.cornerRadius = 12
+        legend.layer.borderWidth = 1
+        legend.layer.borderColor = UIColor.white.cgColor
+        legend.isLayoutMarginsRelativeArrangement = true
+        legend.layoutMargins = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+
+        let title = UILabel()
+        title.text = "Flood Risk"
+        title.textColor = .white
+        title.font = .boldSystemFont(ofSize: 16)
+        legend.addArrangedSubview(title)
+
+        let risks = [
+            ("High", UIColor(red: 0.9, green: 0.1, blue: 0.1, alpha: 1.0)),
+            ("Medium", UIColor.orange),
+            ("Low", UIColor(red: 0.1, green: 0.8, blue: 0.1, alpha: 1.0))
+        ]
+
+        for (text, color) in risks {
+            let row = UIStackView()
+            row.spacing = 10
+
+            let dot = UIView()
+            dot.backgroundColor = color
+            dot.layer.cornerRadius = 8
+            dot.snp.makeConstraints { $0.width.height.equalTo(16) }
+
+            let label = UILabel()
+            label.text = text
+            label.textColor = .white
+            label.font = .systemFont(ofSize: 14)
+
+            row.addArrangedSubview(dot)
+            row.addArrangedSubview(label)
+            legend.addArrangedSubview(row)
+        }
+
+        addSubview(legend)
+        legend.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            legend.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -150),
+            legend.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
+        ])
     }
 }

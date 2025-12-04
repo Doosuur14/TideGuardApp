@@ -10,57 +10,39 @@ import Foundation
 class LgaAPIService {
 
     static let shared = LgaAPIService()
-    private let baseURL = "http://localhost:8080"
-
-//    func getLgasByState( for state: String, completion: @escaping ([LgaModel]?) -> Void) {
-//        let urlString = "\(baseURL)/lgas/\(state)"
-//        guard let url = URL(string: urlString) else {
-//            completion(nil)
-//            return
-//        }
-//
-//        URLSession.shared.dataTask(with: url) { data, response, error in
-//            if let data = data {
-//                let lgas = try? JSONDecoder().decode([LgaModel].self, from: data)
-//                print("Received from backend for api lgaservice \(String(describing: lgas?.count)) LGAs")
-//                completion(lgas)
-//            } else {
-//                completion(nil)
-//            }
-//        }.resume()
-//    }
+    private let baseURL =  "http://192.168.31.202:8080"
 
 
     func getLgasByState( for state: String, completion: @escaping ([LgaModel]?) -> Void) {
         let urlString = "\(baseURL)/lgas/\(state)"
-        print("🌐 BACKEND CALL: Fetching LGAs for state: \(state)")
-        print("🔗 URL: \(urlString)")
+        print("BACKEND CALL: Fetching LGAs for state: \(state)")
+        print("URL: \(urlString)")
 
         guard let url = URL(string: urlString) else {
-            print("❌ BACKEND ERROR: Invalid URL")
+            print("BACKEND ERROR: Invalid URL")
             completion(nil)
             return
         }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
-            print("📡 BACKEND RESPONSE RECEIVED")
+            print("BACKEND RESPONSE RECEIVED")
 
             if let error = error {
-                print("❌ NETWORK ERROR: \(error.localizedDescription)")
+                print("NETWORK ERROR: \(error.localizedDescription)")
                 completion(nil)
                 return
             }
 
             if let httpResponse = response as? HTTPURLResponse {
-                print("📡 HTTP STATUS: \(httpResponse.statusCode)")
+                print("HTTP STATUS: \(httpResponse.statusCode)")
             }
 
             if let data = data {
-                print("📦 RAW DATA RECEIVED: \(data.count) bytes")
+                print("RAW DATA RECEIVED: \(data.count) bytes")
 
                 do {
                     let lgas = try JSONDecoder().decode([LgaModel].self, from: data)
-                    print("✅ BACKEND SUCCESS: Received \(lgas.count) LGAs")
+                    print("BACKEND SUCCESS: Received \(lgas.count) LGAs")
 
                    
                     for (index, lga) in lgas.prefix(3).enumerated() {
@@ -69,21 +51,15 @@ class LgaAPIService {
 
                     completion(lgas)
                 } catch {
-                    print("❌ JSON DECODE ERROR: \(error)")
+                    print("JSON DECODE ERROR: \(error)")
                     completion(nil)
                 }
             } else {
-                print("❌ BACKEND ERROR: No data received")
+                print("BACKEND ERROR: No data received")
                 completion(nil)
             }
         }.resume()
     }
-
-
-
-
-
-
 
 
 

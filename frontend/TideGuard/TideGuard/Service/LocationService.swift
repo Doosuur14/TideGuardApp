@@ -14,26 +14,6 @@ class LocationService {
 
     private let geocoder = CLGeocoder()
 
-//    func getCoordinate(for state: String, completion: @escaping (Result<CLLocationCoordinate2D, Error>) -> Void) {
-//        let address = "\(state), Nigeria"
-//
-//        geocoder.geocodeAddressString(address) { placemarks, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//
-//            guard let location = placemarks?.first?.location else {
-//                completion(.failure(LocationError.noLocationFound))
-//                return
-//            }
-//
-//            completion(.success(location.coordinate))
-//        }
-//    }
-
-
-
     func getCoordinate(for state: String, completion: @escaping (Result<CLLocationCoordinate2D, Error>) -> Void) {
         let address = "\(state), Nigeria"
         print("🗺️ GEOCODING START: Looking up '\(address)'")
@@ -42,8 +22,8 @@ class LocationService {
             print("🗺️ GEOCODING COMPLETE:")
 
             if let error = error {
-                print("❌ GEOCODING ERROR: \(error.localizedDescription)")
-                print("   Error code: \((error as NSError).code)")
+                print("GEOCODING ERROR: \(error.localizedDescription)")
+                print("rror code: \((error as NSError).code)")
                 completion(.failure(error))
                 return
             }
@@ -63,12 +43,12 @@ class LocationService {
             }
 
             guard let location = placemarks?.first?.location else {
-                print("❌ GEOCODING: No location found in placemarks")
+                print("GEOCODING: No location found in placemarks")
                 completion(.failure(LocationError.noLocationFound))
                 return
             }
 
-            print("✅ GEOCODING SUCCESS: Found coordinate \(location.coordinate.latitude), \(location.coordinate.longitude)")
+            print("GEOCODING SUCCESS: Found coordinate \(location.coordinate.latitude), \(location.coordinate.longitude)")
             completion(.success(location.coordinate))
         }
     }
