@@ -74,5 +74,10 @@ extension AlertManager {
                        message: "Upload failed!")
     }
 
+    func showErrorOnSafetyPage(viewCon: UIViewController) {
+        self.showAlert(viewController: viewCon, title: "Error!",
+                       message: "Failed to load map.!")
+    }
+
 }
 

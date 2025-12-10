@@ -7,21 +7,26 @@
 
 import UIKit
 import MapKit
+import Combine
+
+
 
 class SafetyViewController: UIViewController, MKMapViewDelegate {
 
     var safetyView: SafetyView?
     let viewModel: SafetyViewModel
+    private var cancellables: Set<AnyCancellable> = []
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpFunc()
         configureIO()
-
+        
         viewModel.loadStateMap()
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
-        viewModel.fetchWeather()
+
     }
 
     init(viewModel: SafetyViewModel) {
@@ -41,91 +46,82 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     }
 
     private func configureIO() {
-
-        if viewModel.onFloodLgaUpdate == nil {
-            print("CRITICAL: onFloodLgaUpdate callback is NIL")
-        } else {
-            print("onFloodLgaUpdate callback is connected")
-        }
-
-        if viewModel.onGeoJsonPolygonsReady == nil {
-            print("CRITICAL: onGeoJsonPolygonsReady callback is NIL")
-        } else {
-            print("onGeoJsonPolygonsReady callback is connected")
-        }
-
-
-        viewModel.onMapUpdate = { [weak self] region in
-            print("MAP UPDATE CALLBACK FIRED")
-            print("Center: \(region.center.latitude), \(region.center.longitude)")
-            print("Span: \(region.span.latitudeDelta), \(region.span.longitudeDelta)")
-            self?.safetyView?.mapView.setRegion(region, animated: true)
-            print("MAP REGION SET SUCCESSFULLY")
-        }
-
-        viewModel.onGeoJsonPolygonsReady = { [weak self] polygonsWithRisk in
-
-            guard let mapView = self?.safetyView?.mapView else { return }
-
-            print("ADDING \(polygonsWithRisk.count) POLYGONS TO MAP")
-
-            for (polygon, risk) in polygonsWithRisk {
-                print("Adding polygon with risk: \(risk)")
-                mapView.addOverlay(polygon)
-            }
-
-            print("ALL POLYGONS ADDED TO MAP")
-
-        }
-
-
-        viewModel.onFloodLgaUpdate = { [weak self] lgas in
-            print("Received \(lgas.count) LGAs with flood risk")
-            guard let mapView = self?.safetyView?.mapView else { return }
-
-            mapView.removeAnnotations(mapView.annotations)
-
-            var annotations: [MKPointAnnotation] = []
-
-            for lga in lgas {
-                let risk = self?.viewModel.predictFloodRisk(for: lga) ?? 0
-
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
-                annotation.title = lga.lgaName
-
-
-                switch risk {
-                case 2:
-                    annotation.subtitle = "high"
-                case 1:
-                    annotation.subtitle = "medium"
-                default:
-                    annotation.subtitle = "low"
+        viewModel.$state
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                
+                switch state {
+                    
+                case .idle:
+                    break
+                    
+                case .loading:
+                    self.safetyView?.showLoadingSpinner()
+                    
+                case .loadedLGAs(let lgas):
+                    self.safetyView?.hideLoadingSpinner()
+                    self.updateAnnotations(lgas)
+                    
+                case .polygonsReady(let polygons):
+                    self.addPolygonsToMap(polygons)
+                    
+                case .weatherLoaded(let desc, let temp, let humidity, let imageUrl):
+                    self.updateWeather(desc: desc, temp: temp, humidity: humidity, imageUrl: imageUrl)
+                    
+                case .onMapUpdate(let region):
+                    self.safetyView?.mapView.setRegion(region, animated: true)
+                    
+                case .error(let message):
+                    self.safetyView?.hideLoadingSpinner()
+                    self.showError("Failed to load anything")
                 }
-
-                annotations.append(annotation)
             }
 
-            DispatchQueue.main.async {
-                mapView.addAnnotations(annotations)
-            }
-        }
-
-
-        viewModel.onSheltersUpdate = { [weak self]  annotations in
-            guard let mapView = self?.safetyView?.mapView else { return }
-            mapView.addAnnotations(annotations)
-
-        }
-        viewModel.onWeatherUpdate = { [weak self] description, temperature, humidity, imageURL in
-            print("Updating weather UI - Description: \(description), Temp: \(temperature), Humidity: \(humidity), Image: \(imageURL ?? "None")")
-            self?.safetyView?.weatherDescriptionLabel.text = "Weather: \(description)"
-            self?.safetyView?.temperatureLabel.text = "Temp: \(String(format: "%.1f", temperature))°C"
-            self?.safetyView?.humidityLabel.text = "Humidity: \(String(format: "%.0f", humidity))%"
-            self?.safetyView?.updateWeatherImage(with: imageURL)
-        }
+            .store(in: &cancellables)
     }
+
+
+
+    private func updateAnnotations(_ lgas: [LgaModel]) {
+        guard let mapView = safetyView?.mapView else { return }
+
+        mapView.removeAnnotations(mapView.annotations)
+
+        let annotations = lgas.map { lga -> MKPointAnnotation in
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
+            annotation.title = lga.lgaName
+
+            let risk = viewModel.predictFloodRisk(for: lga)
+
+            annotation.subtitle = (risk == 2 ? "high" : risk == 1 ? "medium" : "low")
+            return annotation
+        }
+
+        mapView.addAnnotations(annotations)
+    }
+
+    private func addPolygonsToMap(_ polygons: [(MKPolygon, Int)]) {
+        guard let mapView = safetyView?.mapView else { return }
+        polygons.forEach { mapView.addOverlay($0.0) }
+    }
+
+    private func updateWeather(desc: String, temp: Double, humidity: Double, imageUrl: String?) {
+        safetyView?.weatherDescriptionLabel.text = "Weather: \(desc)"
+        safetyView?.temperatureLabel.text = "Temp: \(String(format: "%.1f", temp))°C"
+        safetyView?.humidityLabel.text = "Humidity: \(Int(humidity))%"
+
+        safetyView?.updateWeatherImage(with: imageUrl)
+    }
+
+
+    private func showError(_ message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
 
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {

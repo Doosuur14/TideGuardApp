@@ -18,6 +18,7 @@ class SafetyView: UIView {
     lazy var weatherDescriptionLabel: UILabel = UILabel()
     lazy var temperatureLabel: UILabel = UILabel()
     lazy var humidityLabel: UILabel = UILabel()
+    lazy var activityIndicator = UIActivityIndicatorView(style: .large)
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,6 +36,7 @@ class SafetyView: UIView {
         addLegend(to:mapView)
         setUpLegendView()
         setUpWeatherContainer()
+        setupActivityIndicator()
 
     }
 
@@ -238,4 +240,26 @@ class SafetyView: UIView {
             legend.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
         ])
     }
+
+    private func setupActivityIndicator() {
+        addSubview(activityIndicator)
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.color = .gray
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+
+    }
+
+    func showLoadingSpinner() {
+            activityIndicator.startAnimating()
+            isUserInteractionEnabled = false
+        }
+
+        func hideLoadingSpinner() {
+            activityIndicator.stopAnimating()
+            isUserInteractionEnabled = true
+        }
 }
