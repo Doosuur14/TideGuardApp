@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 import java.util.Optional;
 
@@ -99,30 +102,50 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     @Cacheable(value = "envDataCache", key = "#lgaName")
-    public EnvData fetchEnvironmentalData(String lgaName) {
+    public EnvData fetchEnvironmentalData(double latitude, double longitude) {
+
         try {
 
-            String geocodeUrl = "https://nominatim.openstreetmap.org/search?format=json&q=" + lgaName.replace(" ", "+");
-            String geocodeResponse = restTemplate.getForObject(geocodeUrl, String.class);
+//            String geocodeUrl = "https://nominatim.openstreetmap.org/search?format=json&q=" + lgaName.replace(" ", "+");
+//            String geocodeResponse = restTemplate.getForObject(geocodeUrl, String.class);
+//
+//            if (geocodeResponse == null || geocodeResponse.trim().isEmpty()) {
+//                return createDefaultEnvData();
+//            }
+//
+//            JSONArray geocodeArray = new JSONArray(geocodeResponse);
+//            if (geocodeArray.length() == 0) {
+//                return createDefaultEnvData();
+//            }
+//
+//            JSONObject geocodeResult = geocodeArray.getJSONObject(0);
+//            double latitude = geocodeResult.getDouble("lat");
+//            double longitude = geocodeResult.getDouble("lon");
 
-            if (geocodeResponse == null || geocodeResponse.trim().isEmpty()) {
-                return createDefaultEnvData();
-            }
+            LocalDate end = LocalDate.now();
+            LocalDate start = end.minusDays(6);
 
-            JSONArray geocodeArray = new JSONArray(geocodeResponse);
-            if (geocodeArray.length() == 0) {
-                return createDefaultEnvData();
-            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-            JSONObject geocodeResult = geocodeArray.getJSONObject(0);
-            double latitude = geocodeResult.getDouble("lat");
-            double longitude = geocodeResult.getDouble("lon");
+            String startDate = start.format(formatter);
+            String endDate = end.format(formatter);
+
 
             // Fetch comprehensive weather data with historical data
             String weatherUrl = String.format(
-                    "https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f&current_weather=true&hourly=precipitation&daily=precipitation_sum&past_days=7&timezone=auto",
-                    latitude, longitude
+                    "https://archive-api.open-meteo.com/v1/era5" +
+                            "?latitude=%.6f" +
+                            "&longitude=%.6f" +
+                            "&start_date=%s" +
+                            "&end_date=%s" +
+                            "&daily=precipitation_sum,temperature_2m_mean,evapotranspiration_sum,runoff_sum,soil_moisture_0_7cm_mean" +
+                            "&timezone=auto",
+                    latitude,
+                    longitude,
+                    startDate,
+                    endDate
             );
+
 
             String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
             if (weatherResponse == null || weatherResponse.trim().isEmpty()) {
@@ -138,107 +161,67 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private EnvData parseEnvData(String weatherResponse) {
-        JSONObject weatherJson = new JSONObject(weatherResponse);
+        JSONObject json = new JSONObject(weatherResponse);
+        JSONObject daily = json.getJSONObject("daily");
+
+        JSONArray rainfall = daily.getJSONArray("precipitation_sum");
+        JSONArray temp = daily.getJSONArray("temperature_2m_mean");
+        JSONArray evap = daily.getJSONArray("evapotranspiration_sum");
+        JSONArray runoff = daily.getJSONArray("runoff_sum");
+        JSONArray soil = daily.getJSONArray("soil_moisture_0_7cm_mean");
+
         EnvData data = new EnvData();
 
-        try {
+        // Rainfall
+        data.setRainfall1d(rainfall.getDouble(rainfall.length() - 1));
+        data.setRainfall3dAvg(avgLastN(rainfall, 3));
+        data.setRainfall7dAvg(avgLastN(rainfall, 7));
+        data.setRainfall7dMax(maxLastN(rainfall, 7));
+        data.setRainfall7dCumulative(sumLastN(rainfall, 7));
 
-            JSONObject currentWeather = weatherJson.getJSONObject("current_weather");
-            data.setAirTemp(currentWeather.getDouble("temperature"));
+        // Soil Moisture
+        data.setSoilMoistureCurrent(soil.getDouble(soil.length() - 1));
+        data.setSoilMoisture7dAvg(avgLastN(soil, 7));
 
+        // Runoff
+        data.setRunoffTotal7d(sumLastN(runoff, 7));
+        data.setSurfaceRunoff7d(sumLastN(runoff, 7)); // if separate surface variable not available
 
-            if (weatherJson.has("daily")) {
-                JSONObject daily = weatherJson.getJSONObject("daily");
-                JSONArray precipitationSum = daily.getJSONArray("precipitation_sum");
+        // Temperature
+        data.setTemperatureCurrent(temp.getDouble(temp.length() - 1));
+        data.setTemperature7dAvg(avgLastN(temp, 7));
 
-                data.setRainfall(getCurrentRainfall(weatherJson));
-                data.setRainfallLast3Days(sumLastNDays(precipitationSum, 3));
-                data.setRainfallLast7Days(sumLastNDays(precipitationSum, 7));
-            } else {
-                setDefaultRainfallData(data);
-            }
-
-
-            data.setRunoff(calculateRunoff(data.getRainfall(), data.getRainfallLast7Days()));
-            data.setRunoffMaxLast3Days(calculateMaxRunoff(data.getRainfallLast3Days()));
-            data.setSoilMoisture(calculateSoilMoisture(data.getRainfallLast7Days(), data.getAirTemp()));
-            data.setSoilMoistureChange7Days(calculateSoilMoistureChange(data));
-            data.setEvaporation(calculateEvaporation(data.getAirTemp(), data.getRainfall()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return createDefaultEnvData();
-        }
+        // Evaporation
+        data.setEvaporation7d(sumLastN(evap, 7));
 
         return data;
     }
 
-    private double getCurrentRainfall(JSONObject weatherJson) {
-        try {
-            if (weatherJson.has("hourly")) {
-                JSONObject hourly = weatherJson.getJSONObject("hourly");
-                JSONArray precipitation = hourly.getJSONArray("precipitation");
-                // Sum last 6 hours of precipitation
-                return sumLastNHours(precipitation, 6);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0.0;
+    private double avgLastN(JSONArray arr, int n) {
+        return sumLastN(arr, n) / Math.min(n, arr.length());
     }
 
-    private double sumLastNHours(JSONArray hourlyData, int hours) {
+    private double maxLastN(JSONArray arr, int n) {
+        double max = Double.MIN_VALUE;
+        int start = Math.max(0, arr.length() - n);
+        for (int i = start; i < arr.length(); i++) {
+            max = Math.max(max, arr.getDouble(i));
+        }
+        return max;
+    }
+
+    private double sumLastN(JSONArray arr, int n) {
         double sum = 0;
-        int actualHours = Math.min(hours, hourlyData.length());
-        for (int i = 0; i < actualHours; i++) {
-            sum += hourlyData.getDouble(i);
+        int start = Math.max(0, arr.length() - n);
+        for (int i = start; i < arr.length(); i++) {
+            sum += arr.getDouble(i);
         }
         return sum;
     }
 
-    private double sumLastNDays(JSONArray dailyData, int days) {
-        double sum = 0;
-        int actualDays = Math.min(days, dailyData.length());
-        for (int i = 0; i < actualDays; i++) {
-            sum += dailyData.getDouble(i);
-        }
-        return sum;
-    }
-
-    private double calculateRunoff(double currentRainfall, double rainfall7Days) {
-        double baseRunoff = currentRainfall * 0.3;
-        double antecedentRunoff = rainfall7Days > 50 ? currentRainfall * 0.2 : 0;
-        return Math.max(0, baseRunoff + antecedentRunoff);
-    }
-
-    private double calculateMaxRunoff(double rainfall3Days) {
-        return rainfall3Days * 0.6;
-    }
-
-    private double calculateSoilMoisture(double rainfall7Days, double temperature) {
-        double baseMoisture = Math.min(100, rainfall7Days * 2);
-        double tempEffect = temperature > 30 ? -15 : 0;
-        return Math.max(0, Math.min(100, baseMoisture + tempEffect + 30));
-    }
-
-    private double calculateSoilMoistureChange(EnvData data) {
-        return data.getRainfallLast7Days() - data.getEvaporation();
-    }
-
-    private double calculateEvaporation(double temperature, double rainfall) {
-
-        double baseEvap = temperature * 0.1;
-        return rainfall > 0 ? baseEvap * 0.5 : baseEvap;
-    }
-
-    private void setDefaultRainfallData(EnvData data) {
-        data.setRainfall(0);
-        data.setRainfallLast3Days(0);
-        data.setRainfallLast7Days(0);
-    }
 
     private EnvData createDefaultEnvData() {
-        return new EnvData(0, 0, 0, 0, 0, 50, 0, 25, 0);
+        return new EnvData();
     }
 
 

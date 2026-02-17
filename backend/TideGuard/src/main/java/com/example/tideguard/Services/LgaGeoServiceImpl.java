@@ -112,7 +112,10 @@ public class LgaGeoServiceImpl implements LgaGeoService {
         LgaWithEnvDTO dto = convertToBasicDto(entity);
 
         try {
-            EnvData envData = weatherService.fetchEnvironmentalData(entity.getLgaName());
+            EnvData envData = weatherService.fetchEnvironmentalData(
+                    entity.getLatitude(),
+                    entity.getLongitude()
+            );
             mapEnvironmentalDataToDto(dto, envData);
             logger.debug("Successfully fetched environmental data for LGA: {}", entity.getLgaName());
         } catch (Exception e) {
@@ -133,26 +136,40 @@ public class LgaGeoServiceImpl implements LgaGeoService {
     }
 
     private void mapEnvironmentalDataToDto(LgaWithEnvDTO dto, EnvData envData) {
-        dto.setRainfall(envData.getRainfall());
-        dto.setRainfallLast3Days(envData.getRainfallLast3Days());
-        dto.setRainfallLast7Days(envData.getRainfallLast7Days());
-        dto.setRunoff(envData.getRunoff());
-        dto.setRunoffMaxLast3Days(envData.getRunoffMaxLast3Days());
-        dto.setSoilMoisture(envData.getSoilMoisture());
-        dto.setSoilMoistureChange7Days(envData.getSoilMoistureChange7Days());
-        dto.setAirTemp(envData.getAirTemp());
-        dto.setEvaporation(envData.getEvaporation());
+        dto.setRainfall1d(envData.getRainfall1d());
+        dto.setRainfall3dAvg(envData.getRainfall3dAvg());
+        dto.setRainfall7dAvg(envData.getRainfall7dAvg());
+        dto.setRainfall7dMax(envData.getRainfall7dMax());
+        dto.setRainfall7dCumulative(envData.getRainfall7dCumulative());
+
+        dto.setSoilMoistureCurrent(envData.getSoilMoistureCurrent());
+        dto.setSoilMoisture7dAvg(envData.getSoilMoisture7dAvg());
+
+        dto.setRunoffTotal7d(envData.getRunoffTotal7d());
+        dto.setSurfaceRunoff7d(envData.getSurfaceRunoff7d());
+
+        dto.setTemperatureCurrent(envData.getTemperatureCurrent());
+        dto.setTemperature7dAvg(envData.getTemperature7dAvg());
+
+        dto.setEvaporation7d(envData.getEvaporation7d());
     }
 
     private void setDefaultEnvironmentalData(LgaWithEnvDTO dto) {
-        dto.setRainfall(0);
-        dto.setRainfallLast3Days(0);
-        dto.setRainfallLast7Days(0);
-        dto.setRunoff(0);
-        dto.setRunoffMaxLast3Days(0);
-        dto.setSoilMoisture(50.0);
-        dto.setSoilMoistureChange7Days(0);
-        dto.setAirTemp(25.0);
-        dto.setEvaporation(0);
+        dto.setRainfall1d(0);
+        dto.setRainfall3dAvg(0);
+        dto.setRainfall7dAvg(0);
+        dto.setRainfall7dMax(0);
+        dto.setRainfall7dCumulative(0);
+
+        dto.setSoilMoistureCurrent(0);
+        dto.setSoilMoisture7dAvg(0);
+
+        dto.setRunoffTotal7d(0);
+        dto.setSurfaceRunoff7d(0);
+
+        dto.setTemperatureCurrent(25);
+        dto.setTemperature7dAvg(25);
+
+        dto.setEvaporation7d(0);
     }
 }

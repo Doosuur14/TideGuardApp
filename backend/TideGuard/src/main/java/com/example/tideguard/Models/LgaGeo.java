@@ -39,6 +39,4 @@ public class LgaGeo {
                 ", longitude=" + longitude +
                 '}';
     }
-
-
 }
