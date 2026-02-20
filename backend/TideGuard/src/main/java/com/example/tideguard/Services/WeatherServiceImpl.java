@@ -138,7 +138,7 @@ public class WeatherServiceImpl implements WeatherService {
                             "&longitude=%.6f" +
                             "&start_date=%s" +
                             "&end_date=%s" +
-                            "&daily=precipitation_sum,temperature_2m_mean,evapotranspiration_sum,runoff_sum,soil_moisture_0_7cm_mean" +
+                            "&daily=precipitation_sum,temperature_2m_mean,evaporation_sum,runoff_sum,soil_moisture_0_7cm_mean" +
                             "&timezone=auto",
                     latitude,
                     longitude,
@@ -148,11 +148,13 @@ public class WeatherServiceImpl implements WeatherService {
 
 
             String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
+            System.out.println("Calling weather API: " + weatherUrl);
             if (weatherResponse == null || weatherResponse.trim().isEmpty()) {
                 return createDefaultEnvData();
             }
 
             return parseEnvData(weatherResponse);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -160,13 +162,15 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
+
+    // To parse data from the api to the front ios ie the json file that will be sent to the frontend from the api
     private EnvData parseEnvData(String weatherResponse) {
         JSONObject json = new JSONObject(weatherResponse);
         JSONObject daily = json.getJSONObject("daily");
 
         JSONArray rainfall = daily.getJSONArray("precipitation_sum");
         JSONArray temp = daily.getJSONArray("temperature_2m_mean");
-        JSONArray evap = daily.getJSONArray("evapotranspiration_sum");
+        JSONArray evap = daily.getJSONArray("evaporation_sum");
         JSONArray runoff = daily.getJSONArray("runoff_sum");
         JSONArray soil = daily.getJSONArray("soil_moisture_0_7cm_mean");
 
