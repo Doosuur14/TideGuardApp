@@ -10,7 +10,7 @@ import Alamofire
 
 final class WeatherService {
     static let shared = WeatherService()
-    private let baseURL = "http://192.168.31.202:8080"
+    private let baseURL = "http://192.168.31.218:8080"
 
     private init() {}
 

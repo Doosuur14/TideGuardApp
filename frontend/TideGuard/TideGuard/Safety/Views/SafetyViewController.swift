@@ -89,13 +89,16 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         mapView.removeAnnotations(mapView.annotations)
 
         let annotations = lgas.map { lga -> MKPointAnnotation in
+            var mutableLga = lga
             let annotation = MKPointAnnotation()
             annotation.coordinate = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
             annotation.title = lga.lgaName
 
-            let risk = viewModel.predictFloodRisk(for: lga)
+//            let risk = viewModel.predictFloodRisk(for: lga)
+            let risk = viewModel.predictFloodRisk(for: &mutableLga)
 
-            annotation.subtitle = (risk == 2 ? "high" : risk == 1 ? "medium" : "low")
+//            annotation.subtitle = (risk == 2 ? "high" : risk == 1 ? "medium" : "low")
+            annotation.subtitle = (risk == 1 ? "flood" : "no flood")
             return annotation
         }
 
@@ -124,12 +127,58 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
 
 
+//    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+//
+//        guard !(annotation is MKUserLocation) else { return nil }
+//
+//        let identifier = "floodRiskDot"
+//
+//        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+//
+//        if annotationView == nil {
+//            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+//            annotationView?.canShowCallout = true
+//        } else {
+//            annotationView?.annotation = annotation
+//        }
+//
+//
+//        let risk = annotation.subtitle ?? "low"
+//        let color: UIColor
+//        switch risk {
+//        case "high":
+//            color = UIColor(red: 0.85, green: 0.05, blue: 0.05, alpha: 1.0)
+//        case "medium":
+//            color = UIColor.orange
+//        default:
+//            color = UIColor(red: 0.05, green: 0.75, blue: 0.05, alpha: 1.0)
+//        }
+//
+//
+//        let size = CGSize(width: 20, height: 20)
+//        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+//        let context = UIGraphicsGetCurrentContext()!
+//
+//
+//        context.setFillColor(UIColor.white.cgColor)
+//        context.fillEllipse(in: CGRect(origin: .zero, size: size))
+//
+//
+//        context.setFillColor(color.cgColor)
+//        context.fillEllipse(in: CGRect(x: 3, y: 3, width: 14, height: 14))
+//
+//        let image = UIGraphicsGetImageFromCurrentImageContext()!
+//        UIGraphicsEndImageContext()
+//
+//        annotationView?.image = image
+//
+//        return annotationView
+//    }
+
+
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-
         guard !(annotation is MKUserLocation) else { return nil }
-
         let identifier = "floodRiskDot"
-
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
         if annotationView == nil {
@@ -139,36 +188,27 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
             annotationView?.annotation = annotation
         }
 
-
-        let risk = annotation.subtitle ?? "low"
-        let color: UIColor
-        switch risk {
-        case "high":
-            color = UIColor(red: 0.85, green: 0.05, blue: 0.05, alpha: 1.0)
-        case "medium":
-            color = UIColor.orange
-        default:
-            color = UIColor(red: 0.05, green: 0.75, blue: 0.05, alpha: 1.0)
+        // Use floodProbability if available
+        var riskColor: UIColor = .gray
+        if let lgaTitle = annotation.title ?? "",
+           let lga = viewModel.lgasCache.first(where: { $0.lgaName == lgaTitle }),
+           let prob = lga.floodProbability {
+            // red = high probability, green = low
+            riskColor = UIColor(red: CGFloat(prob), green: CGFloat(1 - prob), blue: 0, alpha: 1)
         }
-
 
         let size = CGSize(width: 20, height: 20)
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         let context = UIGraphicsGetCurrentContext()!
-
-
         context.setFillColor(UIColor.white.cgColor)
         context.fillEllipse(in: CGRect(origin: .zero, size: size))
-
-
-        context.setFillColor(color.cgColor)
+        context.setFillColor(riskColor.cgColor)
         context.fillEllipse(in: CGRect(x: 3, y: 3, width: 14, height: 14))
-
         let image = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
 
         annotationView?.image = image
-
         return annotationView
     }
+
 }

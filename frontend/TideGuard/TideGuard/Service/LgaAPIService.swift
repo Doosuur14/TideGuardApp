@@ -10,7 +10,7 @@ import Foundation
 class LgaAPIService {
 
     static let shared = LgaAPIService()
-    private let baseURL =  "http://192.168.31.202:8080"
+    private let baseURL =  "http://localhost:8080"
 
 
     func getLgasByState( for state: String, completion: @escaping ([LgaModel]?) -> Void) {

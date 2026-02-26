@@ -29,6 +29,7 @@
 		DE0EDDB32DA4728100D21C74 /* RegistrationScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0EDDB22DA4728100D21C74 /* RegistrationScreenViewController.swift */; };
 		DE141A082EC7709E00D8B491 /* LgaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE141A072EC7709E00D8B491 /* LgaModel.swift */; };
 		DE141A0A2EC772EB00D8B491 /* LgaAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE141A092EC772EB00D8B491 /* LgaAPIService.swift */; };
+		DE162BA82F4DF1EA00FABEC9 /* FloodLGAClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DE162BA72F4DF1EA00FABEC9 /* FloodLGAClassifier.mlmodel */; };
 		DE2883A82DBED77C0013B156 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883A72DBED77C0013B156 /* WeatherService.swift */; };
 		DE2883AA2DBEDE170013B156 /* Evacuation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883A92DBEDE170013B156 /* Evacuation.swift */; };
 		DE2883AC2DC597520013B156 /* FloodArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2883AB2DC597520013B156 /* FloodArea.swift */; };
@@ -41,7 +42,6 @@
 		DE62C7B82DB0CF9B00A8BDF6 /* SafetyModuleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE62C7B72DB0CF9B00A8BDF6 /* SafetyModuleBuilder.swift */; };
 		DE62C7BA2DB0D06B00A8BDF6 /* SplashModuleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE62C7B92DB0D06B00A8BDF6 /* SplashModuleBuilder.swift */; };
 		DE62C7BF2DB0EA7500A8BDF6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE62C7BE2DB0EA7500A8BDF6 /* ViewModel.swift */; };
-		DE6513E72EA9994100562A55 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = DE6513E62EA9994100562A55 /* SnapKit */; };
 		DE6709A72DD20A3200C19369 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A52DD20A3200C19369 /* User+CoreDataClass.swift */; };
 		DE6709A82DD20A3200C19369 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A62DD20A3200C19369 /* User+CoreDataProperties.swift */; };
 		DE7DBD952DD1FE5C0003EC62 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7DBD942DD1FE5C0003EC62 /* UserService.swift */; };
@@ -63,10 +63,11 @@
 		DE9A94812DCD1CC50087581F /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A94802DCD1CC50087581F /* ProfileService.swift */; };
 		DE9A94982DD006AD0087581F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DE9A94972DD006AD0087581F /* GoogleService-Info.plist */; };
 		DE9A949A2DD0B8EC0087581F /* ImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A94992DD0B8EC0087581F /* ImageService.swift */; };
-		DED99AEF2EA99710001ECFF8 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DED99AEE2EA99710001ECFF8 /* Alamofire */; };
+		DED06DB92F50EFE0005ED267 /* FloodRiskModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DED06DB82F50EFDF005ED267 /* FloodRiskModel.mlmodel */; };
 		DEDF01EB2EB04E0100AF8744 /* Shelter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDF01EA2EB04E0000AF8744 /* Shelter.swift */; };
 		DEDF01ED2EB04E4200AF8744 /* FloodRiskResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */; };
-		DEE8D3EB2EC94D7300438FEA /* FloodRiskPredictor.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */; };
+		DEE8A2862F4529F1009C2448 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DEE8A2852F4529F1009C2448 /* Alamofire */; };
+		DEE8A2892F452B85009C2448 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEE8A2882F452B85009C2448 /* SnapKit */; };
 		DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C12DF19AE900497C21 /* FAQ.swift */; };
 		DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */; };
 		DEF3F4C72DF19C3F00497C21 /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C62DF19C3F00497C21 /* FAQView.swift */; };
@@ -95,7 +96,6 @@
 		DEF7D9252D9B2431000B4C01 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9242D9B2431000B4C01 /* LoginViewController.swift */; };
 		DEF7D9272D9B244E000B4C01 /* LoginScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9262D9B244E000B4C01 /* LoginScreenView.swift */; };
 		DEF7D9292D9B245C000B4C01 /* LoginScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9282D9B245C000B4C01 /* LoginScreenViewModel.swift */; };
-		EF7C59BF178AA9714A4D7652 /* Pods_TideGuard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA601515852868B7941D2BF5 /* Pods_TideGuard.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -121,6 +121,7 @@
 		DE0EDDB22DA4728100D21C74 /* RegistrationScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationScreenViewController.swift; sourceTree = "<group>"; };
 		DE141A072EC7709E00D8B491 /* LgaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LgaModel.swift; sourceTree = "<group>"; };
 		DE141A092EC772EB00D8B491 /* LgaAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LgaAPIService.swift; sourceTree = "<group>"; };
+		DE162BA72F4DF1EA00FABEC9 /* FloodLGAClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodLGAClassifier.mlmodel; sourceTree = "<group>"; };
 		DE2883A72DBED77C0013B156 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		DE2883A92DBEDE170013B156 /* Evacuation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Evacuation.swift; sourceTree = "<group>"; };
 		DE2883AB2DC597520013B156 /* FloodArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodArea.swift; sourceTree = "<group>"; };
@@ -156,9 +157,9 @@
 		DE9A94802DCD1CC50087581F /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		DE9A94972DD006AD0087581F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DE9A94992DD0B8EC0087581F /* ImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageService.swift; sourceTree = "<group>"; };
+		DED06DB82F50EFDF005ED267 /* FloodRiskModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodRiskModel.mlmodel; sourceTree = "<group>"; };
 		DEDF01EA2EB04E0000AF8744 /* Shelter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelter.swift; sourceTree = "<group>"; };
 		DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodRiskResponse.swift; sourceTree = "<group>"; };
-		DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodRiskPredictor.mlmodel; sourceTree = "<group>"; };
 		DEF3F4C12DF19AE900497C21 /* FAQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQ.swift; sourceTree = "<group>"; };
 		DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
 		DEF3F4C62DF19C3F00497C21 /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
@@ -187,9 +188,6 @@
 		DEF7D9242D9B2431000B4C01 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		DEF7D9262D9B244E000B4C01 /* LoginScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreenView.swift; sourceTree = "<group>"; };
 		DEF7D9282D9B245C000B4C01 /* LoginScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreenViewModel.swift; sourceTree = "<group>"; };
-		EA601515852868B7941D2BF5 /* Pods_TideGuard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TideGuard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EB170B35AFFC256C411D6EED /* Pods-TideGuard.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TideGuard.release.xcconfig"; path = "Target Support Files/Pods-TideGuard/Pods-TideGuard.release.xcconfig"; sourceTree = "<group>"; };
-		F4A6F0F3B5350C95BFF48425 /* Pods-TideGuard.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TideGuard.debug.xcconfig"; path = "Target Support Files/Pods-TideGuard/Pods-TideGuard.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,9 +195,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE6513E72EA9994100562A55 /* SnapKit in Frameworks */,
-				EF7C59BF178AA9714A4D7652 /* Pods_TideGuard.framework in Frameworks */,
-				DED99AEF2EA99710001ECFF8 /* Alamofire in Frameworks */,
+				DEE8A2862F4529F1009C2448 /* Alamofire in Frameworks */,
+				DEE8A2892F452B85009C2448 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,18 +206,8 @@
 		05E03DA59446AD55191DDBBA /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F4A6F0F3B5350C95BFF48425 /* Pods-TideGuard.debug.xcconfig */,
-				EB170B35AFFC256C411D6EED /* Pods-TideGuard.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		9CE2C935356F230AA63659BA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				EA601515852868B7941D2BF5 /* Pods_TideGuard.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		DE03590F2DAC42D200178E1D /* ModuleBuilder */ = {
@@ -407,7 +394,6 @@
 				DE9A6FDC2D9499CF00B93655 /* TideGuard */,
 				DE9A6FDB2D9499CF00B93655 /* Products */,
 				05E03DA59446AD55191DDBBA /* Pods */,
-				9CE2C935356F230AA63659BA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -422,6 +408,8 @@
 		DE9A6FDC2D9499CF00B93655 /* TideGuard */ = {
 			isa = PBXGroup;
 			children = (
+				DED06DB82F50EFDF005ED267 /* FloodRiskModel.mlmodel */,
+				DE162BA72F4DF1EA00FABEC9 /* FloodLGAClassifier.mlmodel */,
 				DE9A94972DD006AD0087581F /* GoogleService-Info.plist */,
 				DEF3F4E42DFA03F200497C21 /* News */,
 				DEF3F4D72DF6699400497C21 /* Report */,
@@ -443,7 +431,6 @@
 				DE9A6FE62D9499D100B93655 /* Assets.xcassets */,
 				DE9A6FE82D9499D100B93655 /* LaunchScreen.storyboard */,
 				DE9A6FEB2D9499D100B93655 /* Info.plist */,
-				DEE8D3EA2EC94D7300438FEA /* FloodRiskPredictor.mlmodel */,
 			);
 			path = TideGuard;
 			sourceTree = "<group>";
@@ -630,12 +617,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DE9A6FEE2D9499D100B93655 /* Build configuration list for PBXNativeTarget "TideGuard" */;
 			buildPhases = (
-				3E9DB10B209C69B08CA4F144 /* [CP] Check Pods Manifest.lock */,
 				DE9A6FD62D9499CF00B93655 /* Sources */,
 				DE9A6FD72D9499CF00B93655 /* Frameworks */,
 				DE9A6FD82D9499CF00B93655 /* Resources */,
 				DEF7D91C2D94A564000B4C01 /* ShellScript */,
-				54809FF208B2510EAF05486E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -643,8 +628,8 @@
 			);
 			name = TideGuard;
 			packageProductDependencies = (
-				DED99AEE2EA99710001ECFF8 /* Alamofire */,
-				DE6513E62EA9994100562A55 /* SnapKit */,
+				DEE8A2852F4529F1009C2448 /* Alamofire */,
+				DEE8A2882F452B85009C2448 /* SnapKit */,
 			);
 			productName = TideGuard;
 			productReference = DE9A6FDA2D9499CF00B93655 /* TideGuard.app */;
@@ -676,8 +661,8 @@
 			mainGroup = DE9A6FD12D9499CF00B93655;
 			packageReferences = (
 				DE9A94842DCFF1650087581F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				DED99AED2EA99710001ECFF8 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				DE6513E52EA9994100562A55 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				DEE8A2842F4529F1009C2448 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				DEE8A2872F452B85009C2448 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			productRefGroup = DE9A6FDB2D9499CF00B93655 /* Products */;
 			projectDirPath = "";
@@ -703,49 +688,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3E9DB10B209C69B08CA4F144 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-TideGuard-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		54809FF208B2510EAF05486E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TideGuard/Pods-TideGuard-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-TideGuard/Pods-TideGuard-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TideGuard/Pods-TideGuard-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		DEF7D91C2D94A564000B4C01 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -793,6 +735,7 @@
 				DE0359302DAC6AA500178E1D /* User.swift in Sources */,
 				DEDF01EB2EB04E0100AF8744 /* Shelter.swift in Sources */,
 				DEF3F4DF2DF66A2B00497C21 /* ReportViewModel.swift in Sources */,
+				DE162BA82F4DF1EA00FABEC9 /* FloodLGAClassifier.mlmodel in Sources */,
 				DEF3F4CA2DF19DCB00497C21 /* FAQTableViewCell.swift in Sources */,
 				DEF7D9222D95763B000B4C01 /* Coordinator.swift in Sources */,
 				DE0359112DAC431400178E1D /* LoginModuleBuilder.swift in Sources */,
@@ -808,6 +751,7 @@
 				DE9A947D2DCD14A90087581F /* ProfilePhotoError.swift in Sources */,
 				DE03593E2DAD131D00178E1D /* CoreDataManager.swift in Sources */,
 				DE9A6FE02D9499CF00B93655 /* SceneDelegate.swift in Sources */,
+				DED06DB92F50EFE0005ED267 /* FloodRiskModel.mlmodel in Sources */,
 				DE9A94752DCD08B10087581F /* ProfileViewModel.swift in Sources */,
 				DE62C7BF2DB0EA7500A8BDF6 /* ViewModel.swift in Sources */,
 				DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */,
@@ -822,7 +766,6 @@
 				DEF3F4E12DF6F9FB00497C21 /* ReportService.swift in Sources */,
 				DE03592A2DAC656F00178E1D /* RegisterViewModelProtocol.swift in Sources */,
 				DE0EDDAB2DA158BE00D21C74 /* SplashView.swift in Sources */,
-				DEE8D3EB2EC94D7300438FEA /* FloodRiskPredictor.mlmodel in Sources */,
 				DE62C7B82DB0CF9B00A8BDF6 /* SafetyModuleBuilder.swift in Sources */,
 				DE0EDDB32DA4728100D21C74 /* RegistrationScreenViewController.swift in Sources */,
 				DE62C7AD2DB0C58600A8BDF6 /* MainFLowCoordinator.swift in Sources */,
@@ -990,7 +933,6 @@
 		};
 		DE9A6FEF2D9499D100B93655 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F4A6F0F3B5350C95BFF48425 /* Pods-TideGuard.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1019,7 +961,6 @@
 		};
 		DE9A6FF02D9499D100B93655 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EB170B35AFFC256C411D6EED /* Pods-TideGuard.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1070,14 +1011,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		DE6513E52EA9994100562A55 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
 		DE9A94842DCFF1650087581F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -1086,26 +1019,34 @@
 				minimumVersion = 11.12.0;
 			};
 		};
-		DED99AED2EA99710001ECFF8 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		DEE8A2842F4529F1009C2448 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.2;
+				minimumVersion = 5.11.1;
+			};
+		};
+		DEE8A2872F452B85009C2448 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DE6513E62EA9994100562A55 /* SnapKit */ = {
+		DEE8A2852F4529F1009C2448 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DE6513E52EA9994100562A55 /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = SnapKit;
-		};
-		DED99AEE2EA99710001ECFF8 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DED99AED2EA99710001ECFF8 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			package = DEE8A2842F4529F1009C2448 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		DEE8A2882F452B85009C2448 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEE8A2872F452B85009C2448 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 

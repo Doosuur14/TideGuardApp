@@ -12,7 +12,7 @@ import Alamofire
 final class UserService {
 
     static let shared = UserService()
-    private let baseURL = "http://192.168.31.202:8080/api"
+    private let baseURL = "http://192.168.31.218:8080/api"
 
 
     func deleteAccount(completion: @escaping (Result<Void, Error>) -> Void) {

@@ -14,7 +14,7 @@ import Alamofire
 final class ProfileService {
     static let shared = ProfileService()
 
-    private let baseURL = "http://192.168.31.202:8080/api"
+    private let baseURL = "http://192.168.31.218:8080/api"
 
     private var context: NSManagedObjectContext {
         return CoreDataManager.shared.persistentContainer.viewContext

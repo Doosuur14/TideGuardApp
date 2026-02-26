@@ -11,7 +11,7 @@ import Alamofire
 
 class ReportService {
     static let shared = ReportService()
-    private let baseURL = "http://192.168.31.202:8080"
+    private let baseURL = "http://192.168.31.218:8080"
 
     func uploadReport(image: UIImage?, description: String, email: String, completion: @escaping (Result<String, Error>) -> Void) {
         guard let image = image, let imageData = image.jpegData(compressionQuality: 0.8) else {

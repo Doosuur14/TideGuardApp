@@ -11,8 +11,8 @@ import CoreData
 
 final class AuthService {
     static let shared = AuthService()
-    private let baseURL = "http://192.168.31.202:8080/api"
-//    private let baseURL = "http://127.0.0.1:8080/api"
+    private let baseURL = "http://localhost:8080/api"
+//    private let baseURL = "http://localhost:8080/api"
     private var context: NSManagedObjectContext {
         return CoreDataManager.shared.persistentContainer.viewContext
     }
@@ -57,7 +57,6 @@ final class AuthService {
     }
 
 
-
     func login( email: String, password: String,  completion: @escaping (Result<AppUser, Error>) -> Void) {
         let url = "\(baseURL)/login"
         let parameters = LoginRequest(email: email, password: password)
@@ -97,6 +96,7 @@ final class AuthService {
                 }
             }
     }
+
 
     func getCurrentUser() -> User? {
 

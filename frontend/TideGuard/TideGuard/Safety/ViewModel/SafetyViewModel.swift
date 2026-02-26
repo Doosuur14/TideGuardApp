@@ -25,11 +25,12 @@ class SafetyViewModel {
 
     @Published private(set) var state: SafetyState = .idle
 
-    private let model = try? FloodRiskPredictor(configuration: MLModelConfiguration())
+    private let model = try? FloodRiskModel(configuration: MLModelConfiguration())
 
     private var cancellables = Set<AnyCancellable>()
-    private let locationService = LocationService.shared
 
+//    private let locationService = LocationService.shared
+    var lgasCache: [LgaModel] = []
 
 
 
@@ -48,6 +49,7 @@ class SafetyViewModel {
 
             DispatchQueue.main.async {
                 if let lgas = lgas {
+                    self.lgasCache = lgas
                     self.state = .loadedLGAs(lgas)
                 } else {
                     self.state = .error("Failed to load LGAs")
@@ -117,26 +119,58 @@ class SafetyViewModel {
     }
 
 
-    func predictFloodRisk(for lga: LgaModel) -> Int {
+
+    func predictFloodRisk(for lga: inout LgaModel) -> Int {
+        if let cachedPrediction = lga.floodPrediction {
+            return cachedPrediction
+        }
+
+        guard let model = model else { return 0 }
+
         do {
+            // Named inputs - must match feature names exactly from training
+            let input = FloodRiskModelInput(
+                tp:               lga.tp,
+                ro:               lga.ro,
+                t2m:              lga.t2m,
+                swvl1:            lga.swvl1,
+                tp_7d:            lga.tp_7d,
+                tp_14d:           lga.tp_14d,
+                tp_30d:           lga.tp_30d,
+                ro_7d:            lga.ro_7d,
+                ro_14d:           lga.ro_14d,
+                swvl1_3d_change:  lga.swvl1_3d_change,
+                tp_7d_max:        lga.tp_7d_max,
+                latitude:         lga.latitude,
+                longitude:        lga.longitude,
+                month:            lga.month,
+                day_of_year:      lga.day_of_year,
+                state_encoded:    lga.state_encoded
+            )
 
-            let array = try MLMultiArray(shape: [11], dataType: .double)
+//            let prediction = try model.prediction(input: input)
+//
+//            // Get flood probability (0.0 to 1.0)
+//            if let floodProb = prediction.Flood_EventProbability[1] {
+//                lga.floodProbability = Int64(floodProb * 100)
+//            } else {
+//                lga.floodProbability = 0
+//            }
+//
+//            lga.floodPrediction = Int(prediction.Flood_Event)
+//            return Int(prediction.Flood_Event)
 
-            array[0] = NSNumber(value: lga.latitude)
-            array[1] = NSNumber(value: lga.longitude)
-            array[2] = NSNumber(value: lga.rainfall)
-            array[3] = NSNumber(value: lga.rainfallLast3Days)
-            array[4] = NSNumber(value: lga.rainfallLast7Days)
-            array[5] = NSNumber(value: lga.runoff)
-            array[6] = NSNumber(value: lga.runoffMaxLast3Days)
-            array[7] = NSNumber(value: lga.soilMoisture)
-            array[8] = NSNumber(value: lga.soilMoistureChange7Days)
-            array[9] = NSNumber(value: lga.airTemp)
-            array[10] = NSNumber(value: lga.evaporation)
 
-            let output = try model?.prediction(input: array)
+            let prediction = try model.prediction(input: input)
 
-            return Int(output?.classLabel ?? 0)
+            let riskScore = prediction.floodRisk
+
+            lga.floodProbability = Int64(riskScore * 100)
+
+            lga.floodPrediction = riskScore >= 0.6 ? 2 :  // High
+                                  riskScore >= 0.3 ? 1 :  // Medium
+                                                     0    // Low
+            return Int(prediction.floodRisk)
 
         } catch {
             print("Prediction failed: \(error)")
@@ -145,49 +179,51 @@ class SafetyViewModel {
     }
 
 
+
+
     func loadStateMap() {
         state = .loading
-        print("Loading map region using LocationService")
+
         let user = AuthService.shared.getCurrentUser()
-        guard let state = user?.city else {
-            print("No user state, using Nigeria region")
-            let nigeriaRegion = locationService.getNigeriaRegion()
-            DispatchQueue.main.async {
-                self.state = .onMapUpdate(nigeriaRegion)
-            }
-            return
-        }
+        if let stateName = user?.city {
+            print("Centering map on user's state using backend coordinates")
 
-        print("User state: \(state)")
+            LgaAPIService.shared.getLgasByState(for: stateName) { [weak self] lgas in
+                guard let self = self, let lgas = lgas, !lgas.isEmpty else {
+                    DispatchQueue.main.async {
+                        self?.state = .onMapUpdate(self?.defaultNigeriaRegion() ?? MKCoordinateRegion())
+                    }
+                    return
+                }
 
-        print("Getting coordinates for state: \(state)")
-        locationService.getCoordinate(for: state) { [weak self] result in
-            switch result {
-            case .success(let coordinate):
-                print("LocationService found coordinates: \(coordinate.latitude), \(coordinate.longitude)")
+                let avgLat = lgas.map { $0.latitude }.reduce(0,+)/Double(lgas.count)
+                let avgLong = lgas.map { $0.longitude }.reduce(0,+)/Double(lgas.count)
+
                 let region = MKCoordinateRegion(
-                    center: coordinate,
+                    center: CLLocationCoordinate2D(latitude: avgLat, longitude: avgLong),
                     latitudinalMeters: 18000,
                     longitudinalMeters: 18000
                 )
-                DispatchQueue.main.async {
-                    self?.state = .onMapUpdate(region)
-                }
 
-            case .failure(let error):
-                print("LocationService failed: \(error), using Nigeria region")
-                let nigeriaRegion = self?.locationService.getNigeriaRegion() ?? MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(latitude: 9.0820, longitude: 8.6753),
-                    latitudinalMeters: 18000,
-                    longitudinalMeters: 18000
-                )
                 DispatchQueue.main.async {
-                    self?.state = .onMapUpdate(nigeriaRegion)
+                    self.state = .onMapUpdate(region)
                 }
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.state = .onMapUpdate(self.defaultNigeriaRegion())
             }
         }
     }
+    
 
+    private func defaultNigeriaRegion() -> MKCoordinateRegion {
+        return MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 9.0820, longitude: 8.6753),
+            latitudinalMeters: 1500000,
+            longitudinalMeters: 1500000
+        )
+    }
 
 
     private func processFloodMap(features: [MKGeoJSONFeature], lgaData: [LgaModel]) -> [(polygon: MKPolygon, risk: Int)] {
@@ -201,9 +237,10 @@ class SafetyViewModel {
                 continue
             }
 
-            if let lga = lgaData.first(where: { $0.lgaName.caseInsensitiveCompare(lgaName) == .orderedSame }) {
+            if let lgaConst = lgaData.first(where: { $0.lgaName.caseInsensitiveCompare(lgaName) == .orderedSame }) {
 
-                let risk = predictFloodRisk(for: lga)
+                var lga = lgaConst
+                let risk = predictFloodRisk(for: &lga)
 
                 for geometry in feature.geometry {
                     if let polygon = geometry as? MKPolygon {
@@ -216,4 +253,3 @@ class SafetyViewModel {
         return results
     }
 }
-
