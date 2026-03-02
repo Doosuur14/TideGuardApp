@@ -119,6 +119,4 @@ public class FloodRiskServiceImpl implements FloodRiskService {
 
 //        return result.get(0);
     }
-
-
 }

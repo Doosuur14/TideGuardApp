@@ -11,21 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EnvData {
-    private double rainfall1d;
-    private double rainfall3dAvg;
-    private double rainfall7dAvg;
-    private double rainfall7dMax;
-    private double rainfall7dCumulative;
+    private double tp;
+    private double ro;
+    private double t2m;
+    private double swvl1;
 
-    private double soilMoistureCurrent;
-    private double soilMoisture7dAvg;
+    private double tp7d;
+    private double tp14d;
+    private double tp30d;
+    private double tp7dMax;
 
-    private double runoffTotal7d;
-    private double surfaceRunoff7d;
+    private double ro7d;
+    private double ro14d;
 
-    private double temperatureCurrent;
-    private double temperature7dAvg;
-
-    private double evaporation7d;
+    private double swvl1_3dChange;
 
 }

@@ -2,6 +2,7 @@ package com.example.tideguard.Services;
 
 import com.example.tideguard.Models.LgaGeo;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,7 +47,7 @@ public class GeoServiceImpl implements GeoService {
             if (features.length() > 0) {
                 JSONObject firstFeature = features.getJSONObject(0);
                 JSONObject firstProperties = firstFeature.getJSONObject("properties");
-                System.out.println("🔍 FIRST FEATURE PROPERTIES KEYS: " + firstProperties.keySet());
+                System.out.println("🔍 FIRST FEATURE PROPERTIES KEYS: " + firstProperties.keys());
                 System.out.println("🔍 FIRST FEATURE PROPERTIES VALUES: " + firstProperties.toString());
 
                 JSONObject firstGeometry = firstFeature.getJSONObject("geometry");
@@ -62,7 +64,10 @@ public class GeoServiceImpl implements GeoService {
 
                 // Debug: Print all available property keys for first 3 features
                 if (i < 3) {
-                    System.out.println("🔑 Properties keys for feature " + i + ": " + properties.keySet());
+                    Iterator<String> keys = properties.keys();
+                    while (keys.hasNext()) {
+                        System.out.println("Key: " + keys.next());
+                    }
                 }
 
                 // Try to get LGA name and state from various possible property names
@@ -218,7 +223,7 @@ public class GeoServiceImpl implements GeoService {
         return "Unknown";
     }
 
-    private double[] calculatePolygonCentroid(JSONArray coordinates) {
+    private double[] calculatePolygonCentroid(JSONArray coordinates) throws JSONException {
         JSONArray firstRing = coordinates.getJSONArray(0);
         JSONArray firstCoordinate = firstRing.getJSONArray(0);
         double lon = firstCoordinate.getDouble(0);
@@ -226,7 +231,7 @@ public class GeoServiceImpl implements GeoService {
         return new double[]{lat, lon};
     }
 
-    private double[] calculateMultiPolygonCentroid(JSONArray coordinates) {
+    private double[] calculateMultiPolygonCentroid(JSONArray coordinates) throws JSONException {
         JSONArray firstPolygon = coordinates.getJSONArray(0);
         JSONArray firstRing = firstPolygon.getJSONArray(0);
         JSONArray firstCoordinate = firstRing.getJSONArray(0);
