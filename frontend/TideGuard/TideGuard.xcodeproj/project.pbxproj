@@ -45,7 +45,6 @@
 		DE6709A72DD20A3200C19369 /* User+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A52DD20A3200C19369 /* User+CoreDataClass.swift */; };
 		DE6709A82DD20A3200C19369 /* User+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6709A62DD20A3200C19369 /* User+CoreDataProperties.swift */; };
 		DE7DBD952DD1FE5C0003EC62 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7DBD942DD1FE5C0003EC62 /* UserService.swift */; };
-		DE82EBD42ED5000E00E6707F /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE82EBD32ED5000E00E6707F /* LocationService.swift */; };
 		DE9A6FDE2D9499CF00B93655 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FDD2D9499CF00B93655 /* AppDelegate.swift */; };
 		DE9A6FE02D9499CF00B93655 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FDF2D9499CF00B93655 /* SceneDelegate.swift */; };
 		DE9A6FE22D9499CF00B93655 /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9A6FE12D9499CF00B93655 /* HomeScreenViewController.swift */; };
@@ -137,7 +136,6 @@
 		DE6709A52DD20A3200C19369 /* User+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		DE6709A62DD20A3200C19369 /* User+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "User+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		DE7DBD942DD1FE5C0003EC62 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
-		DE82EBD32ED5000E00E6707F /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		DE9A6FDA2D9499CF00B93655 /* TideGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TideGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9A6FDD2D9499CF00B93655 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DE9A6FDF2D9499CF00B93655 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -261,7 +259,6 @@
 				DEF3F4E02DF6F9FB00497C21 /* ReportService.swift */,
 				DEF3F4EF2DFA055D00497C21 /* NewsService.swift */,
 				DE141A092EC772EB00D8B491 /* LgaAPIService.swift */,
-				DE82EBD32ED5000E00E6707F /* LocationService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -760,7 +757,6 @@
 				DE9A949A2DD0B8EC0087581F /* ImageService.swift in Sources */,
 				DEF3F4E32DF76EFC00497C21 /* ReportModuleBuilder.swift in Sources */,
 				DE409EAF2EB617EE00B6F2B7 /* FloodAreaLoader.swift in Sources */,
-				DE82EBD42ED5000E00E6707F /* LocationService.swift in Sources */,
 				DE141A082EC7709E00D8B491 /* LgaModel.swift in Sources */,
 				DE0359282DAC655800178E1D /* RegisterViewModel.swift in Sources */,
 				DEF3F4E12DF6F9FB00497C21 /* ReportService.swift in Sources */,

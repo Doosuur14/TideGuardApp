@@ -33,8 +33,6 @@ class SafetyView: UIView {
         setUpSegments()
         setUpContainer()
         setUpMap()
-        addLegend(to:mapView)
-        setUpLegendView()
         setUpWeatherContainer()
         setupActivityIndicator()
 
@@ -69,49 +67,6 @@ class SafetyView: UIView {
         }
     }
 
-    private func setUpLegendView() {
-        let legendView = UIStackView()
-        legendView.axis = .horizontal
-        legendView.alignment = .center
-        legendView.spacing = 16
-        legendView.distribution = .equalSpacing
-        legendView.translatesAutoresizingMaskIntoConstraints = false
-        legendView.accessibilityIdentifier = "legendView"
-        legendView.isHidden = false
-
-
-        let legendItems = [
-            ("Low Risk", UIColor.green),
-            ("Medium Risk", UIColor.orange),
-            ("High Risk", UIColor.red)
-        ]
-
-        for (text, color) in legendItems {
-            let colorBox = UIView()
-            colorBox.backgroundColor = color.withAlphaComponent(0.8)
-            colorBox.layer.cornerRadius = 4
-            colorBox.snp.makeConstraints { make in
-                make.width.height.equalTo(16)
-            }
-
-            let label = UILabel()
-            label.text = text
-            label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-            label.textColor = UIColor(named: "MainColor")
-
-            let itemStack = UIStackView(arrangedSubviews: [colorBox, label])
-            itemStack.axis = .horizontal
-            itemStack.spacing = 6
-            legendView.addArrangedSubview(itemStack)
-        }
-
-        addSubview(legendView)
-
-        legendView.snp.makeConstraints { make in
-            make.top.equalTo(mapView.snp.bottom).offset(8)
-            make.centerX.equalToSuperview()
-        }
-    }
 
     private func setUpWeatherContainer() {
         containerView.addSubview(weatherContainer)
@@ -163,12 +118,12 @@ class SafetyView: UIView {
 
         mapView.isHidden = true
         weatherContainer.isHidden = true
-        subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = true } }
+        //subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = true } }
 
         switch sender.selectedSegmentIndex {
         case 0:
             mapView.isHidden = false
-            subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = false } }
+           // subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = false } }
         case 1:
             weatherContainer.isHidden = false
         default: break
@@ -189,56 +144,6 @@ class SafetyView: UIView {
                 print("Failed to load weather image: \(error?.localizedDescription ?? "No error")")
             }
         }.resume()
-    }
-
-    private func addLegend(to mapView: MKMapView) {
-        let legend = UIStackView()
-        legend.axis = .vertical
-        legend.spacing = 8
-        legend.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-        legend.layer.cornerRadius = 12
-        legend.layer.borderWidth = 1
-        legend.layer.borderColor = UIColor.white.cgColor
-        legend.isLayoutMarginsRelativeArrangement = true
-        legend.layoutMargins = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
-
-        let title = UILabel()
-        title.text = "Flood Risk"
-        title.textColor = .white
-        title.font = .boldSystemFont(ofSize: 16)
-        legend.addArrangedSubview(title)
-
-        let risks = [
-            ("High", UIColor(red: 0.9, green: 0.1, blue: 0.1, alpha: 1.0)),
-            ("Medium", UIColor.orange),
-            ("Low", UIColor(red: 0.1, green: 0.8, blue: 0.1, alpha: 1.0))
-        ]
-
-        for (text, color) in risks {
-            let row = UIStackView()
-            row.spacing = 10
-
-            let dot = UIView()
-            dot.backgroundColor = color
-            dot.layer.cornerRadius = 8
-            dot.snp.makeConstraints { $0.width.height.equalTo(16) }
-
-            let label = UILabel()
-            label.text = text
-            label.textColor = .white
-            label.font = .systemFont(ofSize: 14)
-
-            row.addArrangedSubview(dot)
-            row.addArrangedSubview(label)
-            legend.addArrangedSubview(row)
-        }
-
-        addSubview(legend)
-        legend.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            legend.topAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -150),
-            legend.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
-        ])
     }
 
     private func setupActivityIndicator() {

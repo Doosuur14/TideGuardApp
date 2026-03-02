@@ -9,6 +9,10 @@ import UIKit
 import MapKit
 import Combine
 
+class FloodAnnotation: MKPointAnnotation {
+    var floodProbability: Int64 = 0
+    var riskLevel: Int = 0
+}
 
 
 class SafetyViewController: UIViewController, MKMapViewDelegate {
@@ -23,9 +27,9 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         setUpFunc()
         configureIO()
         
-        viewModel.loadStateMap()
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
+        viewModel.fetchWeather()
 
     }
 
@@ -72,9 +76,9 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
                 case .onMapUpdate(let region):
                     self.safetyView?.mapView.setRegion(region, animated: true)
                     
-                case .error(let message):
+                case .error:
                     self.safetyView?.hideLoadingSpinner()
-                    self.showError("Failed to load anything")
+//                    self.showError("Failed to load anything")
                 }
             }
 
@@ -85,20 +89,28 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
     private func updateAnnotations(_ lgas: [LgaModel]) {
         guard let mapView = safetyView?.mapView else { return }
-
         mapView.removeAnnotations(mapView.annotations)
 
-        let annotations = lgas.map { lga -> MKPointAnnotation in
+        let annotations = lgas.map { lga -> FloodAnnotation in
             var mutableLga = lga
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = CLLocationCoordinate2D(latitude: lga.latitude, longitude: lga.longitude)
-            annotation.title = lga.lgaName
-
-//            let risk = viewModel.predictFloodRisk(for: lga)
+            viewModel.enrichLgaWithComputedFeatures(lga: &mutableLga)
             let risk = viewModel.predictFloodRisk(for: &mutableLga)
 
-//            annotation.subtitle = (risk == 2 ? "high" : risk == 1 ? "medium" : "low")
-            annotation.subtitle = (risk == 1 ? "flood" : "no flood")
+            let annotation = FloodAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(
+                latitude: lga.latitude,
+                longitude: lga.longitude
+            )
+            annotation.title = lga.lgaName
+
+            annotation.riskLevel = risk
+            annotation.floodProbability = mutableLga.floodProbability ?? 0
+
+            let riskLabel = risk == 2 ? "High Risk" :
+            risk == 1 ? "Medium Risk" : "Low Risk"
+            let probability = mutableLga.floodProbability ?? 0
+            annotation.subtitle = "\(riskLabel) · \(probability)% flood probability"
+
             return annotation
         }
 
@@ -110,11 +122,11 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         polygons.forEach { mapView.addOverlay($0.0) }
     }
 
+
     private func updateWeather(desc: String, temp: Double, humidity: Double, imageUrl: String?) {
         safetyView?.weatherDescriptionLabel.text = "Weather: \(desc)"
         safetyView?.temperatureLabel.text = "Temp: \(String(format: "%.1f", temp))°C"
         safetyView?.humidityLabel.text = "Humidity: \(Int(humidity))%"
-
         safetyView?.updateWeatherImage(with: imageUrl)
     }
 
@@ -126,58 +138,9 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     }
 
 
-
-//    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-//
-//        guard !(annotation is MKUserLocation) else { return nil }
-//
-//        let identifier = "floodRiskDot"
-//
-//        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-//
-//        if annotationView == nil {
-//            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-//            annotationView?.canShowCallout = true
-//        } else {
-//            annotationView?.annotation = annotation
-//        }
-//
-//
-//        let risk = annotation.subtitle ?? "low"
-//        let color: UIColor
-//        switch risk {
-//        case "high":
-//            color = UIColor(red: 0.85, green: 0.05, blue: 0.05, alpha: 1.0)
-//        case "medium":
-//            color = UIColor.orange
-//        default:
-//            color = UIColor(red: 0.05, green: 0.75, blue: 0.05, alpha: 1.0)
-//        }
-//
-//
-//        let size = CGSize(width: 20, height: 20)
-//        UIGraphicsBeginImageContextWithOptions(size, false, 0)
-//        let context = UIGraphicsGetCurrentContext()!
-//
-//
-//        context.setFillColor(UIColor.white.cgColor)
-//        context.fillEllipse(in: CGRect(origin: .zero, size: size))
-//
-//
-//        context.setFillColor(color.cgColor)
-//        context.fillEllipse(in: CGRect(x: 3, y: 3, width: 14, height: 14))
-//
-//        let image = UIGraphicsGetImageFromCurrentImageContext()!
-//        UIGraphicsEndImageContext()
-//
-//        annotationView?.image = image
-//
-//        return annotationView
-//    }
-
-
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard !(annotation is MKUserLocation) else { return nil }
+
         let identifier = "floodRiskDot"
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
@@ -188,13 +151,15 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
             annotationView?.annotation = annotation
         }
 
-        // Use floodProbability if available
-        var riskColor: UIColor = .gray
-        if let lgaTitle = annotation.title ?? "",
-           let lga = viewModel.lgasCache.first(where: { $0.lgaName == lgaTitle }),
-           let prob = lga.floodProbability {
-            // red = high probability, green = low
-            riskColor = UIColor(red: CGFloat(prob), green: CGFloat(1 - prob), blue: 0, alpha: 1)
+        let riskColor: UIColor
+        if let floodAnnotation = annotation as? FloodAnnotation {
+            switch floodAnnotation.riskLevel {
+            case 2:  riskColor = .red
+            case 1:  riskColor = .orange
+            default: riskColor = .green
+            }
+        } else {
+            riskColor = .gray
         }
 
         let size = CGSize(width: 20, height: 20)
@@ -210,5 +175,4 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         annotationView?.image = image
         return annotationView
     }
-
 }

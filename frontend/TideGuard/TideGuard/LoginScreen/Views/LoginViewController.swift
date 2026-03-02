@@ -12,6 +12,7 @@ class LoginViewController<ViewModel: LoginMainViewModelProtocol>: UIViewControll
 
     var loginView: LoginScreenView?
     let viewModel: ViewModel
+    weak var output: LoginOutput?
     private var cancellables: Set<AnyCancellable> = []
 
     init(viewModel: ViewModel) {
@@ -48,7 +49,8 @@ class LoginViewController<ViewModel: LoginMainViewModelProtocol>: UIViewControll
         case .loading:
             print("loading state")
         case .isloggedSuccessfully:
-            AlertManager.shared.showLoginAlert(viewCon: self)
+//            AlertManager.shared.showLoginAlert(viewCon: self)
+            output?.signedInUser()
         case .loginFailed:
             AlertManager.shared.showLoginErrorAlert(viewCon: self)
         }

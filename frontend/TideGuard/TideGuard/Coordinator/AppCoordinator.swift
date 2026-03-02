@@ -56,4 +56,3 @@ extension AppCoordinator: AuthFlowCoordinatorProtocol, MainFlowCoordinatorProtoc
         showMainFlow()
     }
 }
-

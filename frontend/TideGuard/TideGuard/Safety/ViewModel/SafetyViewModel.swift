@@ -29,39 +29,44 @@ class SafetyViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-//    private let locationService = LocationService.shared
     var lgasCache: [LgaModel] = []
 
 
-
     func loadMap() {
-
         state = .loading
-        print("get flood data from lga")
         let user = AuthService.shared.getCurrentUser()
         let userCity = user?.city ?? ""
-        print("User Details for flooddata: \(String(describing: user))")
-        print("User city for flooddata: \(String(describing: userCity))")
 
-        print("Loading LGAs for state: \(String(describing: userCity))")
+        print("Loading LGAs for state: \(userCity)")
+
         LgaAPIService.shared.getLgasByState(for: userCity) { [weak self] lgas in
             guard let self = self else { return }
 
             DispatchQueue.main.async {
-                if let lgas = lgas {
-                    self.lgasCache = lgas
-                    self.state = .loadedLGAs(lgas)
-                } else {
+                guard let lgas = lgas, !lgas.isEmpty else {
                     self.state = .error("Failed to load LGAs")
+                    return
                 }
+
+                self.lgasCache = lgas
+
+                let avgLat = lgas.map { $0.latitude }.reduce(0, +) / Double(lgas.count)
+                let avgLon = lgas.map { $0.longitude }.reduce(0, +) / Double(lgas.count)
+
+                let region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: avgLat, longitude: avgLon),
+                    latitudinalMeters: 30000,
+                    longitudinalMeters: 30000
+                )
+
+                self.state = .onMapUpdate(region)
+                self.state = .loadedLGAs(lgas)
             }
         }
     }
 
 
     func fetchWeather() {
-        state = .loading
-
         let user = AuthService.shared.getCurrentUser()
         let userCity = user?.city ?? ""
 
@@ -78,7 +83,12 @@ class SafetyViewModel {
                         imageUrl: data.imageUrl
                     )
                 case .failure:
-                    self.state = .error("Failed to fetch weather")
+                    self.state = .weatherLoaded(
+                        description: "Weather unavailable",
+                        temp: 0.0,
+                        humidity: 0.0,
+                        imageUrl: nil
+                    )
                 }
             }
         }
@@ -86,9 +96,7 @@ class SafetyViewModel {
 
 
     func loadFullFloodMap() {
-        state = .loading
-
-        print("Loading Nigeria LGA GeoJSON + Env Data…")
+        print("Loading Nigeria LGA GeoJSON")
 
         LgaAPIService.shared.getAllLgas { [weak self] lgaData in
             guard let self = self, let lgaData = lgaData else { return }
@@ -124,53 +132,43 @@ class SafetyViewModel {
         if let cachedPrediction = lga.floodPrediction {
             return cachedPrediction
         }
+        guard let model = model else {
+            return 0
+        }
 
-        guard let model = model else { return 0 }
+        enrichLgaWithComputedFeatures(lga: &lga)
 
         do {
-            // Named inputs - must match feature names exactly from training
             let input = FloodRiskModelInput(
-                tp:               lga.tp,
-                ro:               lga.ro,
-                t2m:              lga.t2m,
-                swvl1:            lga.swvl1,
-                tp_7d:            lga.tp_7d,
-                tp_14d:           lga.tp_14d,
-                tp_30d:           lga.tp_30d,
-                ro_7d:            lga.ro_7d,
-                ro_14d:           lga.ro_14d,
-                swvl1_3d_change:  lga.swvl1_3d_change,
-                tp_7d_max:        lga.tp_7d_max,
-                latitude:         lga.latitude,
-                longitude:        lga.longitude,
-                month:            lga.month,
-                day_of_year:      lga.day_of_year,
-                state_encoded:    lga.state_encoded
+                tp:              lga.tp,
+                ro:              lga.ro,
+                t2m:             lga.t2m,
+                swvl1:           lga.swvl1,
+                tp_7d:           lga.tp_7d,
+                tp_14d:          lga.tp_14d,
+                tp_30d:          lga.tp_30d,
+                ro_7d:           lga.ro_7d,
+                ro_14d:          lga.ro_14d,
+                swvl1_3d_change: lga.swvl1_3d_change,
+                tp_7d_max:       lga.tp_7d_max,
+                latitude:        lga.latitude,
+                longitude:       lga.longitude,
+                month:           lga.month,
+                day_of_year:     lga.day_of_year,
+                state_encoded:   lga.state_encoded
             )
 
-//            let prediction = try model.prediction(input: input)
-//
-//            // Get flood probability (0.0 to 1.0)
-//            if let floodProb = prediction.Flood_EventProbability[1] {
-//                lga.floodProbability = Int64(floodProb * 100)
-//            } else {
-//                lga.floodProbability = 0
-//            }
-//
-//            lga.floodPrediction = Int(prediction.Flood_Event)
-//            return Int(prediction.Flood_Event)
-
-
             let prediction = try model.prediction(input: input)
-
             let riskScore = prediction.floodRisk
+            let clampedScore = max(0.0, min(1.0, riskScore))
+            lga.floodProbability = Int64(clampedScore * 100)
 
-            lga.floodProbability = Int64(riskScore * 100)
+            let category = riskScore >= 0.6 ? 2 :
+            riskScore >= 0.3 ? 1 :
+            0    
 
-            lga.floodPrediction = riskScore >= 0.6 ? 2 :  // High
-                                  riskScore >= 0.3 ? 1 :  // Medium
-                                                     0    // Low
-            return Int(prediction.floodRisk)
+            lga.floodPrediction = category
+            return category
 
         } catch {
             print("Prediction failed: \(error)")
@@ -179,43 +177,32 @@ class SafetyViewModel {
     }
 
 
+    func enrichLgaWithComputedFeatures(lga: inout LgaModel) {
+        let calendar = Calendar.current
+        let now = Date()
 
+        lga.month = Double(calendar.component(.month, from: now))
 
-    func loadStateMap() {
-        state = .loading
+        let startOfYear = calendar.date(from: calendar.dateComponents([.year], from: now))!
+        let dayOfYear = calendar.dateComponents([.day], from: startOfYear, to: now).day! + 1
+        lga.day_of_year = Double(dayOfYear)
 
-        let user = AuthService.shared.getCurrentUser()
-        if let stateName = user?.city {
-            print("Centering map on user's state using backend coordinates")
-
-            LgaAPIService.shared.getLgasByState(for: stateName) { [weak self] lgas in
-                guard let self = self, let lgas = lgas, !lgas.isEmpty else {
-                    DispatchQueue.main.async {
-                        self?.state = .onMapUpdate(self?.defaultNigeriaRegion() ?? MKCoordinateRegion())
-                    }
-                    return
-                }
-
-                let avgLat = lgas.map { $0.latitude }.reduce(0,+)/Double(lgas.count)
-                let avgLong = lgas.map { $0.longitude }.reduce(0,+)/Double(lgas.count)
-
-                let region = MKCoordinateRegion(
-                    center: CLLocationCoordinate2D(latitude: avgLat, longitude: avgLong),
-                    latitudinalMeters: 18000,
-                    longitudinalMeters: 18000
-                )
-
-                DispatchQueue.main.async {
-                    self.state = .onMapUpdate(region)
-                }
-            }
-        } else {
-            DispatchQueue.main.async {
-                self.state = .onMapUpdate(self.defaultNigeriaRegion())
-            }
-        }
+        lga.state_encoded = stateEncoding[lga.state.lowercased()] ?? 0
     }
-    
+
+    let stateEncoding: [String: Double] = [
+        "abia": 0, "adamawa": 1, "akwa ibom": 2, "anambra": 3,
+        "bauchi": 4, "bayelsa": 5, "benue": 6, "borno": 7,
+        "cross river": 8, "delta": 9, "ebonyi": 10, "edo": 11,
+        "ekiti": 12, "enugu": 13, "federal capital territory": 14,
+        "gombe": 15, "imo": 16, "jigawa": 17, "kaduna": 18,
+        "kano": 19, "katsina": 20, "kebbi": 21, "kogi": 22,
+        "kwara": 23, "lagos": 24, "nasarawa": 25, "niger": 26,
+        "ogun": 27, "ondo": 28, "osun": 29, "oyo": 30,
+        "plateau": 31, "rivers": 32, "sokoto": 33, "taraba": 34,
+        "yobe": 35, "zamfara": 36
+    ]
+
 
     private func defaultNigeriaRegion() -> MKCoordinateRegion {
         return MKCoordinateRegion(

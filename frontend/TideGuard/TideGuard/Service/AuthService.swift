@@ -87,8 +87,6 @@ final class AuthService {
                             completion(.failure(error))
                         }
                     }
-                    //                    UserDefaults.standard.set(email, forKey: "userEmail")
-                    //                    completion(.success(user))
                 case .failure(let error):
                     print("Login failed: \(error.localizedDescription)")
                     print(error)

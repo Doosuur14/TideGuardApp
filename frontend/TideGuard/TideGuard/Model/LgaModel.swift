@@ -7,63 +7,91 @@
 
 import Foundation
 
-
-//struct LgaModel: Codable {
-//    
-//    let lgaName: String
-//    let state: String
-//    let latitude: Double
-//    let longitude: Double
-//
-//    let rainfall1d: Double
-//    let rainfall3dAvg: Double
-//    let rainfall7dAvg: Double
-//    let rainfall7dMax: Double
-//    let rainfall7dCumulative: Double
-//
-//    let soilMoistureCurrent: Double
-//    let soilMoisture7dAvg: Double
-//
-//    let runoffTotal7d: Double
-//    let surfaceRunoff7d: Double
-//
-//    let temperatureCurrent: Double
-//    let temperature7dAvg: Double
-//
-////    let evaporation7d: Double
-//
-//    var floodProbability: Int64?      
-//    var floodPrediction: Int?
-//}
-
-
-
 struct LgaModel: Codable {
     let lgaName: String
     let state: String
     let latitude: Double
     let longitude: Double
 
-    // Single day ERA5 features
-    let tp: Double          // total precipitation (was rainfall1d)
-    let ro: Double          // runoff
-    let t2m: Double         // temperature (was temperatureCurrent)
-    let swvl1: Double       // soil moisture (was soilMoistureCurrent)
 
-    // Rolling window features
-    let tp_7d: Double       // 7 day cumulative rainfall
-    let tp_14d: Double      // 14 day cumulative rainfall
-    let tp_30d: Double      // 30 day cumulative rainfall
-    let ro_7d: Double       // 7 day cumulative runoff
-    let ro_14d: Double      // 14 day cumulative runoff
-    let swvl1_3d_change: Double  // soil moisture 3 day change
-    let tp_7d_max: Double   // max rainfall in last 7 days
+    let tp: Double
+    let ro: Double
+    let t2m: Double
+    let swvl1: Double
 
-    // Date features (computed, not fetched)
-    var month: Double
-    var day_of_year: Double
-    var state_encoded: Double
+    
+    let tp_7d: Double
+    let tp_14d: Double
+    let tp_30d: Double
+    let ro_7d: Double
+    let ro_14d: Double
+    let swvl1_3d_change: Double
+    let tp_7d_max: Double
+
+    var month: Double = 0
+    var day_of_year: Double = 0
+    var state_encoded: Double = 0
+
 
     var floodProbability: Int64?
     var floodPrediction: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case lgaName, state, latitude, longitude
+        case tp, ro, t2m, swvl1
+        case tp_7d           = "tp7d"
+        case tp_14d          = "tp14d"
+        case tp_30d          = "tp30d"
+        case ro_7d           = "ro7d"
+        case ro_14d          = "ro14d"
+        case swvl1_3d_change = "swvl1_3dChange"
+        case tp_7d_max       = "tp7dMax"
+        case floodProbability, floodPrediction
+    }
 }
+
+
+//struct LgaModel: Codable {
+//
+//    let lgaName: String
+//    let state: String
+//    let latitude: Double
+//    let longitude: Double
+//
+//
+//    let tp: Double
+//    let ro: Double
+//    let t2m: Double
+//    let swvl1: Double
+//
+//    // Rolling rainfall features
+//    let tp_7d: Double
+//    let tp_14d: Double
+//    let tp_30d: Double
+//    let tp_7d_max: Double
+//
+//    // Rolling runoff
+//    let ro_7d: Double
+//    let ro_14d: Double
+//
+//    // Soil moisture trend
+//    let swvl1_3d_change: Double
+//
+//    // Computed on device
+//    var month: Double = 0
+//    var day_of_year: Double = 0
+//    var state_encoded: Double = 0
+//
+//    // Model output
+//    var floodProbability: Int64?
+//    var floodPrediction: Int?
+//
+//    enum CodingKeys: String, CodingKey {
+//        case lgaName, state, latitude, longitude
+//        case tp, ro, t2m, swvl1
+//        case tp_7d, tp_14d, tp_30d, tp_7d_max
+//        case ro_7d, ro_14d
+//        case swvl1_3d_change
+//        case floodProbability, floodPrediction
+//    }
+//}
