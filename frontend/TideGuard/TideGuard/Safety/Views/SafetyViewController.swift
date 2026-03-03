@@ -78,7 +78,6 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
                     
                 case .error:
                     self.safetyView?.hideLoadingSpinner()
-//                    self.showError("Failed to load anything")
                 }
             }
 

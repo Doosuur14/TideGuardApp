@@ -16,9 +16,14 @@ class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
-        splashView?.onAnimationComplete = { [weak self] in
-            self?.transitionToLogin()
-        }
+//        splashView?.onAnimationComplete = { [weak self] in
+//            self?.transitionToLogin()
+//        }
+
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+//            self?.viewModel.delegate?.goToReg()
+//        }
+        self.transitionToLogin()
     }
 
     init(viewModel: ViewModel) {
@@ -32,7 +37,6 @@ class SplashViewController: UIViewController {
     private func setupView() {
         splashView = SplashView(frame: view.bounds)
         view = splashView
-       // splashView?.backgroundColor = UIColor(red: 230/255, green: 240/255, blue: 250/255, alpha: 1)
     }
 
     func transitionToLogin() {
@@ -40,7 +44,7 @@ class SplashViewController: UIViewController {
 //            let registeVC = RegistrationScreenViewController(viewModel: <#T##RegistrationViewModelProtocol#>)
 //            registeVC.modalPresentationStyle = .fullScreen
 //            self.present(loginVC, animated: true, completion: nil)
-            self.viewModel.delegate?.goToReg()
+            self.viewModel.delegate?.goToLogin()
         }
     }
 
