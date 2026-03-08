@@ -158,16 +158,6 @@ class SplashView: UIView {
     }
 
     private func setupLabels() {
-//        addSubview(appNameLabel)
-//        appNameLabel.text = "TideGuard"
-//        appNameLabel.font = UIFont.systemFont(ofSize: 38, weight: .bold)
-//        appNameLabel.textColor = .white
-//        appNameLabel.textAlignment = .center
-//        appNameLabel.alpha = 0
-//        appNameLabel.snp.makeConstraints { make in
-//            make.top.equalTo(logoImageView.snp.bottom).offset(20)
-//            make.centerX.equalToSuperview()
-//        }
 
         addSubview(taglineLabel)
         taglineLabel.text = "Stay ahead of the flood"

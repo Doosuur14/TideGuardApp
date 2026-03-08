@@ -44,7 +44,7 @@ class SplashViewController: UIViewController {
 //            let registeVC = RegistrationScreenViewController(viewModel: <#T##RegistrationViewModelProtocol#>)
 //            registeVC.modalPresentationStyle = .fullScreen
 //            self.present(loginVC, animated: true, completion: nil)
-            self.viewModel.delegate?.goToLogin()
+            self.viewModel.delegate?.goToReg()
         }
     }
 

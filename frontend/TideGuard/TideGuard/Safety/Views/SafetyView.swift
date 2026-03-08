@@ -10,9 +10,24 @@ import MapKit
 import SnapKit
 
 class SafetyView: UIView {
-    lazy var segmentedControl: UISegmentedControl = UISegmentedControl(items: ["Map","Weather"])
+    lazy var segmentedControl: UISegmentedControl = UISegmentedControl(items: ["Map","Weather", "Forecast"])
+
     lazy var containerView: UIView = UIView()
     lazy var mapView: MKMapView = MKMapView()
+
+    lazy var forecastContainer: UIView = UIView()
+    lazy var forecastScrollView: UIScrollView = UIScrollView()
+
+    lazy var weatherForecastHeaderLabel: UILabel = UILabel()
+    lazy var floodForecastHeaderLabel: UILabel = UILabel()
+
+
+    lazy var weeklyWeatherStackView: UIStackView = UIStackView()
+
+
+    lazy var monthlyFloodStackView: UIStackView = UIStackView()
+
+
     lazy var weatherContainer: UIView = UIView()
     lazy var weatherImageView: UIImageView = UIImageView()
     lazy var weatherDescriptionLabel: UILabel = UILabel()
@@ -34,6 +49,8 @@ class SafetyView: UIView {
         setUpContainer()
         setUpMap()
         setUpWeatherContainer()
+        setupForecastContainer()
+        setupForecastContent()
         setupActivityIndicator()
 
     }
@@ -73,7 +90,6 @@ class SafetyView: UIView {
         weatherContainer.backgroundColor = UIColor(named: "BackgroundColor")?.withAlphaComponent(0.9)
         weatherContainer.layer.cornerRadius = 15
         weatherContainer.clipsToBounds = true
-        containerView.addSubview(weatherContainer)
         weatherContainer.isHidden = true
         weatherContainer.snp.makeConstraints { make in
             make.edges.equalTo(containerView).inset(16)
@@ -114,18 +130,96 @@ class SafetyView: UIView {
         }
     }
 
+    private func setupForecastContainer() {
+        containerView.addSubview(forecastContainer)
+        forecastContainer.isHidden = true
+        forecastContainer.snp.makeConstraints { make in
+            make.edges.equalTo(containerView)
+        }
+    }
+
+    private func  setupForecastContent() {
+        forecastContainer.addSubview(forecastScrollView)
+
+        forecastScrollView.showsVerticalScrollIndicator = false
+        forecastScrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        forecastScrollView.addSubview(forecastContainer)
+        forecastContainer.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalTo(forecastScrollView)
+        }
+
+        // ── Section 1 header: 7 Day Weather Forecast ──
+        forecastContainer.addSubview(weatherForecastHeaderLabel)
+        weatherForecastHeaderLabel.text = "7-Day Weather Forecast"
+        weatherForecastHeaderLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        weatherForecastHeaderLabel.textColor = UIColor(named: "MainColor")
+        weatherForecastHeaderLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(20)
+            make.leading.equalToSuperview().inset(16)
+        }
+
+        // ── Weekly weather stack ──
+        forecastContainer.addSubview(weeklyWeatherStackView)
+        weeklyWeatherStackView.axis = .horizontal
+        weeklyWeatherStackView.distribution = .fillEqually
+        weeklyWeatherStackView.spacing = 8
+        weeklyWeatherStackView.snp.makeConstraints { make in
+            make.top.equalTo(weatherForecastHeaderLabel.snp.bottom).offset(12)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(100)
+        }
+
+        // ── Divider ──
+        let divider = UIView()
+        divider.backgroundColor = UIColor.systemGray5
+        forecastContainer.addSubview(divider)
+        divider.snp.makeConstraints { make in
+            make.top.equalTo(weeklyWeatherStackView.snp.bottom).offset(24)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(1)
+        }
+
+        // ── Section 2 header: Monthly Flood Risk ──
+        forecastContainer.addSubview(floodForecastHeaderLabel)
+        floodForecastHeaderLabel.text = "Monthly Flood Risk Forecast"
+        floodForecastHeaderLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        floodForecastHeaderLabel.textColor = UIColor(named: "MainColor")
+        floodForecastHeaderLabel.snp.makeConstraints { make in
+            make.top.equalTo(divider.snp.bottom).offset(24)
+            make.leading.equalToSuperview().inset(16)
+        }
+
+        
+        forecastContainers.addSubview(monthlyFloodStackView)
+        monthlyFloodStackView.axis = .vertical
+        monthlyFloodStackView.spacing = 12
+        monthlyFloodStackView.snp.makeConstraints { make in
+            make.top.equalTo(floodForecastHeaderLabel.snp.bottom).offset(12)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().offset(-24)
+        }
+
+    }
+
+
+
+
     @objc private func switchSection(_ sender: UISegmentedControl) {
 
         mapView.isHidden = true
         weatherContainer.isHidden = true
-        //subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = true } }
 
         switch sender.selectedSegmentIndex {
         case 0:
             mapView.isHidden = false
-           // subviews.forEach { if $0.accessibilityIdentifier == "legendView" { $0.isHidden = false } }
         case 1:
             weatherContainer.isHidden = false
+        case 2:
+                forecastContainer.isHidden = false
         default: break
         }
     }
