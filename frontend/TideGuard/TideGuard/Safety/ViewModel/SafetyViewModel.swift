@@ -15,8 +15,18 @@ enum SafetyState {
     case idle
     case loading
     case loadedLGAs([LgaModel])
-    case polygonsReady([(polygon: MKPolygon, risk: Int)])
-    case weatherLoaded(description: String, temp: Double, humidity: Double, imageUrl: String?)
+
+    case polygonsReady(
+        [(polygon: MKPolygon,
+          risk: Int)]
+    )
+    case weatherLoaded(description: String,
+                       temp: Double,
+                       humidity: Double,
+                       imageUrl: String?,
+                       weeklyForecast: [WeatherData.DailyForecast]
+    )
+
     case onMapUpdate(MKCoordinateRegion)
     case error(String)
 }
@@ -80,14 +90,15 @@ class SafetyViewModel {
                         description: data.description ?? "No description",
                         temp: data.temperature ?? 0.0,
                         humidity: data.humidity ?? 0.0,
-                        imageUrl: data.imageUrl
+                        imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
                     )
                 case .failure:
                     self.state = .weatherLoaded(
                         description: "Weather unavailable",
                         temp: 0.0,
                         humidity: 0.0,
-                        imageUrl: nil
+                        imageUrl: nil,
+                        weeklyForecast: []
                     )
                 }
             }
@@ -174,6 +185,24 @@ class SafetyViewModel {
             print("Prediction failed: \(error)")
             return 0
         }
+    }
+
+
+
+    func predictMonthlyRisk(for lga: LgaModel) -> [Int] {
+        var monthlyRisks: [Int] = []
+
+        for month in 1...12 {
+            var mutableLga = lga
+            mutableLga.month = Double(month)
+            // Use middle of each month as day_of_year
+            let middleDays = [15, 46, 75, 105, 135, 166, 196, 227, 258, 288, 319, 349]
+            mutableLga.day_of_year = Double(middleDays[month - 1])
+            let risk = predictFloodRisk(for: &mutableLga)
+            monthlyRisks.append(risk)
+        }
+
+        return monthlyRisks
     }
 
 

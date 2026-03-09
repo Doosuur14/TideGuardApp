@@ -14,7 +14,6 @@ class FloodAnnotation: MKPointAnnotation {
     var riskLevel: Int = 0
 }
 
-
 class SafetyViewController: UIViewController, MKMapViewDelegate {
 
     var safetyView: SafetyView?
@@ -66,13 +65,16 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
                 case .loadedLGAs(let lgas):
                     self.safetyView?.hideLoadingSpinner()
                     self.updateAnnotations(lgas)
-                    
+                    if let firstLga = lgas.first {
+                        let monthlyRisks = self.viewModel.predictMonthlyRisk(for: firstLga)
+                        self.safetyView?.updateMonthlyFloodForecast(monthlyRisks)
+                    }
                 case .polygonsReady(let polygons):
                     self.addPolygonsToMap(polygons)
                     
-                case .weatherLoaded(let desc, let temp, let humidity, let imageUrl):
-                    self.updateWeather(desc: desc, temp: temp, humidity: humidity, imageUrl: imageUrl)
-                    
+                case .weatherLoaded(let desc, let temp, let humidity, let imageUrl, let weeklyForecast):
+                    self.updateWeather(desc: desc, temp: temp, humidity: humidity, imageUrl: imageUrl, weeklyForecast: weeklyForecast)
+
                 case .onMapUpdate(let region):
                     self.safetyView?.mapView.setRegion(region, animated: true)
                     
@@ -122,12 +124,15 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     }
 
 
-    private func updateWeather(desc: String, temp: Double, humidity: Double, imageUrl: String?) {
+    private func updateWeather(desc: String, temp: Double, humidity: Double, imageUrl: String?, weeklyForecast: [WeatherData.DailyForecast]) {
         safetyView?.weatherDescriptionLabel.text = "Weather: \(desc)"
         safetyView?.temperatureLabel.text = "Temp: \(String(format: "%.1f", temp))°C"
         safetyView?.humidityLabel.text = "Humidity: \(Int(humidity))%"
         safetyView?.updateWeatherImage(with: imageUrl)
+        safetyView?.updateWeeklyForecast(with: weeklyForecast)
     }
+
+
 
 
     private func showError(_ message: String) {

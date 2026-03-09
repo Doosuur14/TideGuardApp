@@ -17,6 +17,7 @@ class SafetyView: UIView {
 
     lazy var forecastContainer: UIView = UIView()
     lazy var forecastScrollView: UIScrollView = UIScrollView()
+    lazy var forecastContentView: UIView = UIView()
 
     lazy var weatherForecastHeaderLabel: UILabel = UILabel()
     lazy var floodForecastHeaderLabel: UILabel = UILabel()
@@ -146,15 +147,15 @@ class SafetyView: UIView {
             make.edges.equalToSuperview()
         }
 
-        forecastScrollView.addSubview(forecastContainer)
-        forecastContainer.snp.makeConstraints { make in
+        forecastScrollView.addSubview(forecastContentView)
+        forecastContentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
             make.width.equalTo(forecastScrollView)
         }
 
-        // ── Section 1 header: 7 Day Weather Forecast ──
-        forecastContainer.addSubview(weatherForecastHeaderLabel)
-        weatherForecastHeaderLabel.text = "7-Day Weather Forecast"
+
+        forecastContentView.addSubview(weatherForecastHeaderLabel)
+        weatherForecastHeaderLabel.text = "7-Day Forecast"
         weatherForecastHeaderLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         weatherForecastHeaderLabel.textColor = UIColor(named: "MainColor")
         weatherForecastHeaderLabel.snp.makeConstraints { make in
@@ -162,8 +163,8 @@ class SafetyView: UIView {
             make.leading.equalToSuperview().inset(16)
         }
 
-        // ── Weekly weather stack ──
-        forecastContainer.addSubview(weeklyWeatherStackView)
+
+        forecastContentView.addSubview(weeklyWeatherStackView)
         weeklyWeatherStackView.axis = .horizontal
         weeklyWeatherStackView.distribution = .fillEqually
         weeklyWeatherStackView.spacing = 8
@@ -173,18 +174,18 @@ class SafetyView: UIView {
             make.height.equalTo(100)
         }
 
-        // ── Divider ──
+
         let divider = UIView()
         divider.backgroundColor = UIColor.systemGray5
-        forecastContainer.addSubview(divider)
+        forecastContentView.addSubview(divider)
         divider.snp.makeConstraints { make in
             make.top.equalTo(weeklyWeatherStackView.snp.bottom).offset(24)
             make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(1)
         }
 
-        // ── Section 2 header: Monthly Flood Risk ──
-        forecastContainer.addSubview(floodForecastHeaderLabel)
+
+        forecastContentView.addSubview(floodForecastHeaderLabel)
         floodForecastHeaderLabel.text = "Monthly Flood Risk Forecast"
         floodForecastHeaderLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         floodForecastHeaderLabel.textColor = UIColor(named: "MainColor")
@@ -193,8 +194,8 @@ class SafetyView: UIView {
             make.leading.equalToSuperview().inset(16)
         }
 
-        
-        forecastContainers.addSubview(monthlyFloodStackView)
+
+        forecastContentView.addSubview(monthlyFloodStackView)
         monthlyFloodStackView.axis = .vertical
         monthlyFloodStackView.spacing = 12
         monthlyFloodStackView.snp.makeConstraints { make in
@@ -202,9 +203,7 @@ class SafetyView: UIView {
             make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().offset(-24)
         }
-
     }
-
 
 
 
@@ -212,6 +211,7 @@ class SafetyView: UIView {
 
         mapView.isHidden = true
         weatherContainer.isHidden = true
+        forecastContainer.isHidden = true
 
         switch sender.selectedSegmentIndex {
         case 0:
@@ -223,6 +223,7 @@ class SafetyView: UIView {
         default: break
         }
     }
+    
 
     func updateWeatherImage(with urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
@@ -240,6 +241,153 @@ class SafetyView: UIView {
         }.resume()
     }
 
+
+
+    func updateWeeklyForecast(with data: [WeatherData.DailyForecast]) {
+        weeklyWeatherStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        for day in data {
+            let card = makeDayWeatherCard(day: day)
+            weeklyWeatherStackView.addArrangedSubview(card)
+        }
+    }
+
+
+    private func makeDayWeatherCard(day: WeatherData.DailyForecast) -> UIView {
+        let card = UIView()
+        card.backgroundColor = UIColor.systemGray6
+        card.layer.cornerRadius = 12
+
+        // Day name e.g "Mon"
+        let dayLabel = UILabel()
+        dayLabel.text = day.date ?? "-"
+        dayLabel.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        dayLabel.textAlignment = .center
+        dayLabel.textColor = .secondaryLabel
+        card.addSubview(dayLabel)
+        dayLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.centerX.equalToSuperview()
+        }
+
+
+        let iconImageView = UIImageView()
+        iconImageView.contentMode = .scaleAspectFit
+        card.addSubview(iconImageView)
+        iconImageView.snp.makeConstraints { make in
+            make.top.equalTo(dayLabel.snp.bottom).offset(4)
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(32)
+        }
+
+        if let iconUrl = day.icon, let url = URL(string: iconUrl) {
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                if let data = data, let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        iconImageView.image = image
+                    }
+                }
+            }.resume()
+        }
+
+        let tempLabel = UILabel()
+        let maxTemp = day.maxTemp ?? 0
+        let minTemp = day.minTemp ?? 0
+        tempLabel.text = "\(Int(maxTemp))°/\(Int(minTemp))°"
+        tempLabel.font = UIFont.systemFont(ofSize: 11, weight: .bold)
+        tempLabel.textAlignment = .center
+        tempLabel.textColor = .label
+        card.addSubview(tempLabel)
+        tempLabel.snp.makeConstraints { make in
+            make.top.equalTo(iconImageView.snp.bottom).offset(4)
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-8)
+        }
+
+        return card
+    }
+
+    func updateMonthlyFloodForecast(_ monthlyRisks: [Int]) {
+
+        monthlyFloodStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+        // Split into two rows of 6
+        let firstHalf  = Array(zip(monthNames.prefix(6), monthlyRisks.prefix(6)))
+        let secondHalf = Array(zip(monthNames.suffix(6), monthlyRisks.suffix(6)))
+
+        for half in [firstHalf, secondHalf] {
+            let rowStack = UIStackView()
+            rowStack.axis = .horizontal
+            rowStack.distribution = .fillEqually
+            rowStack.spacing = 8
+
+            for (month, risk) in half {
+                let cell = makeMonthRiskCell(month: month, risk: risk)
+                rowStack.addArrangedSubview(cell)
+            }
+            monthlyFloodStackView.addArrangedSubview(rowStack)
+        }
+    }
+
+
+    private func makeMonthRiskCell(month: String, risk: Int) -> UIView {
+        let cell = UIView()
+        cell.backgroundColor = UIColor.systemGray6
+        cell.layer.cornerRadius = 12
+
+        let monthLabel = UILabel()
+        monthLabel.text = month
+        monthLabel.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
+        monthLabel.textAlignment = .center
+        monthLabel.textColor = .secondaryLabel
+        cell.addSubview(monthLabel)
+        monthLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(10)
+            make.centerX.equalToSuperview()
+        }
+
+        let riskLabel = UILabel()
+        riskLabel.font = UIFont.systemFont(ofSize: 10, weight: .medium)
+        riskLabel.textAlignment = .center
+
+        let dot = UIView()
+        dot.layer.cornerRadius = 8
+
+        switch risk {
+        case 2:
+            dot.backgroundColor = .systemRed
+            riskLabel.text = "High"
+            riskLabel.textColor = .systemRed
+        case 1:
+            dot.backgroundColor = .systemOrange
+            riskLabel.text = "Med"
+            riskLabel.textColor = .systemOrange
+        default:
+            dot.backgroundColor = .systemGreen
+            riskLabel.text = "Low"
+            riskLabel.textColor = .systemGreen
+        }
+
+        cell.addSubview(dot)
+        dot.snp.makeConstraints { make in
+            make.top.equalTo(monthLabel.snp.bottom).offset(8)
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(16)
+        }
+
+        cell.addSubview(riskLabel)
+        riskLabel.snp.makeConstraints { make in
+            make.top.equalTo(dot.snp.bottom).offset(4)
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-10)
+        }
+
+        return cell
+    }
+
     private func setupActivityIndicator() {
         addSubview(activityIndicator)
         activityIndicator.hidesWhenStopped = true
@@ -249,16 +397,15 @@ class SafetyView: UIView {
             activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
-
     }
 
     func showLoadingSpinner() {
-            activityIndicator.startAnimating()
-            isUserInteractionEnabled = false
-        }
+        activityIndicator.startAnimating()
+        isUserInteractionEnabled = false
+    }
 
-        func hideLoadingSpinner() {
-            activityIndicator.stopAnimating()
-            isUserInteractionEnabled = true
-        }
+    func hideLoadingSpinner() {
+        activityIndicator.stopAnimating()
+        isUserInteractionEnabled = true
+    }
 }
