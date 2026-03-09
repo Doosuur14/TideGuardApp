@@ -138,7 +138,6 @@ public class LgaGeoServiceImpl implements LgaGeoService {
         dto.setRo7d(envData.getRo7d());
         dto.setRo14d(envData.getRo14d());
         dto.setSwvl1_3dChange(envData.getSwvl1_3dChange());
-
         return dto;
     }
 

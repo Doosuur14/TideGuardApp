@@ -19,4 +19,9 @@ public class WeatherController {
     public WeatherData getWeatherForCity(@PathVariable String city) {
         return weatherService.fetchWeatherForCity(city);
     }
+
+    @GetMapping("/weekly-weather/{city}")
+    public WeatherData getWeeklyForecastForCity(@PathVariable String city) {
+        return weatherService.fetchWeeklyWeatherForCity(city);
+    }
 }
