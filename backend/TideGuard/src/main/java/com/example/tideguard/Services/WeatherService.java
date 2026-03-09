@@ -5,7 +5,7 @@ import com.example.tideguard.Models.WeatherData;
 
 public interface WeatherService {
     WeatherData fetchWeatherForCity(String city);
-    WeatherData fetchWeeklyWeatherForCity(String city);
-    WeatherData fetchWeatherForLga(String lgaName);
+//    WeatherData fetchWeeklyWeatherForCity(String city);
+//    WeatherData fetchWeatherForLga(String lgaName);
     EnvData fetchEnvironmentalData(double latitude, double longitude);
 }

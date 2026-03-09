@@ -20,8 +20,8 @@ public class WeatherController {
         return weatherService.fetchWeatherForCity(city);
     }
 
-    @GetMapping("/weekly-weather/{city}")
-    public WeatherData getWeeklyForecastForCity(@PathVariable String city) {
-        return weatherService.fetchWeeklyWeatherForCity(city);
-    }
+//    @GetMapping("/weekly-weather/{city}")
+//    public WeatherData getWeeklyForecastForCity(@PathVariable String city) {
+//        return weatherService.fetchWeeklyWeatherForCity(city);
+//    }
 }
