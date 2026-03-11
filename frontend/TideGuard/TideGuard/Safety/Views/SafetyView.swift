@@ -554,6 +554,9 @@ class SafetyView: UIView {
     private func setupMapPage() {
         mapPage.addSubview(mapView)
         mapView.frame = mapPage.bounds
+        mapView.mapType = .hybridFlyover
+        mapView.isPitchEnabled = true
+        mapView.isRotateEnabled = true
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
 
