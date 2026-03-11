@@ -19,6 +19,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/api/weather/**").permitAll()
+                .antMatchers("/api/flood-forecast/**").permitAll()
                 .antMatchers("/login").permitAll();
     }
 }

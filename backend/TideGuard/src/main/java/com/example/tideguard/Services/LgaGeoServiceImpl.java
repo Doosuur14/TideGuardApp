@@ -30,34 +30,6 @@ public class LgaGeoServiceImpl implements LgaGeoService {
     private GeoService geoService;
     private static final Logger logger = LoggerFactory.getLogger(LgaGeoServiceImpl.class);
 
-//    @Override
-//    public List<LgaWithEnvDTO> getLgasWithEnvByState(String state) {
-//
-//        System.out.println("=== START getLgasWithEnvByState ===");
-//        System.out.println("📡 Fetching LGAs for state: " + state);
-//
-//        List<LgaGeo> entities = geoService.getLgasByState(state);
-//
-//        System.out.println("🗃️ GeoService returned " + entities.size() + " LGAs for state: " + state);
-//
-//        if (entities.isEmpty()) {
-//            System.out.println("NO LGAs found for state: " + state);
-//
-//
-//            Set<String> availableStates = geoService.getAllStates();
-//            System.out.println("🏛️ Available states: " + availableStates);
-//        }
-//
-//        List<LgaWithEnvDTO> result = entities.stream()
-//                .map(this::convertToDtoWithEnvironmentalData)
-//                .collect(Collectors.toList());
-//
-//        System.out.println("🎯 Final result: " + result.size() + " DTOs being returned");
-//        System.out.println("=== END getLgasWithEnvByState ===");
-//        return result;
-//    }
-
-
     private final Map<String, EnvData> stateCache = new ConcurrentHashMap<>();
     @Override
     public List<LgaWithEnvDTO> getLgasWithEnvByState(String state) {
@@ -140,41 +112,4 @@ public class LgaGeoServiceImpl implements LgaGeoService {
         dto.setSwvl1_3dChange(envData.getSwvl1_3dChange());
         return dto;
     }
-
-//    private LgaWithEnvDTO convertToBasicDto(LgaGeo entity) {
-//        LgaWithEnvDTO dto = new LgaWithEnvDTO();
-//        dto.setLgaName(entity.getLgaName());
-//        dto.setState(entity.getState());
-//        dto.setLatitude(entity.getLatitude());
-//        dto.setLongitude(entity.getLongitude());
-//        return dto;
-//    }
-//
-//    private void mapEnvironmentalDataToDto(LgaWithEnvDTO dto, EnvData envData) {
-//        dto.setTp(envData.getTp());
-//        dto.setRo(envData.getRo());
-//        dto.setT2m(envData.getT2m());
-//        dto.setSwvl1(envData.getSwvl1());
-//        dto.setTp7d(envData.getTp7d());
-//        dto.setTp14d(envData.getTp14d());
-//        dto.setTp30d(envData.getTp30d());
-//        dto.setTp7dMax(envData.getTp7dMax());
-//        dto.setRo7d(envData.getRo7d());
-//        dto.setRo14d(envData.getRo14d());
-//        dto.setSwvl1_3dChange(envData.getSwvl1_3dChange());
-//    }
-
-//    private void setDefaultEnvironmentalData(LgaWithEnvDTO dto) {
-//        dto.setTp(0);
-//        dto.setRo(0);
-//        dto.setT2m(0);
-//        dto.setSwvl1(0);
-//        dto.setTp7d(0);
-//        dto.setTp14d(0);
-//        dto.setTp30d(0);
-//        dto.setTp7dMax(0);
-//        dto.setRo7d(0);
-//        dto.setRo14d(0);
-//        dto.setSwvl1_3dChange(0);
-//    }
 }

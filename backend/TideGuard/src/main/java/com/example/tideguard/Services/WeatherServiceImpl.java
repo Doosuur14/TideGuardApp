@@ -35,8 +35,6 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
 
-
-
     public WeatherData fetchWeatherForCity(String city) {
         try {
 
@@ -111,7 +109,6 @@ public class WeatherServiceImpl implements WeatherService {
                 }
             }
 
-
             WeatherData weatherData = new WeatherData();
             weatherData.setDescription(mapWeatherCodeToDescription(weatherCode));
             weatherData.setTemperature(temperature);
@@ -126,166 +123,6 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
-
-//    public WeatherData fetchWeatherForCity(String city) {
-//
-//        try {
-//            String geocodeUrl = "https://nominatim.openstreetmap.org/search?format=json&q="
-//                    + city.replace(" ", "+");
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.set("User-Agent", "TideGuardApp/1.0 (contact@youremail.com)");
-//            HttpEntity<String> entity = new HttpEntity<>(headers);
-//
-//            ResponseEntity<String> geocodeResponse = restTemplate.exchange(
-//                    geocodeUrl,
-//                    HttpMethod.GET,
-//                    entity,
-//                    String.class
-//            );
-//
-//            if (geocodeResponse.getBody() == null) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONArray geocodeArray = new JSONArray(geocodeResponse.getBody());
-//            if (geocodeArray.length() == 0) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONObject geocodeResult = geocodeArray.getJSONObject(0);
-//            double latitude = geocodeResult.getDouble("lat");
-//            double longitude = geocodeResult.getDouble("lon");
-//
-//            String weatherUrl = String.format(
-//                    "https://api.open-meteo.com/v1/forecast" +
-//                            "?latitude=%.6f&longitude=%.6f" +
-//                            "&current_weather=true" +
-//                            "&hourly=relative_humidity_2m",
-//                    latitude, longitude
-//            );
-//
-//            String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
-//            if (weatherResponse == null) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONObject weatherJson     = new JSONObject(weatherResponse);
-//            JSONObject currentWeather  = weatherJson.getJSONObject("current_weather");
-//            double temperature         = currentWeather.getDouble("temperature");
-//            int weatherCode            = currentWeather.getInt("weathercode");
-//
-//            double humidity = 0.0;
-//            if (weatherJson.has("hourly")) {
-//                JSONObject hourly = weatherJson.getJSONObject("hourly");
-//                if (hourly.has("relative_humidity_2m")) {
-//                    JSONArray humidityArray = hourly.getJSONArray("relative_humidity_2m");
-//                    humidity = humidityArray.length() > 0 ? humidityArray.getDouble(0) : 0.0;
-//                }
-//            }
-//
-//            String description = mapWeatherCodeToDescription(weatherCode);
-//            String imageUrl    = mapWeatherCodeToImageUrl(weatherCode);
-//
-//            WeatherData weatherData = new WeatherData();
-//            weatherData.setDescription(description);
-//            weatherData.setTemperature(temperature);
-//            weatherData.setHumidity(humidity);
-//            weatherData.setImageUrl(imageUrl);
-//            return weatherData;
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return createDefaultWeatherData();
-//        }
-//    }
-//
-//
-//    public WeatherData fetchWeeklyWeatherForCity(String city) {
-//        try {
-//
-//            String geocodeUrl = "https://nominatim.openstreetmap.org/search?format=json&q="
-//                    + city.replace(" ", "+");
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.set("User-Agent", "TideGuardApp/1.0 (contact@youremail.com)");
-//            HttpEntity<String> entity = new HttpEntity<>(headers);
-//
-//            ResponseEntity<String> geocodeResponse = restTemplate.exchange(
-//                    geocodeUrl,
-//                    HttpMethod.GET,
-//                    entity,
-//                    String.class
-//            );
-//
-//            if (geocodeResponse.getBody() == null) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONArray geocodeArray = new JSONArray(geocodeResponse.getBody());
-//            if (geocodeArray.length() == 0) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONObject geocodeResult = geocodeArray.getJSONObject(0);
-//            double latitude = geocodeResult.getDouble("lat");
-//            double longitude = geocodeResult.getDouble("lon");
-//
-//            String weatherUrl = String.format(
-//                    "https://api.open-meteo.com/v1/forecast" +
-//                            "?latitude=%.6f&longitude=%.6f" +
-//                            "&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum" +
-//                            "&forecast_days=7" +
-//                            "&timezone=auto",
-//                    latitude, longitude
-//            );
-//
-//            String weatherResponse = restTemplate.getForObject(weatherUrl, String.class);
-//            if (weatherResponse == null) {
-//                return createDefaultWeatherData();
-//            }
-//
-//            JSONObject weatherJson     = new JSONObject(weatherResponse);
-//            JSONObject daily       = weatherJson.getJSONObject("daily");
-//
-//            JSONArray dates        = daily.getJSONArray("time");
-//            JSONArray maxTemps     = daily.getJSONArray("temperature_2m_max");
-//            JSONArray minTemps     = daily.getJSONArray("temperature_2m_min");
-//            JSONArray weatherCodes = daily.getJSONArray("weathercode");
-//            JSONArray precipitation = daily.getJSONArray("precipitation_sum");
-//
-//            List<WeatherData.DailyForecast> forecastList = new ArrayList<>();
-//
-//            for (int i = 0; i < dates.length(); i++) {
-//                WeatherData.DailyForecast day = new WeatherData.DailyForecast();
-//
-//                String date    = dates.getString(i);
-//                String dayName = getDayName(date);
-//
-//                int code = weatherCodes.getInt(i);
-//
-//                day.setDate(dayName);
-//                day.setMaxTemp(maxTemps.getDouble(i));
-//                day.setMinTemp(minTemps.getDouble(i));
-//                day.setWeatherCode(code);
-//                day.setPrecipitation(precipitation.getDouble(i));
-//                day.setDescription(mapWeatherCodeToDescription(code));
-//                day.setIcon(mapWeatherCodeToImageUrl(code));
-//
-//                forecastList.add(day);
-//
-//            }
-//
-//            WeatherData weatherData = new WeatherData();
-//            weatherData.setWeeklyForecast(forecastList);
-//            return weatherData;
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return createDefaultWeatherData();
-//        }
-//    }
-
     private String getDayName(String dateStr) {
         try {
             java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
@@ -296,11 +133,6 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
-
-    @Override
-    public WeatherData fetchWeatherForLga(String lgaName) {
-        return fetchWeatherForCity(lgaName);
-    }
 
     @Override
     @Cacheable(value = "envDataCache", key = "#state")
