@@ -7,7 +7,7 @@
 
 import Foundation
 
-class LgaAPIService {
+final class LgaAPIService {
 
     static let shared = LgaAPIService()
     private let baseURL =  "http://localhost:8080"

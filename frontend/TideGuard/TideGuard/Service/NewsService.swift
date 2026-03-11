@@ -8,10 +8,9 @@
 import Foundation
 import Alamofire
 
-class NewsService {
+final class NewsService {
     static let shared = NewsService()
     let baseURL = "http://192.168.31.202:8080/news"
-
 
     private let session: Session
 

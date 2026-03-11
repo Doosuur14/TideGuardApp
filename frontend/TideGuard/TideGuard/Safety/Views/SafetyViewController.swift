@@ -29,6 +29,7 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
         viewModel.fetchWeather()
+        viewModel.fetchFloodForecast()
 
     }
 
@@ -65,19 +66,19 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
                 case .loadedLGAs(let lgas):
                     self.safetyView?.hideLoadingSpinner()
                     self.updateAnnotations(lgas)
-                    if let firstLga = lgas.first {
-                        let monthlyRisks = self.viewModel.predictMonthlyRisk(for: firstLga)
-                        self.safetyView?.updateMonthlyFloodForecast(monthlyRisks)
-                    }
+
                 case .polygonsReady(let polygons):
                     self.addPolygonsToMap(polygons)
                     
-                case .weatherLoaded(let desc, let temp, let humidity, let imageUrl, let weeklyForecast):
-                    self.updateWeather(desc: desc, temp: temp, humidity: humidity, imageUrl: imageUrl, weeklyForecast: weeklyForecast)
+                case .weatherLoaded(let desc, let temp, let humidity,  let precipitation,  let imageUrl, let weeklyForecast):
+                    self.updateWeather(desc: desc, temp: temp, humidity: humidity, precipitation: precipitation, imageUrl: imageUrl, weeklyForecast: weeklyForecast)
 
                 case .onMapUpdate(let region):
                     self.safetyView?.mapView.setRegion(region, animated: true)
-                    
+
+                case .floodForecastLoaded(let riskDays):
+                    self.safetyView?.updateFloodForecastGrid(riskDays)
+
                 case .error:
                     self.safetyView?.hideLoadingSpinner()
                 }
@@ -123,16 +124,10 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         polygons.forEach { mapView.addOverlay($0.0) }
     }
 
-
-    private func updateWeather(desc: String, temp: Double, humidity: Double, imageUrl: String?, weeklyForecast: [WeatherData.DailyForecast]) {
-        safetyView?.weatherDescriptionLabel.text = "Weather: \(desc)"
-        safetyView?.temperatureLabel.text = "Temp: \(String(format: "%.1f", temp))°C"
-        safetyView?.humidityLabel.text = "Humidity: \(Int(humidity))%"
-        safetyView?.updateWeatherImage(with: imageUrl)
+    private func updateWeather(desc: String, temp: Double, humidity: Double, precipitation: Double, imageUrl: String?, weeklyForecast: [WeatherData.DailyForecast]) {
+        safetyView?.updateWeather(description: desc, temp: temp, humidity: humidity, precipitation: precipitation, imageUrl: imageUrl)
         safetyView?.updateWeeklyForecast(with: weeklyForecast)
     }
-
-
 
 
     private func showError(_ message: String) {

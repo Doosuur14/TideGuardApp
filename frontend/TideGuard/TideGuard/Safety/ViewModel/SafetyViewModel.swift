@@ -23,12 +23,14 @@ enum SafetyState {
     case weatherLoaded(description: String,
                        temp: Double,
                        humidity: Double,
+                       precipitation: Double,
                        imageUrl: String?,
                        weeklyForecast: [WeatherData.DailyForecast]
     )
 
     case onMapUpdate(MKCoordinateRegion)
     case error(String)
+    case floodForecastLoaded([FloodRiskDay])
 }
 
 class SafetyViewModel {
@@ -90,6 +92,7 @@ class SafetyViewModel {
                         description: data.description ?? "No description",
                         temp: data.temperature ?? 0.0,
                         humidity: data.humidity ?? 0.0,
+                        precipitation: data.precipitation ?? 0.0,
                         imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
                     )
                 case .failure:
@@ -97,6 +100,7 @@ class SafetyViewModel {
                         description: "Weather unavailable",
                         temp: 0.0,
                         humidity: 0.0,
+                        precipitation: 0.0,
                         imageUrl: nil,
                         weeklyForecast: []
                     )
@@ -187,23 +191,70 @@ class SafetyViewModel {
         }
     }
 
+    func fetchFloodForecast() {
+        let user = AuthService.shared.getCurrentUser()
+        let userState = user?.city ?? ""
 
+        print("🌊 Fetching flood forecast for state: \(userState)")
 
-    func predictMonthlyRisk(for lga: LgaModel) -> [Int] {
-        var monthlyRisks: [Int] = []
+        FloodForecastService.shared.fetchFloodForecast(for: userState) { [weak self] result in
+            guard let self = self else { return }
 
-        for month in 1...12 {
-            var mutableLga = lga
-            mutableLga.month = Double(month)
-            // Use middle of each month as day_of_year
-            let middleDays = [15, 46, 75, 105, 135, 166, 196, 227, 258, 288, 319, 349]
-            mutableLga.day_of_year = Double(middleDays[month - 1])
-            let risk = predictFloodRisk(for: &mutableLga)
-            monthlyRisks.append(risk)
+            switch result {
+            case .success(let days):
+                print("✅ Got \(days.count) forecast days from backend")
+                let riskDays = days.map { day -> FloodRiskDay in
+                    let probability = self.predictFloodRisk14DayForecast(day, state: userState)
+                    let level: Int = probability >= 0.6 ? 2 :
+                    probability >= 0.3 ? 1 : 0
+                    return FloodRiskDay(
+                        date: day.date,
+                        dayName: day.dayName,
+                        riskLevel: level,
+                        probability: probability
+                    )
+                }
+                DispatchQueue.main.async {
+                    self.state = .floodForecastLoaded(riskDays)
+                }
+            case .failure(let error):
+                print("Flood forecast fetch failed: \(error)")
+            }
         }
-
-        return monthlyRisks
     }
+
+    private func predictFloodRisk14DayForecast(_ day: FloodForecast, state: String) -> Double {
+        guard let model  = model else { return 0.0 }
+
+        do {
+            let input = FloodRiskModelInput(
+                tp:              day.tp,
+                ro:              day.ro,
+                t2m:             day.t2m,
+                swvl1:           day.swvl1,
+                tp_7d:           day.tp_7d,
+                tp_14d:          day.tp_14d,
+                tp_30d:          day.tp_30d,
+                ro_7d:           day.ro_7d,
+                ro_14d:          day.ro_14d,
+                swvl1_3d_change: day.swvl1_3d_change,
+                tp_7d_max:       day.tp_7d_max,
+                latitude:        day.latitude,
+                longitude:       day.longitude,
+                month:           Double(day.month),
+                day_of_year:     Double(day.dayOfYear),
+                state_encoded:   stateEncoding[state.lowercased()] ?? 0.0
+            )
+            let output = try model.prediction(input: input)
+            return max(0.0, min(1.0, output.floodRisk))
+
+        } catch {
+            print("Forecast prediction failed: \(error)")
+            return 0.0
+        }
+    }
+
+
 
 
     func enrichLgaWithComputedFeatures(lga: inout LgaModel) {

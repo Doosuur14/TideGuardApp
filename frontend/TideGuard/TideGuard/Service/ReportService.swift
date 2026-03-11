@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import Alamofire
 
-class ReportService {
+final class ReportService {
     static let shared = ReportService()
     private let baseURL = "http://192.168.31.218:8080"
 

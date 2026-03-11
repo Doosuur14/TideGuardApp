@@ -14,7 +14,6 @@ final class UserService {
     static let shared = UserService()
     private let baseURL = "http://localhost:8080/api"
 
-
     func deleteAccount(completion: @escaping (Result<Void, Error>) -> Void) {
         let url = "\(baseURL)/delete"
         let headers: HTTPHeaders = ["email": UserDefaults.standard.string(forKey: "userEmail") ?? ""]
@@ -29,7 +28,6 @@ final class UserService {
                 }
             }
     }
-
 
 
     func logOut(completion: @escaping (Result<Void, Error>) -> Void) {

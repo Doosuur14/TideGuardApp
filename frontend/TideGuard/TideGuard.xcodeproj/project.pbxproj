@@ -66,6 +66,8 @@
 		DEE8A2862F4529F1009C2448 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DEE8A2852F4529F1009C2448 /* Alamofire */; };
 		DEE8A2892F452B85009C2448 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEE8A2882F452B85009C2448 /* SnapKit */; };
 		DEF38F782F5D9C6800B87FD1 /* FloodRiskModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */; };
+		DEF38F7A2F62113C00B87FD1 /* FloodForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F792F62113C00B87FD1 /* FloodForecast.swift */; };
+		DEF38F7C2F6211AC00B87FD1 /* FloodForecastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */; };
 		DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C12DF19AE900497C21 /* FAQ.swift */; };
 		DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */; };
 		DEF3F4C72DF19C3F00497C21 /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C62DF19C3F00497C21 /* FAQView.swift */; };
@@ -156,6 +158,8 @@
 		DEDF01EA2EB04E0000AF8744 /* Shelter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shelter.swift; sourceTree = "<group>"; };
 		DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodRiskResponse.swift; sourceTree = "<group>"; };
 		DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodRiskModel.mlmodel; sourceTree = "<group>"; };
+		DEF38F792F62113C00B87FD1 /* FloodForecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodForecast.swift; sourceTree = "<group>"; };
+		DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodForecastService.swift; sourceTree = "<group>"; };
 		DEF3F4C12DF19AE900497C21 /* FAQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQ.swift; sourceTree = "<group>"; };
 		DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
 		DEF3F4C62DF19C3F00497C21 /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
@@ -257,6 +261,7 @@
 				DEF3F4E02DF6F9FB00497C21 /* ReportService.swift */,
 				DEF3F4EF2DFA055D00497C21 /* NewsService.swift */,
 				DE141A092EC772EB00D8B491 /* LgaAPIService.swift */,
+				DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -302,6 +307,7 @@
 				DEDF01EA2EB04E0000AF8744 /* Shelter.swift */,
 				DEDF01EC2EB04E4200AF8744 /* FloodRiskResponse.swift */,
 				DE141A072EC7709E00D8B491 /* LgaModel.swift */,
+				DEF38F792F62113C00B87FD1 /* FloodForecast.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -715,6 +721,7 @@
 				DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */,
 				DEF7D9272D9B244E000B4C01 /* LoginScreenView.swift in Sources */,
 				DE62C7BA2DB0D06B00A8BDF6 /* SplashModuleBuilder.swift in Sources */,
+				DEF38F7A2F62113C00B87FD1 /* FloodForecast.swift in Sources */,
 				DEDF01ED2EB04E4200AF8744 /* FloodRiskResponse.swift in Sources */,
 				DE7DBD952DD1FE5C0003EC62 /* UserService.swift in Sources */,
 				DE03590E2DAAA9BC00178E1D /* TideGuardModel.xcdatamodeld in Sources */,
@@ -776,6 +783,7 @@
 				DEF3F4D42DF1B97A00497C21 /* EditProfileView.swift in Sources */,
 				DE6709A82DD20A3200C19369 /* User+CoreDataProperties.swift in Sources */,
 				DE0359262DAC652F00178E1D /* RegisterViewIntent.swift in Sources */,
+				DEF38F7C2F6211AC00B87FD1 /* FloodForecastService.swift in Sources */,
 				DEF3F4F02DFA055D00497C21 /* NewsService.swift in Sources */,
 				DE9A946C2DCC2A110087581F /* WeatherData.swift in Sources */,
 				DEF3F4E82DFA051C00497C21 /* NewsViewModel.swift in Sources */,
