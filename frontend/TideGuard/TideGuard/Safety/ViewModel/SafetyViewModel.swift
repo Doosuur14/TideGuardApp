@@ -202,7 +202,7 @@ class SafetyViewModel {
 
             switch result {
             case .success(let days):
-                print("✅ Got \(days.count) forecast days from backend")
+                print("Got \(days.count) forecast days from backend")
                 let riskDays = days.map { day -> FloodRiskDay in
                     let probability = self.predictFloodRisk14DayForecast(day, state: userState)
                     let level: Int = probability >= 0.6 ? 2 :

@@ -535,6 +535,7 @@ class SafetyView: UIView {
         pagingScrollView.addSubview(forecastPage)
     }
 
+    private var tabBarInitialised = false
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -549,12 +550,17 @@ class SafetyView: UIView {
         forecastPage.frame = CGRect(x: w * 2, y: 0, width: w, height: h)
 
         weatherAnimationContainer.frame = weatherPage.bounds
+
+        if !tabBarInitialised && bottomTabBar.bounds.width > 0 {
+            tabBarInitialised = true
+            updateTabAppearance(selectedIndex: 0, animated: false)
+        }
     }
 
     private func setupMapPage() {
         mapPage.addSubview(mapView)
         mapView.frame = mapPage.bounds
-        mapView.mapType = .hybridFlyover
+        mapView.mapType = .mutedStandard
         mapView.isPitchEnabled = true
         mapView.isRotateEnabled = true
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -607,7 +613,6 @@ class SafetyView: UIView {
         weatherAnimationContainer.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         weatherAnimationContainer.clipsToBounds = true
 
-
         let card = UIView()
         card.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.75)
         card.layer.cornerRadius = 28
@@ -622,7 +627,8 @@ class SafetyView: UIView {
 
         weatherPage.addSubview(card)
         card.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.centerY.equalTo(safeAreaLayoutGuide.snp.centerY)
             make.leading.trailing.equalToSuperview().inset(24)
         }
 
@@ -664,10 +670,9 @@ class SafetyView: UIView {
 
         forecastPage.addSubview(forecastScrollView)
         forecastScrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.bottom.equalToSuperview()
         }
-
-        forecastScrollView.contentInset = UIEdgeInsets(top: 44, left: 0, bottom: 0, right: 0)
 
         forecastScrollView.addSubview(forecastContentView)
         forecastContentView.snp.makeConstraints { make in
@@ -1044,8 +1049,6 @@ class SafetyView: UIView {
         return btn
     }
 
-
-
     private func makeHeaderLabel(_ text: String) -> UILabel {
         let l = UILabel()
         l.text = text
@@ -1053,7 +1056,6 @@ class SafetyView: UIView {
         l.textColor = UIColor(named: "MainColor") ?? .label
         return l
     }
-
 
     func showLoadingSpinner() {
         activityIndicator.startAnimating()
