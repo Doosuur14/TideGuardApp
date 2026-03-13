@@ -75,7 +75,7 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         case 0: return 1
         case 1: return 1
         case 2: return 1
-        case 3: return 3
+        case 3: return 2
         default: return 0
         }
     }
@@ -90,16 +90,18 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.deselectRow(at: indexPath, animated: true)
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            let pviewModel = EditProfileViewModel()
-            let viewCon = EditProfileViewController(viewModel: pviewModel)
+            let viewCon = EditProfileViewController(viewModel: EditProfileViewModel())
             self.navigationController?.pushViewController(viewCon, animated: true)
         case (1, 0):
             viewModel.toggleTheme()
             profileView?.tableView.reloadData()
         case (2, 0):
-            let fviewModel = FAQViewModel()
-            let viewCon = FAQViewController(viewModel: fviewModel)
+            let viewCon = FAQViewController(viewModel: FAQViewModel())
             self.navigationController?.pushViewController(viewCon, animated: true)
+        case (3, 0):
+            didPressLogoutButton()
+        case (3, 1):
+            didPressDeleteButton()
         default:
             break
         }
@@ -113,13 +115,14 @@ class ProfileViewController: UIViewController, UITableViewDelegate, UITableViewD
             return "Settings"
         case 2:
             return "Support"
+        case 3: return nil
         default:
             return nil
         }
     }
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
 
     func setupGesture() {

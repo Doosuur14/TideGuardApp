@@ -10,7 +10,7 @@ import Alamofire
 
 final class NewsService {
     static let shared = NewsService()
-    let baseURL = "http://192.168.31.202:8080/news"
+    let baseURL = "http://localhost:8080/news"
 
     private let session: Session
 

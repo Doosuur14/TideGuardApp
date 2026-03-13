@@ -10,25 +10,25 @@ import UIKit
 import CoreData
 
 class ProfileViewModel {
-    
+
     @Published var profile: UserProfile?
     @Published var profileImage: UIImage?
     var onProfileUpdated: (() -> Void)?
-    
+
     private var context: NSManagedObjectContext {
         return CoreDataManager.shared.persistentContainer.viewContext
     }
-    
+
     init() {
         applyTheme()
     }
-    
+
     @objc func toggleTheme() {
         let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         UserDefaults.standard.set(!isDarkMode, forKey: "isDarkMode")
         applyTheme()
     }
-    
+
     private func applyTheme() {
         let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
         let interfaceStyle: UIUserInterfaceStyle = isDarkMode ? .dark : .light
@@ -40,12 +40,12 @@ class ProfileViewModel {
             window.overrideUserInterfaceStyle = interfaceStyle
         }
     }
-    
+
     func heightForRowAt() -> Int {
         return 100
     }
-    
-    
+
+
     private func deleteFromCoreData() {
         guard let email =  profile?.email   else { return }
         let fetchRequest: NSFetchRequest<User> = User.fetchRequest()
@@ -230,7 +230,7 @@ class ProfileViewModel {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
             cell?.configureCell(with: Profile(photo: UIImage(systemName: "person.fill"), label: "Edit profile"))
-            cell?.redirectButton.setImage(UIImage(systemName: "arrow.forward"), for: .normal)
+            cell?.redirectButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
 
         case (1, 0):
             let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")
@@ -243,17 +243,26 @@ class ProfileViewModel {
             cell?.isUserInteractionEnabled = true
         case (2, 0):
             cell?.configureCell(with: Profile(photo: UIImage(systemName: "questionmark.circle.fill"), label: "FAQ"))
-        case (2, 1):
-            cell?.configureCell(with: Profile(photo: UIImage(systemName: "phone.fill"), label: "Contact Us"))
+//        case (2, 1):
+//            cell?.configureCell(with: Profile(photo: UIImage(systemName: "phone.fill"), label: "Contact Us"))
         case (3, 0):
-            cell?.configureCell(with: Profile(photo: UIImage(systemName: "rectangle.portrait.and.arrow.right"), label: "Log Out"))
+            cell?.configureCell(
+                with: Profile(photo: UIImage(systemName: "rectangle.portrait.and.arrow.right"), label: "Log Out"),
+                isDestructive: false
+            )
+            cell?.redirectButton.isHidden = true
         case (3, 1):
-            cell?.configureCell(with: Profile(photo: UIImage(systemName: "trash.fill"), label: "Delete Account"))
+            cell?.configureCell(
+                with: Profile(photo: UIImage(systemName: "trash.fill"), label: "Delete Account"),
+                isDestructive: true
+            )
+            cell?.redirectButton.isHidden = true
         default:
             cell?.configureCell(with: Profile(photo: nil, label: ""))
         }
         return cell ?? ProfileTableViewCell(style: .default, reuseIdentifier: ProfileTableViewCell.profileReuseIdentifier)
     }
+
 
 
     func deleteAccount(completion: @escaping (Result<Void, Error>) -> Void) {
@@ -291,5 +300,4 @@ class ProfileViewModel {
             return UIApplication.shared.windows
         }
     }
-
 }
