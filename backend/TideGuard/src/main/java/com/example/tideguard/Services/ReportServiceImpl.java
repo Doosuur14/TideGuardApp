@@ -25,13 +25,10 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private UserRepository userRepository;
     @Override
-    public Report uploadReport(MultipartFile photo, String description, String email) {
+    public Report uploadReport(MultipartFile photo, String description, String email, Double latitude, Double longitude) {
         try {
-
             File directory = new File(reportDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
+            if (!directory.exists()) directory.mkdirs();
 
             String fileName = email + "_" + UUID.randomUUID().toString() + ".jpg";
             File file = new File(reportDir + fileName);
@@ -44,9 +41,10 @@ public class ReportServiceImpl implements ReportService {
             report.setFileName(fileName);
             report.setPhotoUrl("http://localhost:8080/api/files/" + fileName);
             report.setDescription(description);
+            report.setLatitude(latitude);
+            report.setLongitude(longitude);
             report.setUser(user);
             return reportRepository.save(report);
-
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload report: " + e.getMessage());
         }

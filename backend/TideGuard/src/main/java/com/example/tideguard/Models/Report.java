@@ -20,6 +20,8 @@ public class Report {
     private String photoUrl;
     private String description;
     private String fileName;
+    private Double latitude;
+    private Double longitude;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName ="userId")
