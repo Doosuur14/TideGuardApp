@@ -9,8 +9,10 @@ import Foundation
 
 struct News: Codable {
     let id: Int
-    let title: String
-    let description: String
-    let url: String
-    let publishedAt: String
+    let title: String?
+    let description: String?
+    let url: String?
+    let urlToImage: String?
+    let source: String?
+    let publishedAt: String?
 }

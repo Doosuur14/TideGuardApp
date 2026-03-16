@@ -230,7 +230,8 @@ class ProfileViewModel {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
             cell?.configureCell(with: Profile(photo: UIImage(systemName: "person.fill"), label: "Edit profile"))
-            cell?.redirectButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+            cell?.redirectButton.isHidden = false
+            //cell?.redirectButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
 
         case (1, 0):
             let isDarkMode = UserDefaults.standard.bool(forKey: "isDarkMode")

@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import SafariServices
 
 
 protocol NewsModuleProtocol: AnyObject {
@@ -17,11 +18,8 @@ protocol NewsModuleProtocol: AnyObject {
 class NewsViewController: UIViewController, UITableViewDataSource,
                           UITableViewDelegate, NewsModuleProtocol {
 
-
     var viewModel: NewsViewModel
-
     var newsView: NewsView?
-
     private var cancellables: Set<AnyCancellable> = []
 
     init(newsView: NewsView? = nil, viewModel: NewsViewModel) {
@@ -29,43 +27,32 @@ class NewsViewController: UIViewController, UITableViewDataSource,
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+
+    required init?(coder: NSCoder) { fatalError() }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpView()
         fetchNewsData()
     }
-    
 
     private func fetchNewsData() {
-        print("Attempting to fetch news")
-        viewModel.fetchNews { [weak self] result in
-            switch result {
-            case .success:
-                print("News fetched successfully")
-            case .failure(let error):
+        viewModel.fetchNews { result in
+            if case .failure(let error) = result {
                 print("Failed to fetch news: \(error.localizedDescription)")
-//                DispatchQueue.main.async { [weak self] in
-//                    AlertManager.shared.showUpdateFailureAlert(viewCon: self ?? UIViewController())
-//                }
             }
         }
     }
-
 
     func setUpView() {
         newsView = NewsView(frame: view.bounds)
         view = newsView
         newsView?.setupDelegate(with: self)
         newsView?.setupDataSource(with: self)
-        newsView?.tableView.separatorStyle = .singleLine
-        newsView?.tableView.register(NewsTableViewCell.self, forCellReuseIdentifier: NewsTableViewCell.NewsReuseIdentifier)
-        view.backgroundColor = .systemBackground
+        newsView?.tableView.register(
+            NewsTableViewCell.self,
+            forCellReuseIdentifier: NewsTableViewCell.NewsReuseIdentifier
+        )
         viewModel.$newsItems
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -83,7 +70,19 @@ class NewsViewController: UIViewController, UITableViewDataSource,
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        CGFloat(viewModel.heightForRowAt())
+        UITableView.automaticDimension
     }
-    
+
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        260
+    }
+
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard let urlString = viewModel.newsItems[indexPath.row].url,
+              let url = URL(string: urlString) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
+    }
 }
