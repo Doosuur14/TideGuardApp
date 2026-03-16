@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -30,40 +31,19 @@ public class TideGuardApplication {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+//    @Bean
+//    public RestTemplate restTemplate() {
+//        return new RestTemplate();
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(TideGuardApplication.class, args);
     }
 
-//    @Bean
-//    CommandLineRunner init(EvacuationRepository evacuationRepository) {
-//        return args -> {
-//            evacuationRepository.deleteAll();
-//
-//            ObjectMapper mapper = new ObjectMapper();
-//            ClassPathResource evacuationResource = new ClassPathResource("evacuationdata.json");
-//            List<Evacuation> evacuations = mapper.readValue(evacuationResource.getInputStream(), new TypeReference<List<Evacuation>>() {}) ;
-//            evacuationRepository.saveAll(evacuations);
-//            System.out.println("Loaded " + evacuations.size() + " evacuation records into the database.");
-//        };
-//    }
 
     @Bean
     CommandLineRunner init(ShelterRepository shelterRepository, FloodRepository floodAreaRepository, FAQRepository faqRepository ) {
         return args -> {
-//            if (evacuationRepository.count() == 0) {
-//                ObjectMapper mapper = new ObjectMapper();
-//                ClassPathResource evacuationResource = new ClassPathResource("evacuationdata.json");
-//                List<Evacuation> evacuations = mapper.readValue(evacuationResource.getInputStream(), new TypeReference<List<Evacuation>>() {});
-//                evacuationRepository.saveAll(evacuations);
-//                System.out.println("Loaded " + evacuations.size() + " evacuation records into the database.");
-//            } else {
-//                System.out.println("Evacuation data already exists. Skipping initialization.");
-//            }
 
             if (shelterRepository.count() == 0) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -101,4 +81,12 @@ public class TideGuardApplication {
         };
     }
 
+
+    @Bean
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(5000);
+        return new RestTemplate(factory);
+    }
 }

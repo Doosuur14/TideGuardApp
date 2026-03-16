@@ -8,69 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-//@Component
-//public class NewsServiceImpl implements NewsService {
-//
-//    @Autowired
-//    private NewsRepository newsRepository;
-//
-//    @Value("${newsapi.key}")
-//    private String apiKey;
-//    @Override
-//    public List<News> getNews() {
-//        List<News> cachedNews = newsRepository.findAll();
-//        if (!cachedNews.isEmpty() && cachedNews.get(0).getPublishedAt() != null) {
-//            LocalDateTime lastUpdate = LocalDateTime.parse(cachedNews.get(0).getPublishedAt());
-//            if (lastUpdate.isAfter(LocalDateTime.now().minusHours(24))) { // Changed to 24 hours
-//                return cachedNews;
-//            }
-//        }
-//
-//        String url = "https://newsapi.org/v2/everything?q=flood+nigeria&apiKey=" + apiKey + "&language=en";
-//        RestTemplate restTemplate = new RestTemplate();
-//        NewsAPIResponse response = restTemplate.getForObject(url, NewsAPIResponse.class);
-//
-//        if (response != null && response.getArticles() != null) {
-//            newsRepository.deleteAll();
-//            List<News> newsList = response.getArticles().stream()
-//                    .map(article -> News.builder()
-//                            .title(article.getTitle())
-//                            .description(article.getDescription())
-//                            .url(article.getUrl())
-//                            .publishedAt(LocalDateTime.now().toString()) // Use current time as placeholder
-//                            .build())
-//                    .toList();
-//            return newsRepository.saveAll(newsList);
-//        }
-//        return Collections.emptyList();
-//    }
-//}
-//
-//class NewsAPIResponse {
-//    private List<Article> articles;
-//
-//    public List<Article> getArticles() {
-//        return articles;
-//    }
-//
-//    public void setArticles(List<Article> articles) {
-//        this.articles = articles;
-//    }
-//}
-//
-//@Getter
-//class Article {
-//    private String title;
-//    private String description;
-//    private String url;
-//
-//}
-
-
 
 @Component
 public class NewsServiceImpl implements NewsService {
@@ -89,19 +30,35 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public List<News> getNews() {
         List<News> cachedNews = newsRepository.findAll();
+
         if (!cachedNews.isEmpty()) {
-            // Uncomment and adjust if you want to enforce 24-hour caching
-            // LocalDateTime lastUpdate = LocalDateTime.parse(cachedNews.get(0).getPublishedAt());
-            // if (lastUpdate.isAfter(LocalDateTime.now().minusHours(24))) {
-            return cachedNews;
-            // }
+            LocalDateTime lastFetched = cachedNews.get(0).getFetchedAt();
+            if (lastFetched != null && lastFetched.isAfter(LocalDateTime.now().minusHours(6))) {
+                return cachedNews;
+            }
         }
 
-        // Fallback: Fetch from API if cache is empty or outdated
-        String url = "https://newsapi.org/v2/everything?q=flood+nigeria&apiKey=" + apiKey + "&language=en";
-        String response = restTemplate.getForObject(url, String.class);
-        List<News> freshNews = parseAndSaveNews(response);
-        return freshNews != null ? freshNews : Collections.emptyList();
+        newsRepository.deleteAll();
+
+        String url = "https://newsapi.org/v2/everything"
+                + "?q=\"Nigeria\" AND (\"flood\" OR \"flooding\" OR \"climate change\" OR \"rainfall\" OR \"natural disaster\")"
+                + "&sortBy=publishedAt"
+                + "&language=en"
+                + "&pageSize=100"
+                + "&apiKey=" + apiKey;
+
+        System.out.println("Fetching from NewsAPI: " + url);
+
+        try {
+            String response = restTemplate.getForObject(url, String.class);
+            System.out.println("NewsAPI response: " + response); // ← see what came back
+            List<News> freshNews = parseAndSaveNews(response);
+            System.out.println("Parsed articles: " + (freshNews != null ? freshNews.size() : "null"));
+            return freshNews != null && !freshNews.isEmpty() ? freshNews : cachedNews;
+        } catch (Exception e) {
+            System.out.println("NewsAPI fetch failed: " + e.getMessage()); // ← see the actual error
+            return cachedNews;
+        }
     }
 
     private List<News> parseAndSaveNews(String jsonResponse) {
@@ -109,17 +66,49 @@ public class NewsServiceImpl implements NewsService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(jsonResponse);
             List<News> newsList = new ArrayList<>();
+
             for (JsonNode article : root.path("articles")) {
+                String title = article.path("title").asText();
+                String description = article.path("description").asText();
+
+                if (title.equals("[Removed]") || title.isBlank()) continue;
+                if (description.equals("[Removed]")) continue;
+
+                boolean mentionsNigeria = title.toLowerCase().contains("nigeria")
+                        || description.toLowerCase().contains("nigeria");
+
+                if (!mentionsNigeria) continue;
+
                 News news = new News();
-                news.setTitle(article.path("title").asText());
+                news.setTitle(title);
+                news.setDescription(description);
+                news.setUrl(article.path("url").asText());
+                news.setUrlToImage(article.path("urlToImage").asText());
+                news.setSource(article.path("source").path("name").asText());
                 news.setPublishedAt(article.path("publishedAt").asText());
+                news.setFetchedAt(LocalDateTime.now());
+
                 newsList.add(news);
             }
+
             newsRepository.saveAll(newsList);
             return newsList;
         } catch (Exception e) {
             return null;
         }
     }
-}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
