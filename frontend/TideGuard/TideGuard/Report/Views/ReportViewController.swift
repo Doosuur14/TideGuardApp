@@ -35,7 +35,6 @@ class ReportViewController: UIViewController, ReportDelegate {
         view.backgroundColor = .systemBackground
         navigationItem.title = "Report An Emergency!"
         reportView = ReportView(frame: view.bounds)
-//        view = reportView
         view.addSubview(reportView ?? UIView())
         reportView?.snp.makeConstraints { make in make.edges.equalToSuperview() }
         reportView?.delegate = self
@@ -47,9 +46,9 @@ class ReportViewController: UIViewController, ReportDelegate {
         viewModel.uploadReport(image: image, description: description) { [weak self] result in
             switch result {
             case .success:
-//                AlertManager.shared.showSuccessfulReportAlert(viewCon: self ?? UIViewController())
                 self?.reportView?.descriptionTextView.text = "" 
                 self?.reportView?.imageView.image = nil
+                self?.reportView?.imageDidChange(false)
             case .failure(_):
                 AlertManager.shared.showUpdateFailureAlert(viewCon: self ?? UIViewController())
             }
@@ -103,14 +102,88 @@ class ReportViewController: UIViewController, ReportDelegate {
 
 
 extension ReportViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+//        if let image = info[.originalImage] as? UIImage {
+//            reportView?.imageView.image = image
+//            reportView?.imageDidChange(true)
+//        }
+//        picker.dismiss(animated: true)
+//    }
+
+
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        if let image = info[.originalImage] as? UIImage {
-            reportView?.imageView.image = image
+        guard let image = info[.originalImage] as? UIImage else {
+            picker.dismiss(animated: true)
+            return
         }
+
         picker.dismiss(animated: true)
+
+        reportView?.uploadButton.setTitle("Analysing image...", for: .normal)
+        reportView?.uploadButton.isEnabled = false
+
+        FloodImageClassifier.shared.classify(image: image) { [weak self] isFlood, confidence in
+            DispatchQueue.main.async {
+
+                self?.reportView?.uploadButton.setTitle("Submit Report", for: .normal)
+                self?.reportView?.uploadButton.isEnabled = true
+
+                if isFlood {
+                    self?.reportView?.imageView.image = image
+                    self?.reportView?.imageDidChange(true)
+                    self?.showFloodConfirmedBanner(confidence: confidence)
+                } else {
+
+                    self?.showNotFloodAlert(confidence: confidence)
+                }
+            }
+        }
     }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
+    }
+
+
+    private func showNotFloodAlert(confidence: Float) {
+        let percentage = Int(confidence * 100)
+        let alert = UIAlertController(
+            title: "Not a Flood Image",
+            message: "Our classifier is \(percentage)% confident this photo doesn't show a flood. Please upload a photo of the flooded area.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Try Again", style: .default))
+        present(alert, animated: true)
+    }
+
+    private func showFloodConfirmedBanner(confidence: Float) {
+        let percentage = Int(confidence * 100)
+        let banner = UILabel()
+        banner.text = "Flood image confirmed (\(percentage)% confidence)"
+        banner.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
+        banner.textColor = .white
+        banner.textAlignment = .center
+        banner.backgroundColor = UIColor.systemGreen
+        banner.layer.cornerRadius = 10
+        banner.clipsToBounds = true
+        banner.alpha = 0
+
+        view.addSubview(banner)
+        banner.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-20)
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(40)
+        }
+
+        UIView.animate(withDuration: 0.3, animations: {
+            banner.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 2.5) {
+                banner.alpha = 0
+            } completion: { _ in
+                banner.removeFromSuperview()
+            }
+        }
     }
 }

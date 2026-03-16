@@ -10,6 +10,7 @@ import CoreLocation
 import MapKit
 import CoreML
 import Combine
+import UserNotifications
 
 enum SafetyState {
     case idle
@@ -195,7 +196,7 @@ class SafetyViewModel {
         let user = AuthService.shared.getCurrentUser()
         let userState = user?.city ?? ""
 
-        print("🌊 Fetching flood forecast for state: \(userState)")
+        print("Fetching flood forecast for state: \(userState)")
 
         FloodForecastService.shared.fetchFloodForecast(for: userState) { [weak self] result in
             guard let self = self else { return }
@@ -214,6 +215,7 @@ class SafetyViewModel {
                         probability: probability
                     )
                 }
+                self.scheduleHighRiskNotification(for: riskDays)
                 DispatchQueue.main.async {
                     self.state = .floodForecastLoaded(riskDays)
                 }
@@ -255,6 +257,46 @@ class SafetyViewModel {
     }
 
 
+
+    private func scheduleHighRiskNotification(for days: [FloodRiskDay]) {
+        let highRiskDays = days.filter { $0.riskLevel == 2}
+        guard !highRiskDays.isEmpty else { return }
+
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized else { return }
+
+            let content = UNMutableNotificationContent()
+            content.title = "⚠️ High Flood Risk Alert"
+            content.sound = .default
+
+            if highRiskDays.count == 1 {
+                let day = highRiskDays[0]
+                let probability = Int(day.probability * 100)
+                content.body = "High flood risk detected for \(day.dayName) in your area. \(probability)% probability — stay alert."
+            } else {
+                content.body = "High flood risk detected on \(highRiskDays.count) days in the next 14 days for your area. Stay alert."
+            }
+
+
+            UNUserNotificationCenter.current().removePendingNotificationRequests(
+                withIdentifiers: ["flood_high_risk"]
+            )
+
+            let request = UNNotificationRequest(
+                identifier: "flood_high_risk",
+                content: content,
+                trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+            )
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Failed to schedule flood alert: \(error)")
+                } else {
+                    print("High risk notification scheduled for \(highRiskDays.count) day(s)")
+                }
+            }
+        }
+    }
 
 
     func enrichLgaWithComputedFeatures(lga: inout LgaModel) {
@@ -318,5 +360,44 @@ class SafetyViewModel {
             }
         }
         return results
+    }
+
+
+    func scheduleDailyForecastReminder() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            guard settings.authorizationStatus == .authorized else { return }
+
+            UNUserNotificationCenter.current().removePendingNotificationRequests(
+                withIdentifiers: ["daily_forecast_reminder"]
+            )
+
+            let content = UNMutableNotificationContent()
+            content.title = "TideGuard Daily Update"
+            content.body = "Good morning! Check today's flood risk forecast for your area."
+            content.sound = .default
+
+            var dateComponents = DateComponents()
+            dateComponents.hour = 8
+            dateComponents.minute = 0
+
+            let trigger = UNCalendarNotificationTrigger(
+                dateMatching: dateComponents,
+                repeats: true
+            )
+
+            let request = UNNotificationRequest(
+                identifier: "daily_forecast_reminder",
+                content: content,
+                trigger: trigger
+            )
+
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Failed to schedule daily reminder: \(error)")
+                } else {
+                    print("Daily forecast reminder scheduled for 8:00 AM")
+                }
+            }
+        }
     }
 }

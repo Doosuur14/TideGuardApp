@@ -68,6 +68,8 @@
 		DEF38F782F5D9C6800B87FD1 /* FloodRiskModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */; };
 		DEF38F7A2F62113C00B87FD1 /* FloodForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F792F62113C00B87FD1 /* FloodForecast.swift */; };
 		DEF38F7C2F6211AC00B87FD1 /* FloodForecastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */; };
+		DEF38F7E2F68AC8E00B87FD1 /* FloodClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F7D2F68AC8D00B87FD1 /* FloodClassifier.mlmodel */; };
+		DEF38F802F68AD1A00B87FD1 /* FloodImageClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF38F7F2F68AD1A00B87FD1 /* FloodImageClassifier.swift */; };
 		DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C12DF19AE900497C21 /* FAQ.swift */; };
 		DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */; };
 		DEF3F4C72DF19C3F00497C21 /* FAQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF3F4C62DF19C3F00497C21 /* FAQView.swift */; };
@@ -160,6 +162,8 @@
 		DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodRiskModel.mlmodel; sourceTree = "<group>"; };
 		DEF38F792F62113C00B87FD1 /* FloodForecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodForecast.swift; sourceTree = "<group>"; };
 		DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodForecastService.swift; sourceTree = "<group>"; };
+		DEF38F7D2F68AC8D00B87FD1 /* FloodClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = FloodClassifier.mlmodel; sourceTree = "<group>"; };
+		DEF38F7F2F68AD1A00B87FD1 /* FloodImageClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloodImageClassifier.swift; sourceTree = "<group>"; };
 		DEF3F4C12DF19AE900497C21 /* FAQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQ.swift; sourceTree = "<group>"; };
 		DEF3F4C42DF19C2000497C21 /* FAQViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQViewController.swift; sourceTree = "<group>"; };
 		DEF3F4C62DF19C3F00497C21 /* FAQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FAQView.swift; sourceTree = "<group>"; };
@@ -339,6 +343,7 @@
 				DE03593F2DAD141D00178E1D /* AlertManager.swift */,
 				DE409EAE2EB617EE00B6F2B7 /* FloodAreaLoader.swift */,
 				DE409EB22EB61BBD00B6F2B7 /* FloodAreas.json */,
+				DEF38F7F2F68AD1A00B87FD1 /* FloodImageClassifier.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -409,6 +414,7 @@
 		DE9A6FDC2D9499CF00B93655 /* TideGuard */ = {
 			isa = PBXGroup;
 			children = (
+				DEF38F7D2F68AC8D00B87FD1 /* FloodClassifier.mlmodel */,
 				DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */,
 				DE9A94972DD006AD0087581F /* GoogleService-Info.plist */,
 				DEF3F4E42DFA03F200497C21 /* News */,
@@ -730,6 +736,7 @@
 				DE62C7B62DB0CF7A00A8BDF6 /* SafetyView.swift in Sources */,
 				DE2883AC2DC597520013B156 /* FloodArea.swift in Sources */,
 				DE9A94772DCD09BE0087581F /* ProfileTableViewCell.swift in Sources */,
+				DEF38F802F68AD1A00B87FD1 /* FloodImageClassifier.swift in Sources */,
 				DE0359422DAD1D3C00178E1D /* AuthFlowCoordinator.swift in Sources */,
 				DEF7D9292D9B245C000B4C01 /* LoginScreenViewModel.swift in Sources */,
 				DE0EDDA92DA1577C00D21C74 /* SplashViewController.swift in Sources */,
@@ -756,6 +763,7 @@
 				DEF3F4C52DF19C2000497C21 /* FAQViewController.swift in Sources */,
 				DEF3F4DD2DF66A0E00497C21 /* ReportView.swift in Sources */,
 				DE0359222DAC544000178E1D /* AuthService.swift in Sources */,
+				DEF38F7E2F68AC8E00B87FD1 /* FloodClassifier.mlmodel in Sources */,
 				DE9A949A2DD0B8EC0087581F /* ImageService.swift in Sources */,
 				DEF3F4E32DF76EFC00497C21 /* ReportModuleBuilder.swift in Sources */,
 				DE409EAF2EB617EE00B6F2B7 /* FloodAreaLoader.swift in Sources */,

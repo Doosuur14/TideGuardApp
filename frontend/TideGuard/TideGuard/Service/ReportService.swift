@@ -11,33 +11,35 @@ import Alamofire
 
 final class ReportService {
     static let shared = ReportService()
-    private let baseURL = "http://192.168.31.218:8080"
+    private let baseURL = "http://localhost:8080"
 
-    func uploadReport(image: UIImage?, description: String, email: String, completion: @escaping (Result<String, Error>) -> Void) {
-        guard let image = image, let imageData = image.jpegData(compressionQuality: 0.8) else {
+    func uploadReport(
+        image: UIImage?,
+        description: String,
+        email: String,
+        latitude: Double,
+        longitude: Double,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
+        let url = "\(baseURL)/report"
+
+        guard let image = image, let imageData = image.jpegData(compressionQuality: 0.7) else {
             completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No image selected"])))
             return
         }
 
-        let url = "\(baseURL)/report"
-        let headers: HTTPHeaders = ["email": email]
-
-        AF.upload(
-            multipartFormData: { multipartFormData in
-                multipartFormData.append(imageData, withName: "photo", fileName: "\(email)_report.jpg", mimeType: "image/jpeg")
-                multipartFormData.append(description.data(using: .utf8)!, withName: "description")
-            },
-            to: url,
-            headers: headers
-        ).responseDecodable(of: ReportResponse.self) { response in
+        AF.upload(multipartFormData: { formData in
+            formData.append(imageData, withName: "photo", fileName: "report.jpg", mimeType: "image/jpeg")
+            formData.append(description.data(using: .utf8)!, withName: "description")
+            formData.append("\(latitude)".data(using: .utf8)!, withName: "latitude")
+            formData.append("\(longitude)".data(using: .utf8)!, withName: "longitude")
+        }, to: url, headers: ["email": email])
+        .validate()
+        .responseDecodable(of: ReportResponse.self) { response in
             switch response.result {
-            case .success(let reportResponse):
-                completion(.success(reportResponse.photoUrl))
+            case .success(let report):
+                completion(.success(report.photoUrl ?? ""))
             case .failure(let error):
-                print("Error uploading report: \(error)")
-                if let statusCode = response.response?.statusCode {
-                    print("HTTP Status Code: \(statusCode)")
-                }
                 completion(.failure(error))
             }
         }
@@ -46,7 +48,9 @@ final class ReportService {
 
 struct ReportResponse: Decodable {
     let id: Int
-    let photoUrl: String
-    let description: String
-    let fileName: String
+    let photoUrl: String?
+    let description: String?
+    let fileName: String?
+    let latitude: Double?
+    let longitude: Double?
 }

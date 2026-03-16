@@ -30,8 +30,14 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         viewModel.loadFullFloodMap()
         viewModel.fetchWeather()
         viewModel.fetchFloodForecast()
+        viewModel.scheduleDailyForecastReminder()
 
+        edgesForExtendedLayout = .all
+        extendedLayoutIncludesOpaqueBars = true
     }
+
+
+
 
     init(viewModel: SafetyViewModel) {
         self.viewModel = viewModel

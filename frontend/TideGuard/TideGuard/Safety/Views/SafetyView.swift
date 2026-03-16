@@ -413,12 +413,6 @@ import SnapKit
 
 class SafetyView: UIView {
 
-    lazy var bottomTabBar: UIView = UIView()
-    lazy var mapTabButton: UIButton    = makeTabButton(icon: "map.fill",    title: "Map")
-    lazy var weatherTabButton: UIButton = makeTabButton(icon: "cloud.sun.fill", title: "Weather")
-    lazy var forecastTabButton: UIButton = makeTabButton(icon: "calendar",  title: "Forecast")
-    lazy var tabIndicator: UIView = UIView()
-
     lazy var pagingScrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.isPagingEnabled = true
@@ -430,11 +424,9 @@ class SafetyView: UIView {
     lazy var mapPage: UIView     = UIView()
     lazy var weatherPage: UIView = UIView()
     lazy var forecastPage: UIView = UIView()
-
-    lazy var mapView: MKMapView = MKMapView()
+    lazy var mapView: MKMapView  = MKMapView()
 
     lazy var weatherAnimationContainer: UIView = UIView()
-    lazy var weatherIconContainer: UIView = UIView()
     lazy var weatherIconImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
@@ -461,17 +453,16 @@ class SafetyView: UIView {
         sv.distribution = .fillEqually
         return sv
     }()
-    lazy var humidityPill: WeatherDetailPill  = WeatherDetailPill(icon: "💧", title: "Humidity")
-    lazy var precipPill: WeatherDetailPill    = WeatherDetailPill(icon: "🌧", title: "Rainfall")
-
+    lazy var humidityPill: WeatherDetailPill = WeatherDetailPill(icon: "💧", title: "Humidity")
+    lazy var precipPill: WeatherDetailPill   = WeatherDetailPill(icon: "🌧", title: "Rainfall")
 
     lazy var forecastScrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.showsVerticalScrollIndicator = false
         return sv
     }()
-    lazy var forecastContentView: UIView = UIView()
-    lazy var weeklyHeaderLabel: UILabel  = makeHeaderLabel("7-Day Weather Forecast")
+    lazy var forecastContentView: UIView     = UIView()
+    lazy var weeklyHeaderLabel: UILabel      = makeHeaderLabel("7-Day Weather Forecast")
     lazy var weeklyWeatherStackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .horizontal
@@ -479,11 +470,8 @@ class SafetyView: UIView {
         sv.spacing = 10
         return sv
     }()
-
-    lazy var floodHeaderLabel: UILabel = makeHeaderLabel("14-Day Flood Forecast")
-    lazy var floodGridContainer: UIView = UIView()
-
-
+    lazy var floodHeaderLabel: UILabel   = makeHeaderLabel("14-Day Flood Forecast")
+    lazy var floodGridContainer: UIView  = UIView()
     lazy var activityIndicator: UIActivityIndicatorView = {
         let ai = UIActivityIndicatorView(style: .large)
         ai.hidesWhenStopped = true
@@ -491,51 +479,46 @@ class SafetyView: UIView {
         return ai
     }()
 
+    // MARK: - Page Dots
+    private let dotsContainer = UIView()
+    private var dots: [UIView] = []
+    private let dotCount = 3
 
-    //to enable me track the current page
     private var currentPage: Int = 0
-
-
     private var weatherAnimationLayers: [CALayer] = []
-    private var weatherAnimationViews: [UIView] = []
-
+    private var weatherAnimationViews: [UIView]   = []
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
 
-    required init?(coder: NSCoder) {
-        fatalError()
-    }
+    required init?(coder: NSCoder) { fatalError() }
 
     private func setup() {
         backgroundColor = UIColor(named: "BackgroundColor") ?? .systemBackground
         setupPagingScrollView()
+        setupPageDots()
         setupMapPage()
         setupWeatherPage()
         setupForecastPage()
-        setupBottomTabBar()
         setupActivityIndicator()
         setupEdgeSwipeZones()
     }
 
-
+    // MARK: - Paging Scroll View
 
     private func setupPagingScrollView() {
         addSubview(pagingScrollView)
         pagingScrollView.delegate = self
         pagingScrollView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-84) // leave room for tab bar
+            make.edges.equalToSuperview() // full screen now
         }
 
         pagingScrollView.addSubview(mapPage)
         pagingScrollView.addSubview(weatherPage)
         pagingScrollView.addSubview(forecastPage)
     }
-
-    private var tabBarInitialised = false
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -544,18 +527,62 @@ class SafetyView: UIView {
         guard w > 0 else { return }
 
         pagingScrollView.contentSize = CGSize(width: w * 3, height: h)
-
-        mapPage.frame     = CGRect(x: 0,     y: 0, width: w, height: h)
-        weatherPage.frame = CGRect(x: w,     y: 0, width: w, height: h)
+        mapPage.frame      = CGRect(x: 0,     y: 0, width: w, height: h)
+        weatherPage.frame  = CGRect(x: w,     y: 0, width: w, height: h)
         forecastPage.frame = CGRect(x: w * 2, y: 0, width: w, height: h)
-
         weatherAnimationContainer.frame = weatherPage.bounds
+    }
 
-        if !tabBarInitialised && bottomTabBar.bounds.width > 0 {
-            tabBarInitialised = true
-            updateTabAppearance(selectedIndex: 0, animated: false)
+
+    private func setupPageDots() {
+        addSubview(dotsContainer)
+        dotsContainer.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-16)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(8)
+        }
+
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.alignment = .center
+        dotsContainer.addSubview(stack)
+        stack.snp.makeConstraints { make in make.edges.equalToSuperview() }
+
+        for i in 0..<dotCount {
+            let dot = UIView()
+            dot.layer.cornerRadius = 4
+            dot.backgroundColor = i == 0
+                ? (UIColor(named: "MainColor") ?? .systemBlue)
+                : UIColor.white.withAlphaComponent(0.5)
+            dot.snp.makeConstraints { make in
+                make.width.equalTo(i == 0 ? 20 : 8)
+                make.height.equalTo(8)
+            }
+            dots.append(dot)
+            stack.addArrangedSubview(dot)
         }
     }
+
+    private func updateDots(selectedIndex: Int) {
+        let accent = UIColor(named: "MainColor") ?? .systemBlue
+        for (i, dot) in dots.enumerated() {
+            UIView.animate(withDuration: 0.3,
+                           delay: 0,
+                           usingSpringWithDamping: 0.7,
+                           initialSpringVelocity: 0.5) {
+                let isSelected = i == selectedIndex
+                dot.backgroundColor = isSelected
+                    ? accent
+                    : UIColor.white.withAlphaComponent(0.5)
+                dot.snp.updateConstraints { make in
+                    make.width.equalTo(isSelected ? 20 : 8)
+                }
+                dot.superview?.layoutIfNeeded()
+            }
+        }
+    }
+
 
     private func setupMapPage() {
         mapPage.addSubview(mapView)
@@ -567,7 +594,6 @@ class SafetyView: UIView {
     }
 
     private func setupEdgeSwipeZones() {
-
         let leftEdge = UIView()
         leftEdge.backgroundColor = .clear
         addSubview(leftEdge)
@@ -596,16 +622,12 @@ class SafetyView: UIView {
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
         switch gesture.direction {
         case .left:
-            let nextPage = min(currentPage + 1, 2)
-            navigateToPage(nextPage, animated: true)
+            navigateToPage(min(currentPage + 1, 2), animated: true)
         case .right:
-            let prevPage = max(currentPage - 1, 0)
-            navigateToPage(prevPage, animated: true)
-        default:
-            break
+            navigateToPage(max(currentPage - 1, 0), animated: true)
+        default: break
         }
     }
-
 
     private func setupWeatherPage() {
         weatherPage.addSubview(weatherAnimationContainer)
@@ -618,13 +640,10 @@ class SafetyView: UIView {
         card.layer.cornerRadius = 28
         card.layer.borderWidth = 1
         card.layer.borderColor = UIColor.white.withAlphaComponent(0.3).cgColor
-
-
         card.layer.shadowColor = UIColor.black.cgColor
         card.layer.shadowOpacity = 0.08
         card.layer.shadowOffset = CGSize(width: 0, height: 8)
         card.layer.shadowRadius = 20
-
         weatherPage.addSubview(card)
         card.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -632,13 +651,11 @@ class SafetyView: UIView {
             make.leading.trailing.equalToSuperview().inset(24)
         }
 
-
         card.addSubview(weatherTempLabel)
         weatherTempLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(36)
             make.centerX.equalToSuperview()
         }
-
 
         card.addSubview(weatherConditionLabel)
         weatherConditionLabel.snp.makeConstraints { make in
@@ -646,14 +663,12 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
         }
 
-
         card.addSubview(weatherIconImageView)
         weatherIconImageView.snp.makeConstraints { make in
             make.top.equalTo(weatherConditionLabel.snp.bottom).offset(16)
             make.centerX.equalToSuperview()
             make.width.height.equalTo(80)
         }
-
 
         card.addSubview(weatherDetailsStack)
         weatherDetailsStack.addArrangedSubview(humidityPill)
@@ -667,7 +682,6 @@ class SafetyView: UIView {
     }
 
     private func setupForecastPage() {
-
         forecastPage.addSubview(forecastScrollView)
         forecastScrollView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
@@ -680,13 +694,11 @@ class SafetyView: UIView {
             make.width.equalTo(forecastScrollView)
         }
 
-
         forecastContentView.addSubview(weeklyHeaderLabel)
         weeklyHeaderLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(24)
             make.leading.equalToSuperview().inset(20)
         }
-
 
         forecastContentView.addSubview(weeklyWeatherStackView)
         weeklyWeatherStackView.snp.makeConstraints { make in
@@ -694,7 +706,6 @@ class SafetyView: UIView {
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(150)
         }
-
 
         let divider = UIView()
         divider.backgroundColor = UIColor.systemGray5
@@ -704,7 +715,6 @@ class SafetyView: UIView {
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(1)
         }
-
 
         forecastContentView.addSubview(floodHeaderLabel)
         floodHeaderLabel.snp.makeConstraints { make in
@@ -722,90 +732,12 @@ class SafetyView: UIView {
     }
 
 
-    private func setupBottomTabBar() {
-        addSubview(bottomTabBar)
-        bottomTabBar.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.95)
-
-        let blur = UIBlurEffect(style: .systemMaterial)
-        let blurView = UIVisualEffectView(effect: blur)
-        bottomTabBar.addSubview(blurView)
-        blurView.snp.makeConstraints { make in make.edges.equalToSuperview() }
-
-        bottomTabBar.layer.shadowColor = UIColor.black.cgColor
-        bottomTabBar.layer.shadowOpacity = 0.08
-        bottomTabBar.layer.shadowOffset = CGSize(width: 0, height: -4)
-        bottomTabBar.layer.shadowRadius = 12
-
-        bottomTabBar.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(84)
-        }
-
-        bottomTabBar.addSubview(tabIndicator)
-        tabIndicator.backgroundColor = (UIColor(named: "MainColor") ?? .systemBlue).withAlphaComponent(0.12)
-        tabIndicator.layer.cornerRadius = 16
-        let stack = UIStackView(arrangedSubviews: [mapTabButton, weatherTabButton, forecastTabButton])
-        stack.axis = .horizontal
-        stack.distribution = .fillEqually
-        bottomTabBar.addSubview(stack)
-        stack.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(8)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(60)
-        }
-
-        mapTabButton.addTarget(self, action: #selector(tabTapped(_:)), for: .touchUpInside)
-        weatherTabButton.addTarget(self, action: #selector(tabTapped(_:)), for: .touchUpInside)
-        forecastTabButton.addTarget(self, action: #selector(tabTapped(_:)), for: .touchUpInside)
-
-        mapTabButton.tag = 0
-        weatherTabButton.tag = 1
-        forecastTabButton.tag = 2
-
-        updateTabAppearance(selectedIndex: 0, animated: false)
-    }
-
-    @objc private func tabTapped(_ sender: UIButton) {
-        navigateToPage(sender.tag, animated: true)
-    }
 
     func navigateToPage(_ index: Int, animated: Bool) {
         currentPage = index
         let offset = CGPoint(x: pagingScrollView.bounds.width * CGFloat(index), y: 0)
         pagingScrollView.setContentOffset(offset, animated: animated)
-        updateTabAppearance(selectedIndex: index, animated: true)
-    }
-
-    private func updateTabAppearance(selectedIndex: Int, animated: Bool) {
-        let buttons = [mapTabButton, weatherTabButton, forecastTabButton]
-        let accent = UIColor(named: "MainColor") ?? .systemBlue
-
-
-        let buttonWidth = bottomTabBar.bounds.width / 3
-        let indicatorWidth: CGFloat = 72
-        let indicatorX = buttonWidth * CGFloat(selectedIndex) + (buttonWidth - indicatorWidth) / 2
-
-        let update = {
-            self.tabIndicator.frame = CGRect(
-                x: indicatorX,
-                y: 6,
-                width: indicatorWidth,
-                height: 48
-            )
-            for (i, btn) in buttons.enumerated() {
-                let isSelected = i == selectedIndex
-                btn.tintColor = isSelected ? accent : .tertiaryLabel
-                btn.transform = isSelected ? CGAffineTransform(scaleX: 1.08, y: 1.08) : .identity
-            }
-        }
-
-        if animated {
-            UIView.animate(withDuration: 0.3, delay: 0,
-                           usingSpringWithDamping: 0.7,
-                           initialSpringVelocity: 0.5) { update() }
-        } else {
-            update()
-        }
+        updateDots(selectedIndex: index)
     }
 
 
@@ -819,7 +751,6 @@ class SafetyView: UIView {
     }
 
 
-
     func updateWeather(description: String, temp: Double, humidity: Double, precipitation: Double, imageUrl: String?) {
         weatherTempLabel.text = "\(Int(temp))°"
         weatherConditionLabel.text = description
@@ -828,7 +759,6 @@ class SafetyView: UIView {
         updateWeatherImage(with: imageUrl)
         playWeatherAnimation(for: description)
     }
-    
 
     func updateWeatherImage(with urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
@@ -850,17 +780,14 @@ class SafetyView: UIView {
             card.transform = CGAffineTransform(translationX: 0, y: 20)
             weeklyWeatherStackView.addArrangedSubview(card)
             UIView.animate(withDuration: 0.4, delay: Double(i) * 0.06,
-                           usingSpringWithDamping: 0.8,
-                           initialSpringVelocity: 0) {
+                           usingSpringWithDamping: 0.8, initialSpringVelocity: 0) {
                 card.alpha = 1
                 card.transform = .identity
             }
         }
     }
 
-
     func updateFloodForecastGrid(_ days: [FloodRiskDay]) {
-
         floodGridContainer.subviews.forEach { $0.removeFromSuperview() }
 
         let columns = 7
@@ -872,14 +799,11 @@ class SafetyView: UIView {
         for (index, day) in days.enumerated() {
             let col = index % columns
             let row = index / columns
-
             let x = CGFloat(col) * (cellWidth + spacing)
             let y = CGFloat(row) * (cellHeight + spacing)
-
             let cell = makeFloodCell(day: day, width: cellWidth, height: cellHeight)
             cell.frame = CGRect(x: x, y: y, width: cellWidth, height: cellHeight)
             floodGridContainer.addSubview(cell)
-
             cell.alpha = 0
             UIView.animate(withDuration: 0.4, delay: Double(index) * 0.04,
                            usingSpringWithDamping: 0.8, initialSpringVelocity: 0) {
@@ -894,11 +818,11 @@ class SafetyView: UIView {
         }
     }
 
+
     private func makeFloodCell(day: FloodRiskDay, width: CGFloat, height: CGFloat) -> UIView {
         let container = UIView()
         container.layer.cornerRadius = 10
         container.clipsToBounds = true
-
         switch day.riskLevel {
         case 2:  container.backgroundColor = UIColor.systemRed.withAlphaComponent(0.15)
         case 1:  container.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.15)
@@ -911,13 +835,11 @@ class SafetyView: UIView {
         dayLabel.textColor = .secondaryLabel
         dayLabel.textAlignment = .center
 
-
         let dateLabel = UILabel()
         dateLabel.text = day.date.split(separator: "-").last.map(String.init) ?? ""
         dateLabel.font = .systemFont(ofSize: 13, weight: .bold)
         dateLabel.textColor = .label
         dateLabel.textAlignment = .center
-
 
         let dot = UIView()
         dot.layer.cornerRadius = 4
@@ -944,10 +866,8 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
             make.width.height.equalTo(8)
         }
-
         return container
     }
-
 
     private func makeDayWeatherCard(day: WeatherData.DailyForecast) -> UIView {
         let card = UIView()
@@ -957,7 +877,6 @@ class SafetyView: UIView {
         card.layer.shadowOpacity = 0.06
         card.layer.shadowOffset = CGSize(width: 0, height: 4)
         card.layer.shadowRadius = 8
-
 
         let dayLabel = UILabel()
         dayLabel.text = day.date ?? "-"
@@ -970,7 +889,6 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
         }
 
-
         let iconView = UIImageView()
         iconView.contentMode = .scaleAspectFit
         card.addSubview(iconView)
@@ -979,7 +897,6 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
             make.width.height.equalTo(36)
         }
-
         if let iconUrl = day.icon, let url = URL(string: iconUrl) {
             URLSession.shared.dataTask(with: url) { data, _, _ in
                 if let data = data, let image = UIImage(data: data) {
@@ -987,7 +904,6 @@ class SafetyView: UIView {
                 }
             }.resume()
         }
-
 
         let maxTempLabel = UILabel()
         maxTempLabel.text = "\(Int(day.maxTemp ?? 0))°"
@@ -1000,7 +916,6 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
         }
 
-
         let minTempLabel = UILabel()
         minTempLabel.text = "\(Int(day.minTemp ?? 0))°"
         minTempLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -1011,7 +926,6 @@ class SafetyView: UIView {
             make.top.equalTo(maxTempLabel.snp.bottom).offset(2)
             make.centerX.equalToSuperview()
         }
-
 
         let rainLabel = UILabel()
         let precip = day.precipitation ?? 0
@@ -1025,28 +939,7 @@ class SafetyView: UIView {
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-12)
         }
-
         return card
-    }
-
-
-
-    private func makeTabButton(icon: String, title: String) -> UIButton {
-        let btn = UIButton(type: .system)
-        var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: icon)
-        config.title = title
-        config.imagePlacement = .top
-        config.imagePadding = 4
-        config.baseForegroundColor = .tertiaryLabel
-        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 20)
-        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attrs in
-            var a = attrs
-            a.font = UIFont.systemFont(ofSize: 10, weight: .medium)
-            return a
-        }
-        btn.configuration = config
-        return btn
     }
 
     private func makeHeaderLabel(_ text: String) -> UILabel {
@@ -1253,7 +1146,6 @@ extension SafetyView: UIScrollViewDelegate {
         let page = Int(round(scrollView.contentOffset.x / max(scrollView.bounds.width, 1)))
         if page != currentPage {
             currentPage = page
-            updateTabAppearance(selectedIndex: page, animated: true)
         }
     }
 }
