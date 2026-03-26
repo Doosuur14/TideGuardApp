@@ -25,7 +25,7 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private UserRepository userRepository;
     @Override
-    public Report uploadReport(MultipartFile photo, String description, String email, Double latitude, Double longitude) {
+    public Report uploadReport(MultipartFile photo, String description, String email, Double latitude, Double longitude, String severity) {
         try {
             File directory = new File(reportDir);
             if (!directory.exists()) directory.mkdirs();
@@ -43,6 +43,7 @@ public class ReportServiceImpl implements ReportService {
             report.setDescription(description);
             report.setLatitude(latitude);
             report.setLongitude(longitude);
+            report.setSeverity(severity);
             report.setUser(user);
             return reportRepository.save(report);
         } catch (IOException e) {

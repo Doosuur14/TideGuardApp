@@ -22,6 +22,7 @@ public class Report {
     private String fileName;
     private Double latitude;
     private Double longitude;
+    private String severity;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName ="userId")

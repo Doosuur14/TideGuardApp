@@ -19,8 +19,9 @@ public class ReportController {
             @RequestParam("description") String description,
             @RequestParam("latitude") Double latitude,
             @RequestParam("longitude") Double longitude,
+            @RequestParam("severity") String severity,
             @RequestHeader("email") String email) {
-        Report report = reportService.uploadReport(photo, description, email, latitude, longitude);
+        Report report = reportService.uploadReport(photo, description, email, latitude, longitude, severity);
         return ResponseEntity.ok(report);
     }
 
