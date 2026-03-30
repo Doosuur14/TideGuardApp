@@ -31,10 +31,6 @@ public class TideGuardApplication {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-//    @Bean
-//    public RestTemplate restTemplate() {
-//        return new RestTemplate();
-//    }
 
     public static void main(String[] args) {
         SpringApplication.run(TideGuardApplication.class, args);

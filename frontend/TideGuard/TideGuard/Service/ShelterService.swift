@@ -39,6 +39,7 @@ class ShelterService {
             guard let httpResponse = response as? HTTPURLResponse else {
                 DispatchQueue.main.async {
                     completion(.failure(NSError(domain: "Invalid response", code: -1, userInfo: nil)))
+                   
                 }
                 return
             }
@@ -49,6 +50,7 @@ class ShelterService {
                 }
                 return
             }
+
 
             guard let data = data else {
                 DispatchQueue.main.async {

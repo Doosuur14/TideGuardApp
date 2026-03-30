@@ -80,8 +80,9 @@ class SafetyView: UIView {
 
     lazy var shelterButton: UIButton = {
         let btn = UIButton(type: .system)
-        btn.backgroundColor = UIColor(red: 70/255, green: 130/255, blue: 180/255, alpha: 0.95)
+//        btn.backgroundColor = UIColor(red: 70/255, green: 130/255, blue: 180/255, alpha: 0.95)
         btn.layer.cornerRadius = 28
+        btn.backgroundColor =  UIColor(named: "MainColor")
         btn.layer.shadowColor = UIColor.black.cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 4)
         btn.layer.shadowRadius = 12

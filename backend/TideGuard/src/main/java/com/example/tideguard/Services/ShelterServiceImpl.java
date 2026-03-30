@@ -14,8 +14,13 @@ public class ShelterServiceImpl implements ShelterService {
     private ShelterRepository shelterRepository;
 
     @Override
-    public List<Shelters> getSheltersByCity(String city) {
+    public List<Shelters> getSheltersByState(String city) {
         return shelterRepository.findByCity(city);
+    }
+
+    @Override
+    public List<Shelters> getAllShelters() {
+        return shelterRepository.findAll();
     }
 }
 

@@ -20,7 +20,6 @@ class ShelterMapViewController: UIViewController, SheltersModuleProtocol,  MKMap
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Shelters"
         view.backgroundColor = .systemBackground
 
         setupMap()
@@ -43,6 +42,7 @@ class ShelterMapViewController: UIViewController, SheltersModuleProtocol,  MKMap
         view.addSubview(mapView)
         mapView.frame = view.bounds
         mapView.delegate = self
+        mapView.mapType = .mutedStandard
     }
 
     private func bindViewModel() {
@@ -61,7 +61,7 @@ class ShelterMapViewController: UIViewController, SheltersModuleProtocol,  MKMap
         let annotations = viewModel.shelters.map { shelter -> MKPointAnnotation in
             let annotation = MKPointAnnotation()
             annotation.title = shelter.name
-            annotation.subtitle = "\(shelter.lga), \(shelter.state)"
+            annotation.subtitle = "\(shelter.lga), \(shelter.city)"
             annotation.coordinate = CLLocationCoordinate2D(
                 latitude: shelter.latitude,
                 longitude: shelter.longitude
@@ -71,7 +71,7 @@ class ShelterMapViewController: UIViewController, SheltersModuleProtocol,  MKMap
 
         mapView.addAnnotations(annotations)
 
-        // Zoom to first shelter
+       
         if let first = annotations.first {
             mapView.setRegion(
                 MKCoordinateRegion(

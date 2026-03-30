@@ -10,7 +10,7 @@ import Foundation
 struct Shelter: Codable, Identifiable {
     let id: Int64
     let name: String
-    let state: String
+    let city: String
     let lga: String
     let latitude: Double
     let longitude: Double

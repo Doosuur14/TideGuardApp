@@ -86,6 +86,7 @@ class SheltersViewModel {
 
             case .failure(let error):
                 self.handleError("Failed to load shelters: \(error.localizedDescription)")
+                print(error)
             }
         }
     }
@@ -104,6 +105,7 @@ class SheltersViewModel {
 
             case .failure(let error):
                 self.handleError("Failed to load shelters: \(error.localizedDescription)")
+                print(error)
             }
         }
     }

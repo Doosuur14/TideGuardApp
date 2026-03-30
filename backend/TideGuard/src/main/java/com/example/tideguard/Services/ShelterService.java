@@ -5,6 +5,7 @@ import com.example.tideguard.Models.Shelters;
 import java.util.List;
 
 public interface ShelterService {
-    List<Shelters> getSheltersByCity(String city);
+    List<Shelters> getSheltersByState(String city);
+    List<Shelters> getAllShelters();
 }
 
