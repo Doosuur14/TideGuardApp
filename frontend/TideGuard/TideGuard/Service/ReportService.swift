@@ -19,6 +19,7 @@ final class ReportService {
         email: String,
         latitude: Double,
         longitude: Double,
+        severity: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         let url = "\(baseURL)/report"
@@ -33,6 +34,7 @@ final class ReportService {
             formData.append(description.data(using: .utf8)!, withName: "description")
             formData.append("\(latitude)".data(using: .utf8)!, withName: "latitude")
             formData.append("\(longitude)".data(using: .utf8)!, withName: "longitude")
+            formData.append(severity.data(using: .utf8)!,       withName: "severity")
         }, to: url, headers: ["email": email])
         .validate()
         .responseDecodable(of: ReportResponse.self) { response in

@@ -159,12 +159,19 @@ class ReportView: UIView {
     private let locationIcon = UIImageView()
     private let locationLabel = UILabel()
 
+    private let severityCard = UIView()
+    private let minorButton   = makeSeverityButton(title: "🟡 Minor",    color: .systemYellow)
+    private let moderateButton = makeSeverityButton(title: "🟠 Moderate", color: .systemOrange)
+    private let severeButton  = makeSeverityButton(title: "🔴 Severe",   color: .systemRed)
+    var selectedSeverity: String = "minor"
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = UIColor.systemGroupedBackground
         setupScrollView()
         setupImageCard()
         setupDescriptionCard()
+        setupSeverityCard()
         setupLocationRow()
         setupUploadButton()
     }
@@ -292,7 +299,8 @@ class ReportView: UIView {
         locationRow.layer.cornerRadius = 14
         contentView.addSubview(locationRow)
         locationRow.snp.makeConstraints { make in
-            make.top.equalTo(descriptionCard.snp.bottom).offset(12)
+//            make.top.equalTo(descriptionCard.snp.bottom).offset(12)
+            make.top.equalTo(severityCard.snp.bottom).offset(12)
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(48)
         }
@@ -367,6 +375,80 @@ class ReportView: UIView {
     func imageDidChange(_ hasImage: Bool) {
         cameraIcon.isHidden = hasImage
         tapHintLabel.isHidden = hasImage
+    }
+
+    private func setupSeverityCard() {
+        severityCard.backgroundColor = .systemBackground
+        severityCard.layer.cornerRadius = 20
+        severityCard.layer.shadowColor = UIColor.black.cgColor
+        severityCard.layer.shadowOpacity = 0.06
+        severityCard.layer.shadowRadius = 12
+        severityCard.layer.shadowOffset = CGSize(width: 0, height: 3)
+        contentView.addSubview(severityCard)
+        severityCard.snp.makeConstraints { make in
+            make.top.equalTo(descriptionCard.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        let sectionLabel = UILabel()
+        sectionLabel.text = "SEVERITY"
+        sectionLabel.font = UIFont.systemFont(ofSize: 11, weight: .bold)
+        sectionLabel.textColor = .tertiaryLabel
+        severityCard.addSubview(sectionLabel)
+        sectionLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(16)
+            make.leading.equalToSuperview().offset(16)
+        }
+
+        let stack = UIStackView(arrangedSubviews: [minorButton, moderateButton, severeButton])
+        stack.axis = .horizontal
+        stack.spacing = 10
+        stack.distribution = .fillEqually
+        severityCard.addSubview(stack)
+        stack.snp.makeConstraints { make in
+            make.top.equalTo(sectionLabel.snp.bottom).offset(12)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().offset(-16)
+            make.height.equalTo(44)
+        }
+
+        selectSeverity("minor")
+
+        minorButton.addTarget(self, action: #selector(minorTapped), for: .touchUpInside)
+        moderateButton.addTarget(self, action: #selector(moderateTapped), for: .touchUpInside)
+        severeButton.addTarget(self, action: #selector(severeTapped), for: .touchUpInside)
+    }
+
+    private static func makeSeverityButton(title: String, color: UIColor) -> UIButton {
+        let btn = UIButton(type: .system)
+        btn.setTitle(title, for: .normal)
+        btn.titleLabel?.font = UIFont.systemFont(ofSize: 13, weight: .semibold)
+        btn.layer.cornerRadius = 10
+        btn.layer.borderWidth = 1.5
+        btn.layer.borderColor = color.cgColor
+        btn.setTitleColor(color, for: .normal)
+        btn.backgroundColor = color.withAlphaComponent(0.08)
+        return btn
+    }
+
+    @objc private func minorTapped()    { selectSeverity("minor") }
+    @objc private func moderateTapped() { selectSeverity("moderate") }
+    @objc private func severeTapped()   { selectSeverity("severe") }
+
+    func selectSeverity(_ severity: String) {
+        selectedSeverity = severity
+        let buttons: [(UIButton, UIColor, String)] = [
+            (minorButton,    .systemYellow, "minor"),
+            (moderateButton, .systemOrange, "moderate"),
+            (severeButton,   .systemRed,    "severe")
+        ]
+        for (btn, color, value) in buttons {
+            let isSelected = value == severity
+            btn.backgroundColor = isSelected
+            ? color.withAlphaComponent(0.2)
+            : color.withAlphaComponent(0.08)
+            btn.layer.borderWidth = isSelected ? 2.5 : 1.5
+        }
     }
 }
 

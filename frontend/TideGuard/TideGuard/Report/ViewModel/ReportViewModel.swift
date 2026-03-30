@@ -27,7 +27,7 @@ class ReportViewModel: NSObject {
     }
 
 
-    func uploadReport(image: UIImage?, description: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadReport(image: UIImage?, description: String, severity: String, completion: @escaping (Result<String, Error>) -> Void) {
         guard let email = UserDefaults.standard.string(forKey: "userEmail") else {
             completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "User email not found"])))
             return
@@ -42,16 +42,15 @@ class ReportViewModel: NSObject {
             description: description,
             email: email,
             latitude: latitude,
-            longitude: longitude
+            longitude: longitude,
+            severity: severity
         ) { [weak self] result in
             switch result {
             case .success(let photoUrl):
-                print("Report uploaded successfully: \(photoUrl)")
                 self?.scheduleNotification()
                 self?.onUploadCompleted?()
                 completion(.success(photoUrl))
             case .failure(let error):
-                print("Report upload failed: \(error)")
                 completion(.failure(error))
             }
         }

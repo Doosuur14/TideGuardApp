@@ -25,7 +25,8 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         setUpFunc()
         configureIO()
-        
+        safetyView?.shelterButton.addTarget(self, action: #selector(openSheltersMap), for: .touchUpInside)
+
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
         viewModel.fetchWeather()
@@ -36,7 +37,12 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         extendedLayoutIncludesOpaqueBars = true
     }
 
-
+    @objc private func openSheltersMap() {
+        let context = CoreDataManager.shared.viewContext
+        let viewModel = SheltersViewModel(context: context)
+        let sheltersVC = ShelterMapViewController(viewModel: viewModel)
+        navigationController?.pushViewController(sheltersVC, animated: true)
+    }
 
 
     init(viewModel: SafetyViewModel) {
@@ -141,7 +147,6 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
 
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard !(annotation is MKUserLocation) else { return nil }

@@ -23,27 +23,60 @@ final class FloodImageClassifier {
         self.model = vnModel
     }
 
-    func classify(image: UIImage, completion: @escaping (Bool, Float) -> Void) {
+//    func classify(image: UIImage, completion: @escaping (Bool, Float) -> Void) {
+//
+//        guard let ciImage = CIImage(image: image) else {
+//            completion(false, 0)
+//            return
+//        }
+//
+//        let request = VNCoreMLRequest(model: model) { request, error in
+//            guard let results = request.results as? [VNClassificationObservation],
+//                  let top = results.first else {
+//                completion(false, 0)
+//                return
+//            }
+//
+//            let isFlood = top.identifier == "flooded"
+//            let confidence = top.confidence
+//            completion(isFlood, confidence)
+//        }
+//
+//        request.imageCropAndScaleOption = .centerCrop
+//
+//        let handler = VNImageRequestHandler(ciImage: ciImage)
+//        DispatchQueue.global(qos: .userInitiated).async {
+//            try? handler.perform([request])
+//        }
+//    }
 
+    func classify(image: UIImage, completion: @escaping (Bool, Float, String) -> Void) {
         guard let ciImage = CIImage(image: image) else {
-            completion(false, 0)
+            completion(false, 0, "minor")
             return
         }
 
         let request = VNCoreMLRequest(model: model) { request, error in
             guard let results = request.results as? [VNClassificationObservation],
                   let top = results.first else {
-                completion(false, 0)
+                completion(false, 0, "minor")
                 return
             }
 
             let isFlood = top.identifier == "flooded"
             let confidence = top.confidence
-            completion(isFlood, confidence)
+
+            let severity: String
+            switch confidence {
+            case 0.60..<0.75: severity = "minor"
+            case 0.75..<0.90: severity = "moderate"
+            default:          severity = "severe"
+            }
+
+            completion(isFlood, confidence, severity)
         }
 
         request.imageCropAndScaleOption = .centerCrop
-
         let handler = VNImageRequestHandler(ciImage: ciImage)
         DispatchQueue.global(qos: .userInitiated).async {
             try? handler.perform([request])

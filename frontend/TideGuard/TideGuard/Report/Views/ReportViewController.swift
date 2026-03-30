@@ -43,12 +43,14 @@ class ReportViewController: UIViewController, ReportDelegate {
     }
 
     func didUploadReport(image: UIImage?, description: String) {
-        viewModel.uploadReport(image: image, description: description) { [weak self] result in
+        let severity = reportView?.selectedSeverity ?? "minor"
+        viewModel.uploadReport(image: image, description: description, severity: severity) { [weak self] result in
             switch result {
             case .success:
                 self?.reportView?.descriptionTextView.text = "" 
                 self?.reportView?.imageView.image = nil
                 self?.reportView?.imageDidChange(false)
+                self?.reportView?.selectSeverity("minor")
             case .failure(_):
                 AlertManager.shared.showUpdateFailureAlert(viewCon: self ?? UIViewController())
             }
@@ -123,7 +125,7 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
         reportView?.uploadButton.setTitle("Analysing image...", for: .normal)
         reportView?.uploadButton.isEnabled = false
 
-        FloodImageClassifier.shared.classify(image: image) { [weak self] isFlood, confidence in
+        FloodImageClassifier.shared.classify(image: image) { [weak self] isFlood, confidence, severity in
             DispatchQueue.main.async {
 
                 self?.reportView?.uploadButton.setTitle("Submit Report", for: .normal)
@@ -132,7 +134,8 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
                 if isFlood {
                     self?.reportView?.imageView.image = image
                     self?.reportView?.imageDidChange(true)
-                    self?.showFloodConfirmedBanner(confidence: confidence)
+                    self?.reportView?.selectSeverity(severity)
+                    self?.showFloodConfirmedBanner(confidence: confidence, severity: severity)
                 } else {
 
                     self?.showNotFloodAlert(confidence: confidence)
@@ -157,8 +160,12 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
         present(alert, animated: true)
     }
 
-    private func showFloodConfirmedBanner(confidence: Float) {
+    private func showFloodConfirmedBanner(confidence: Float,severity: String) {
         let percentage = Int(confidence * 100)
+        let severityLabel = severity == "severe" ? "🔴 Severe"
+        : severity == "moderate" ? "🟠 Moderate"
+        : "🟡 Minor"
+
         let banner = UILabel()
         banner.text = "Flood image confirmed (\(percentage)% confidence)"
         banner.font = UIFont.systemFont(ofSize: 13, weight: .semibold)

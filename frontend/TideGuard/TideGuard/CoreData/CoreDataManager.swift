@@ -17,7 +17,6 @@ class CoreDataManager {
         return persistentContainer.viewContext
     }
 
-    // MARK: - Core Data stack
 
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TideGuardModel")
@@ -30,7 +29,6 @@ class CoreDataManager {
         return container
     }()
 
-    // MARK: - Core Data Saving support
 
     func saveContext () {
         let context = persistentContainer.viewContext
@@ -44,7 +42,6 @@ class CoreDataManager {
         }
     }
 
-    // MARK: - Checking if the user already exists in core dat.
 
     func checkUserExistsInCoreData(email: String, completion: @escaping (Bool) -> Void) {
         let fetchRequest: NSFetchRequest<User> = User.fetchRequest()

@@ -98,6 +98,9 @@
 		DEF7D9252D9B2431000B4C01 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9242D9B2431000B4C01 /* LoginViewController.swift */; };
 		DEF7D9272D9B244E000B4C01 /* LoginScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9262D9B244E000B4C01 /* LoginScreenView.swift */; };
 		DEF7D9292D9B245C000B4C01 /* LoginScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF7D9282D9B245C000B4C01 /* LoginScreenViewModel.swift */; };
+		DEFC57E22F7A595D0051411A /* ShelterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFC57E12F7A595D0051411A /* ShelterService.swift */; };
+		DEFC57E52F7A5A3F0051411A /* ShelterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFC57E42F7A5A3F0051411A /* ShelterViewModel.swift */; };
+		DEFC57E92F7A5C480051411A /* ShelterMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFC57E82F7A5C480051411A /* ShelterMapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -192,6 +195,9 @@
 		DEF7D9242D9B2431000B4C01 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		DEF7D9262D9B244E000B4C01 /* LoginScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreenView.swift; sourceTree = "<group>"; };
 		DEF7D9282D9B245C000B4C01 /* LoginScreenViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreenViewModel.swift; sourceTree = "<group>"; };
+		DEFC57E12F7A595D0051411A /* ShelterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelterService.swift; sourceTree = "<group>"; };
+		DEFC57E42F7A5A3F0051411A /* ShelterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelterViewModel.swift; sourceTree = "<group>"; };
+		DEFC57E82F7A5C480051411A /* ShelterMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelterMapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,6 +272,7 @@
 				DEF3F4EF2DFA055D00497C21 /* NewsService.swift */,
 				DE141A092EC772EB00D8B491 /* LgaAPIService.swift */,
 				DEF38F7B2F6211AC00B87FD1 /* FloodForecastService.swift */,
+				DEFC57E12F7A595D0051411A /* ShelterService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -417,6 +424,7 @@
 				DEF38F7D2F68AC8D00B87FD1 /* FloodClassifier.mlmodel */,
 				DEF38F772F5D9C6800B87FD1 /* FloodRiskModel.mlmodel */,
 				DE9A94972DD006AD0087581F /* GoogleService-Info.plist */,
+				DEFC57E32F7A5A0F0051411A /* Shelter */,
 				DEF3F4E42DFA03F200497C21 /* News */,
 				DEF3F4D72DF6699400497C21 /* Report */,
 				DEF3F4CE2DF1A94200497C21 /* EditProfile */,
@@ -616,6 +624,15 @@
 			path = LoginScreen;
 			sourceTree = "<group>";
 		};
+		DEFC57E32F7A5A0F0051411A /* Shelter */ = {
+			isa = PBXGroup;
+			children = (
+				DEFC57E42F7A5A3F0051411A /* ShelterViewModel.swift */,
+				DEFC57E82F7A5C480051411A /* ShelterMapViewController.swift */,
+			);
+			path = Shelter;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -723,6 +740,7 @@
 				DE03591B2DAC489D00178E1D /* LoginViewState.swift in Sources */,
 				DE141A0A2EC772EB00D8B491 /* LgaAPIService.swift in Sources */,
 				DEF3F4EA2DFA053100497C21 /* NewsView.swift in Sources */,
+				DEFC57E92F7A5C480051411A /* ShelterMapViewController.swift in Sources */,
 				DE9A94792DCD0DFE0087581F /* Profile.swift in Sources */,
 				DEF3F4C22DF19AE900497C21 /* FAQ.swift in Sources */,
 				DEF7D9272D9B244E000B4C01 /* LoginScreenView.swift in Sources */,
@@ -799,8 +817,10 @@
 				DEF7D91A2D94A20B000B4C01 /* HomeScreenViewModel.swift in Sources */,
 				DE2883A82DBED77C0013B156 /* WeatherService.swift in Sources */,
 				DE0359192DAC479D00178E1D /* LoginViewModelProtocol.swift in Sources */,
+				DEFC57E52F7A5A3F0051411A /* ShelterViewModel.swift in Sources */,
 				DEF3F4D62DF1B99A00497C21 /* EditProfileViewModel.swift in Sources */,
 				DEF7D9202D9575FF000B4C01 /* AppCoordinator.swift in Sources */,
+				DEFC57E22F7A595D0051411A /* ShelterService.swift in Sources */,
 				DE0359242DAC651D00178E1D /* RegisterViewState.swift in Sources */,
 				DEF38F782F5D9C6800B87FD1 /* FloodRiskModel.mlmodel in Sources */,
 			);
