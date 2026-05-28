@@ -80,7 +80,6 @@ class SafetyView: UIView {
 
     lazy var shelterButton: UIButton = {
         let btn = UIButton(type: .system)
-//        btn.backgroundColor = UIColor(red: 70/255, green: 130/255, blue: 180/255, alpha: 0.95)
         btn.layer.cornerRadius = 28
         btn.backgroundColor =  UIColor(named: "MainColor")
         btn.layer.shadowColor = UIColor.black.cgColor
@@ -103,7 +102,8 @@ class SafetyView: UIView {
         return btn
     }()
 
-    // MARK: - Page Dots
+
+
     private let dotsContainer = UIView()
     private var dots: [UIView] = []
     private let dotCount = 3
@@ -128,15 +128,14 @@ class SafetyView: UIView {
         setupForecastPage()
         setupActivityIndicator()
         setupEdgeSwipeZones()
-    }
 
-    // MARK: - Paging Scroll View
+    }
 
     private func setupPagingScrollView() {
         addSubview(pagingScrollView)
         pagingScrollView.delegate = self
         pagingScrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview() // full screen now
+            make.edges.equalToSuperview()
         }
 
         pagingScrollView.addSubview(mapPage)
@@ -206,9 +205,6 @@ class SafetyView: UIView {
             }
         }
     }
-
-    
-
 
     private func setupMapPage() {
         mapPage.addSubview(mapView)

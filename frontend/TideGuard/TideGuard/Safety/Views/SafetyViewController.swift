@@ -32,9 +32,11 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         viewModel.fetchWeather()
         viewModel.fetchFloodForecast()
         viewModel.scheduleDailyForecastReminder()
+        viewModel.isDemoMode = true
 
         edgesForExtendedLayout = .all
         extendedLayoutIncludesOpaqueBars = true
+
     }
 
     @objc private func openSheltersMap() {
@@ -78,6 +80,7 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
                 case .loadedLGAs(let lgas):
                     self.safetyView?.hideLoadingSpinner()
                     self.updateAnnotations(lgas)
+                    LocationService.shared.allLgas = lgas
 
                 case .polygonsReady(let polygons):
                     self.addPolygonsToMap(polygons)
@@ -90,6 +93,8 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
                 case .floodForecastLoaded(let riskDays):
                     self.safetyView?.updateFloodForecastGrid(riskDays)
+                case .reportsLoaded(let reports):
+                    self.addReportAnnotationsToMap(reports)
 
                 case .error:
                     self.safetyView?.hideLoadingSpinner()
@@ -98,8 +103,6 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
             .store(in: &cancellables)
     }
-
-
 
     private func updateAnnotations(_ lgas: [LgaModel]) {
         guard let mapView = safetyView?.mapView else { return }
@@ -151,6 +154,23 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard !(annotation is MKUserLocation) else { return nil }
 
+
+        if let reportAnnotation = annotation as? ReportAnnotation {
+            let identifier = "ReportMarker"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = true
+            }
+
+            annotationView?.annotation = annotation
+            annotationView?.markerTintColor = reportAnnotation.markerColor
+            annotationView?.glyphImage = UIImage(systemName: "exclamationmark.triangle.fill")
+
+            return annotationView
+        }
+
         let identifier = "floodRiskDot"
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
 
@@ -184,5 +204,19 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
         annotationView?.image = image
         return annotationView
+    }
+
+
+
+    private func addReportAnnotationsToMap(_ reports: [FloodReport]) {
+        guard let mapView = safetyView?.mapView else { return }
+
+        let existingReports = mapView.annotations.filter { $0 is ReportAnnotation }
+        mapView.removeAnnotations(existingReports)
+
+        let annotations = reports.map { ReportAnnotation(report: $0) }
+        mapView.addAnnotations(annotations)
+
+        print("Added \(annotations.count) report annotations to map")
     }
 }

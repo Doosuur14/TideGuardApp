@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import CoreLocation
 
 class SheltersViewModel {
 
@@ -91,6 +92,43 @@ class SheltersViewModel {
         }
     }
 
+
+
+    func loadNearestShelters(userLocation: CLLocationCoordinate2D, limit: Int = 10) {
+        isLoading = true
+        onLoadingStateChanged?(true)
+        errorMessage = nil
+
+        print("Loading nearest shelters from: \(userLocation.latitude), \(userLocation.longitude)")
+
+        shelterService.fetchNearestShelters(
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            limit: limit
+        ) { [weak self] result in
+            guard let self = self else { return }
+
+            self.isLoading = false
+            self.onLoadingStateChanged?(false)
+
+            switch result {
+            case .success(let fetchedShelters):
+                print("Loaded \(fetchedShelters.count) nearest shelters")
+                self.shelters = fetchedShelters
+                self.onSheltersUpdated?()
+
+                if fetchedShelters.isEmpty {
+                    self.handleError("No shelters found nearby.")
+                }
+
+            case .failure(let error):
+                self.handleError("Failed to load nearest shelters: \(error.localizedDescription)")
+                print("Error: \(error)")
+            }
+        }
+    }
+
+
     private func loadAllShelters() {
         shelterService.fetchAllShelters { [weak self] result in
             guard let self = self else { return }
@@ -125,4 +163,3 @@ class SheltersViewModel {
         return shelters[index]
     }
 }
-

@@ -32,6 +32,7 @@ enum SafetyState {
     case onMapUpdate(MKCoordinateRegion)
     case error(String)
     case floodForecastLoaded([FloodRiskDay])
+    case reportsLoaded([FloodReport])
 }
 
 class SafetyViewModel {
@@ -43,6 +44,8 @@ class SafetyViewModel {
     private var cancellables = Set<AnyCancellable>()
 
     var lgasCache: [LgaModel] = []
+
+    var isDemoMode: Bool = true
 
 
     func loadMap() {
@@ -78,225 +81,309 @@ class SafetyViewModel {
         }
     }
 
+    func fetchReports() {
+        ReportAPIService.shared.fetchAllReports { [weak self] result in
+            guard let self = self else { return }
+
+            switch result {
+            case .success(let reports):
+                print("Loaded \(reports.count) user reports for map")
+                DispatchQueue.main.async {
+                    self.state = .reportsLoaded(reports)
+                }
+            case .failure(let error):
+                print("Failed to load reports: \(error)")
+            }
+        }
+    }
+
+
 
     func fetchWeather() {
         let user = AuthService.shared.getCurrentUser()
         let userCity = user?.city ?? ""
-
-        WeatherService.shared.fetchWeather(for: userCity) { [weak self] result in
-            guard let self = self else { return }
-
+        
+        if isDemoMode {
+            // Realistic Lagos August weather
             DispatchQueue.main.async {
+                self.state = .weatherLoaded(
+                    description: "Heavy Rain",
+                    temp: 27.0,
+                    humidity: 89.0,
+                    precipitation: 78.0,
+                    imageUrl: nil,
+                    weeklyForecast: [
+                        WeatherData.DailyForecast(date: "Fri", maxTemp: 28.0, minTemp: 24.0, weatherCode: 63, precipitation: 15.2, description: "Heavy Rain", icon: nil),
+                        WeatherData.DailyForecast(date: "Sat", maxTemp: 27.0, minTemp: 23.0, weatherCode: 61, precipitation: 8.4,  description: "Light Rain", icon: nil),
+                        WeatherData.DailyForecast(date: "Sun", maxTemp: 29.0, minTemp: 25.0, weatherCode: 80, precipitation: 12.1, description: "Rain Showers", icon: nil),
+                        WeatherData.DailyForecast(date: "Mon", maxTemp: 30.0, minTemp: 25.0, weatherCode: 2,  precipitation: 0.0,  description: "Partly Cloudy", icon: nil),
+                        WeatherData.DailyForecast(date: "Tue", maxTemp: 28.0, minTemp: 24.0, weatherCode: 95, precipitation: 18.7, description: "Thunderstorm", icon: nil),
+                        WeatherData.DailyForecast(date: "Wed", maxTemp: 27.0, minTemp: 23.0, weatherCode: 63, precipitation: 11.3, description: "Heavy Rain", icon: nil),
+                        WeatherData.DailyForecast(date: "Thu", maxTemp: 28.0, minTemp: 24.0, weatherCode: 80, precipitation: 9.8,  description: "Rain Showers", icon: nil)
+                    ]
+                )
+            }
+            return
+        }
+    }
+
+
+        //    func fetchWeather() {
+        //        let user = AuthService.shared.getCurrentUser()
+        //        let userCity = user?.city ?? ""
+        //
+        //        WeatherService.shared.fetchWeather(for: userCity) { [weak self] result in
+        //            guard let self = self else { return }
+        //
+        //            DispatchQueue.main.async {
+        //                switch result {
+        //                case .success(let data):
+        //                    self.state = .weatherLoaded(
+        //                        description: data.description ?? "No description",
+        //                        temp: data.temperature ?? 0.0,
+        //                        humidity: data.humidity ?? 0.0,
+        //                        precipitation: data.precipitation ?? 0.0,
+        //                        imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
+        //                    )
+        //                case .failure:
+        //                    self.state = .weatherLoaded(
+        //                        description: "Weather unavailable",
+        //                        temp: 0.0,
+        //                        humidity: 0.0,
+        //                        precipitation: 0.0,
+        //                        imageUrl: nil,
+        //                        weeklyForecast: []
+        //                    )
+        //                }
+        //            }
+        //        }
+        //    }
+
+
+        func loadFullFloodMap() {
+            print("Loading Nigeria LGA GeoJSON")
+
+            LgaAPIService.shared.getAllLgas { [weak self] lgaData in
+                guard let self = self, let lgaData = lgaData else { return }
+
+                LgaAPIService.shared.getNigeriaGeoJSON { geoJson in
+                    guard let geoJson = geoJson else { return }
+
+
+                    let decoder = MKGeoJSONDecoder()
+
+                    do {
+                        let features = try decoder.decode(geoJson)
+                            .compactMap { $0 as? MKGeoJSONFeature }
+
+                        let results = self.processFloodMap(features: features, lgaData: lgaData)
+
+                        DispatchQueue.main.async {
+                            self.state = .polygonsReady(results)
+                        }
+
+                    } catch {
+                        DispatchQueue.main.async {
+                            self.state = .error("Failed to decode GeoJSON")
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        func predictFloodRisk(for lga: inout LgaModel) -> Int {
+            if let cachedPrediction = lga.floodPrediction {
+                return cachedPrediction
+            }
+            guard let model = model else {
+                return 0
+            }
+
+            enrichLgaWithComputedFeatures(lga: &lga)
+
+            do {
+                let input = FloodRiskModelInput(
+                    tp:              lga.tp,
+                    ro:              lga.ro,
+                    t2m:             lga.t2m,
+                    swvl1:           lga.swvl1,
+                    tp_7d:           lga.tp_7d,
+                    tp_14d:          lga.tp_14d,
+                    tp_30d:          lga.tp_30d,
+                    ro_7d:           lga.ro_7d,
+                    ro_14d:          lga.ro_14d,
+                    swvl1_3d_change: lga.swvl1_3d_change,
+                    tp_7d_max:       lga.tp_7d_max,
+                    latitude:        lga.latitude,
+                    longitude:       lga.longitude,
+                    month:           lga.month,
+                    day_of_year:     lga.day_of_year,
+                    state_encoded:   lga.state_encoded
+                )
+
+                let prediction = try model.prediction(input: input)
+                let riskScore = prediction.floodRisk
+                let clampedScore = max(0.0, min(1.0, riskScore))
+                lga.floodProbability = Int64(clampedScore * 100)
+
+                let category = riskScore >= 0.6 ? 2 :
+                riskScore >= 0.3 ? 1 :
+                0
+
+                print("   riskScore: \(riskScore) → category: \(category)")
+
+                lga.floodPrediction = category
+                return category
+
+            } catch {
+                print("Prediction failed: \(error)")
+                return 0
+            }
+        }
+
+
+        func fetchFloodForecast() {
+            let user = AuthService.shared.getCurrentUser()
+            let userState = user?.city ?? ""
+
+            print("Fetching flood forecast for state: \(userState)")
+
+            FloodForecastService.shared.fetchFloodForecast(for: userState) { [weak self] result in
+                guard let self = self else { return }
+
                 switch result {
-                case .success(let data):
-                    self.state = .weatherLoaded(
-                        description: data.description ?? "No description",
-                        temp: data.temperature ?? 0.0,
-                        humidity: data.humidity ?? 0.0,
-                        precipitation: data.precipitation ?? 0.0,
-                        imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
-                    )
-                case .failure:
-                    self.state = .weatherLoaded(
-                        description: "Weather unavailable",
-                        temp: 0.0,
-                        humidity: 0.0,
-                        precipitation: 0.0,
-                        imageUrl: nil,
-                        weeklyForecast: []
-                    )
-                }
-            }
-        }
-    }
-
-
-    func loadFullFloodMap() {
-        print("Loading Nigeria LGA GeoJSON")
-
-        LgaAPIService.shared.getAllLgas { [weak self] lgaData in
-            guard let self = self, let lgaData = lgaData else { return }
-
-            LgaAPIService.shared.getNigeriaGeoJSON { geoJson in
-                guard let geoJson = geoJson else { return }
-
-
-                let decoder = MKGeoJSONDecoder()
-
-                do {
-                    let features = try decoder.decode(geoJson)
-                        .compactMap { $0 as? MKGeoJSONFeature }
-
-                    let results = self.processFloodMap(features: features, lgaData: lgaData)
-
-                    DispatchQueue.main.async {
-                        self.state = .polygonsReady(results)
+                case .success(let days):
+                    print("Got \(days.count) forecast days from backend")
+                    let riskDays = days.map { day -> FloodRiskDay in
+                        let probability = self.predictFloodRisk14DayForecast(day, state: userState)
+                        let level: Int = probability >= 0.6 ? 2 :
+                        probability >= 0.3 ? 1 : 0
+                        return FloodRiskDay(
+                            date: day.date,
+                            dayName: day.dayName,
+                            riskLevel: level,
+                            probability: probability
+                        )
                     }
-
-                } catch {
+                    self.scheduleHighRiskNotification(for: riskDays)
                     DispatchQueue.main.async {
-                        self.state = .error("Failed to decode GeoJSON")
+                        self.state = .floodForecastLoaded(riskDays)
                     }
+                case .failure(let error):
+                    print("Flood forecast fetch failed: \(error)")
                 }
             }
         }
-    }
 
+        private func predictFloodRisk14DayForecast(_ day: FloodForecast, state: String) -> Double {
+            guard let model  = model else { return 0.0 }
 
+            do {
+                let input = FloodRiskModelInput(
+                    tp:              day.tp,
+                    ro:              day.ro,
+                    t2m:             day.t2m,
+                    swvl1:           day.swvl1,
+                    tp_7d:           day.tp_7d,
+                    tp_14d:          day.tp_14d,
+                    tp_30d:          day.tp_30d,
+                    ro_7d:           day.ro_7d,
+                    ro_14d:          day.ro_14d,
+                    swvl1_3d_change: day.swvl1_3d_change,
+                    tp_7d_max:       day.tp_7d_max,
+                    latitude:        day.latitude,
+                    longitude:       day.longitude,
+                    month:           Double(day.month),
+                    day_of_year:     Double(day.dayOfYear),
+                    state_encoded:   stateEncoding[state.lowercased()] ?? 0.0
+                )
+                let output = try model.prediction(input: input)
+                return max(0.0, min(1.0, output.floodRisk))
 
-    func predictFloodRisk(for lga: inout LgaModel) -> Int {
-        if let cachedPrediction = lga.floodPrediction {
-            return cachedPrediction
-        }
-        guard let model = model else {
-            return 0
-        }
-
-        enrichLgaWithComputedFeatures(lga: &lga)
-
-        do {
-            let input = FloodRiskModelInput(
-                tp:              lga.tp,
-                ro:              lga.ro,
-                t2m:             lga.t2m,
-                swvl1:           lga.swvl1,
-                tp_7d:           lga.tp_7d,
-                tp_14d:          lga.tp_14d,
-                tp_30d:          lga.tp_30d,
-                ro_7d:           lga.ro_7d,
-                ro_14d:          lga.ro_14d,
-                swvl1_3d_change: lga.swvl1_3d_change,
-                tp_7d_max:       lga.tp_7d_max,
-                latitude:        lga.latitude,
-                longitude:       lga.longitude,
-                month:           lga.month,
-                day_of_year:     lga.day_of_year,
-                state_encoded:   lga.state_encoded
-            )
-
-            let prediction = try model.prediction(input: input)
-            let riskScore = prediction.floodRisk
-            let clampedScore = max(0.0, min(1.0, riskScore))
-            lga.floodProbability = Int64(clampedScore * 100)
-
-            let category = riskScore >= 0.6 ? 2 :
-            riskScore >= 0.3 ? 1 :
-            0    
-
-            lga.floodPrediction = category
-            return category
-
-        } catch {
-            print("Prediction failed: \(error)")
-            return 0
-        }
-    }
-
-    func fetchFloodForecast() {
-        let user = AuthService.shared.getCurrentUser()
-        let userState = user?.city ?? ""
-
-        print("Fetching flood forecast for state: \(userState)")
-
-        FloodForecastService.shared.fetchFloodForecast(for: userState) { [weak self] result in
-            guard let self = self else { return }
-
-            switch result {
-            case .success(let days):
-                print("Got \(days.count) forecast days from backend")
-                let riskDays = days.map { day -> FloodRiskDay in
-                    let probability = self.predictFloodRisk14DayForecast(day, state: userState)
-                    let level: Int = probability >= 0.6 ? 2 :
-                    probability >= 0.3 ? 1 : 0
-                    return FloodRiskDay(
-                        date: day.date,
-                        dayName: day.dayName,
-                        riskLevel: level,
-                        probability: probability
-                    )
-                }
-                self.scheduleHighRiskNotification(for: riskDays)
-                DispatchQueue.main.async {
-                    self.state = .floodForecastLoaded(riskDays)
-                }
-            case .failure(let error):
-                print("Flood forecast fetch failed: \(error)")
+            } catch {
+                print("Forecast prediction failed: \(error)")
+                return 0.0
             }
         }
-    }
-
-    private func predictFloodRisk14DayForecast(_ day: FloodForecast, state: String) -> Double {
-        guard let model  = model else { return 0.0 }
-
-        do {
-            let input = FloodRiskModelInput(
-                tp:              day.tp,
-                ro:              day.ro,
-                t2m:             day.t2m,
-                swvl1:           day.swvl1,
-                tp_7d:           day.tp_7d,
-                tp_14d:          day.tp_14d,
-                tp_30d:          day.tp_30d,
-                ro_7d:           day.ro_7d,
-                ro_14d:          day.ro_14d,
-                swvl1_3d_change: day.swvl1_3d_change,
-                tp_7d_max:       day.tp_7d_max,
-                latitude:        day.latitude,
-                longitude:       day.longitude,
-                month:           Double(day.month),
-                day_of_year:     Double(day.dayOfYear),
-                state_encoded:   stateEncoding[state.lowercased()] ?? 0.0
-            )
-            let output = try model.prediction(input: input)
-            return max(0.0, min(1.0, output.floodRisk))
-
-        } catch {
-            print("Forecast prediction failed: \(error)")
-            return 0.0
-        }
-    }
 
 
+        private func scheduleHighRiskNotification(for days: [FloodRiskDay]) {
+            let highRiskDays = days.filter { $0.riskLevel == 2}
+            guard !highRiskDays.isEmpty else { return }
 
-    private func scheduleHighRiskNotification(for days: [FloodRiskDay]) {
-        let highRiskDays = days.filter { $0.riskLevel == 2}
-        guard !highRiskDays.isEmpty else { return }
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                guard settings.authorizationStatus == .authorized else { return }
 
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            guard settings.authorizationStatus == .authorized else { return }
+                let content = UNMutableNotificationContent()
+                content.title = "⚠️ High Flood Risk Alert"
+                content.sound = .default
 
-            let content = UNMutableNotificationContent()
-            content.title = "⚠️ High Flood Risk Alert"
-            content.sound = .default
-
-            if highRiskDays.count == 1 {
-                let day = highRiskDays[0]
-                let probability = Int(day.probability * 100)
-                content.body = "High flood risk detected for \(day.dayName) in your area. \(probability)% probability — stay alert."
-            } else {
-                content.body = "High flood risk detected on \(highRiskDays.count) days in the next 14 days for your area. Stay alert."
-            }
-
-
-            UNUserNotificationCenter.current().removePendingNotificationRequests(
-                withIdentifiers: ["flood_high_risk"]
-            )
-
-            let request = UNNotificationRequest(
-                identifier: "flood_high_risk",
-                content: content,
-                trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
-            )
-
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print("Failed to schedule flood alert: \(error)")
+                if highRiskDays.count == 1 {
+                    let day = highRiskDays[0]
+                    let probability = Int(day.probability * 100)
+                    content.body = "High flood risk detected for \(day.dayName) in your area. \(probability)% probability — stay alert."
                 } else {
-                    print("High risk notification scheduled for \(highRiskDays.count) day(s)")
+                    content.body = "High flood risk detected on \(highRiskDays.count) days in the next 14 days for your area. Stay alert."
+                }
+
+
+                UNUserNotificationCenter.current().removePendingNotificationRequests(
+                    withIdentifiers: ["flood_high_risk"]
+                )
+
+                let request = UNNotificationRequest(
+                    identifier: "flood_high_risk",
+                    content: content,
+                    trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
+                )
+
+                UNUserNotificationCenter.current().add(request) { error in
+                    if let error = error {
+                        print("Failed to schedule flood alert: \(error)")
+                    } else {
+                        print("High risk notification scheduled for \(highRiskDays.count) day(s)")
+                    }
                 }
             }
         }
-    }
+
+
+//    func enrichLgaWithComputedFeatures(lga: inout LgaModel) {
+//        if isDemoMode {
+//            print("🌧 Demo enriching: \(lga.lgaName) | lat: \(lga.latitude)")
+//
+//            lga.month        = 8.0
+//            lga.day_of_year  = 227.0
+//
+//            let latFactor = max(0, 7.0 - lga.latitude)
+//            print("   latFactor: \(latFactor)")
+//
+//            lga.tp              = 8.0  + (latFactor * 1.2)
+//            lga.ro              = 5.0  + (latFactor * 0.9)
+//            lga.t2m             = 300.15
+//            lga.swvl1           = 0.28 + (latFactor * 0.02)
+//            lga.tp_7d           = 55.0 + (latFactor * 4.0)
+//            lga.tp_14d          = 95.0 + (latFactor * 6.0)
+//            lga.tp_30d          = 180.0 + (latFactor * 8.0)
+//            lga.tp_7d_max       = 14.0 + (latFactor * 1.5)
+//            lga.ro_7d           = 35.0 + (latFactor * 3.0)
+//            lga.ro_14d          = 60.0 + (latFactor * 4.0)
+//            lga.swvl1_3d_change = 0.04 + (latFactor * 0.005)
+//
+//            print("   tp: \(lga.tp) | ro: \(lga.ro) | swvl1: \(lga.swvl1)")
+//        } else {
+//            let calendar = Calendar.current
+//            let now = Date()
+//            lga.month = Double(calendar.component(.month, from: now))
+//            let startOfYear = calendar.date(from: calendar.dateComponents([.year], from: now))!
+//            let dayOfYear = calendar.dateComponents([.day], from: startOfYear, to: now).day! + 1
+//            lga.day_of_year = Double(dayOfYear)
+//        }
+//
+//        lga.state_encoded = stateEncoding[lga.state.lowercased()] ?? 0
+//    }
 
 
     func enrichLgaWithComputedFeatures(lga: inout LgaModel) {

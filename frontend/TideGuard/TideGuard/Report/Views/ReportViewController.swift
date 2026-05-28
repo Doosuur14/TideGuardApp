@@ -51,6 +51,12 @@ class ReportViewController: UIViewController, ReportDelegate {
                 self?.reportView?.imageView.image = nil
                 self?.reportView?.imageDidChange(false)
                 self?.reportView?.selectSeverity("minor")
+
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("ReportSubmitted"),
+                    object: nil
+                )
+                print("Report submitted - notifying map to refresh")
             case .failure(_):
                 AlertManager.shared.showUpdateFailureAlert(viewCon: self ?? UIViewController())
             }

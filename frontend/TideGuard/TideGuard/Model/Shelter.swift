@@ -16,6 +16,9 @@ struct Shelter: Codable, Identifiable {
     let longitude: Double
     let capacity: Int
     let type: String
+    let address: String?
+    let phoneNumber: String?
+    var distanceKm: Double?
 
     var typeDisplayName: String {
         switch type {
@@ -23,6 +26,10 @@ struct Shelter: Codable, Identifiable {
             return "IDP Camp"
         case "STADIUM":
             return "Stadium"
+        case "SCHOOL":
+            return "School"
+        case "COMMUNITY_CENTER":
+            return "Community Center"
         default:
             return type.capitalized
         }
@@ -32,6 +39,10 @@ struct Shelter: Codable, Identifiable {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: capacity)) ?? "\(capacity)"
+    }
+
+    var displayAddress: String {
+        return address ?? "\(lga), \(city)"
     }
 }
 

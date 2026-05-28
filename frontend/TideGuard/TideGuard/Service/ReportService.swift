@@ -46,6 +46,35 @@ final class ReportService {
             }
         }
     }
+
+    func fetchAllReports(completion: @escaping (Result<[FloodReport], Error>) -> Void) {
+        guard let url = URL(string: "\(baseURL)/reports") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1)))
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data", code: -1)))
+                return
+            }
+
+            do {
+                let reports = try JSONDecoder().decode([FloodReport].self, from: data)
+                print("Fetched \(reports.count) flood reports")
+                completion(.success(reports))
+            } catch {
+                print("Report decode error: \(error)")
+                completion(.failure(error))
+            }
+        }.resume()
+    }
+
 }
 
 struct ReportResponse: Decodable {
