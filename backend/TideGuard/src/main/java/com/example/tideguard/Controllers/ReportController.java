@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 public class ReportController {
     @Autowired
@@ -31,5 +33,23 @@ public class ReportController {
         return ResponseEntity.ok()
                 .header("Content-Type", "image/jpeg")
                 .body(fileContent);
+    }
+
+
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<Report>> getAllReports() {
+        List<Report> reports = reportService.getAllReports();
+        return ResponseEntity.ok(reports);
+    }
+
+
+    @GetMapping("/reports/nearby")
+    public ResponseEntity<List<Report>> getNearbyReports(
+            @RequestParam Double latitude,
+            @RequestParam Double longitude,
+            @RequestParam(required = false, defaultValue = "50") Double radiusKm) {
+        List<Report> reports = reportService.getNearbyReports(latitude, longitude, radiusKm);
+        return ResponseEntity.ok(reports);
     }
 }
