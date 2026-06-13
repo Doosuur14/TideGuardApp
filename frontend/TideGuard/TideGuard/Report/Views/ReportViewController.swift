@@ -12,7 +12,7 @@ class ReportViewController: UIViewController, ReportDelegate {
 
     let viewModel: ReportViewModel
     var reportView: ReportView?
-    //var reportView: ReportView
+
 
     init(viewModel: ReportViewModel) {
         self.viewModel = viewModel
@@ -100,24 +100,45 @@ class ReportViewController: UIViewController, ReportDelegate {
 
 
     @objc func didTaponAvatar() {
+        let alert = UIAlertController(title: "Select Photo", message: nil, preferredStyle: .actionSheet)
+
+        alert.addAction(UIAlertAction(title: "Photo Library", style: .default) { _ in
+            self.openPicker(source: .photoLibrary)
+        })
+
+        alert.addAction(UIAlertAction(title: "Choose File", style: .default) { _ in
+            self.openDocumentPicker()
+        })
+
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            alert.addAction(UIAlertAction(title: "Camera", style: .default) { _ in
+                self.openPicker(source: .camera)
+            })
+        }
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    private func openPicker(source: UIImagePickerController.SourceType) {
         let picker = UIImagePickerController()
-        picker.sourceType = .photoLibrary
+        picker.sourceType = source
         picker.allowsEditing = true
         picker.delegate = self
-        self.present(picker, animated: true)
+        present(picker, animated: true)
+    }
+
+    private func openDocumentPicker() {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.image, .jpeg, .png])
+        picker.delegate = self
+        picker.allowsMultipleSelection = false
+        present(picker, animated: true)
     }
 }
 
 
 extension ReportViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-//        if let image = info[.originalImage] as? UIImage {
-//            reportView?.imageView.image = image
-//            reportView?.imageDidChange(true)
-//        }
-//        picker.dismiss(animated: true)
-//    }
 
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
@@ -130,10 +151,11 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
 
         reportView?.uploadButton.setTitle("Analysing image...", for: .normal)
         reportView?.uploadButton.isEnabled = false
+        self.reportView?.imageView.image = nil
+        self.reportView?.imageDidChange(false)   
 
         FloodImageClassifier.shared.classify(image: image) { [weak self] isFlood, confidence, severity in
             DispatchQueue.main.async {
-
                 self?.reportView?.uploadButton.setTitle("Submit Report", for: .normal)
                 self?.reportView?.uploadButton.isEnabled = true
 
@@ -142,8 +164,9 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
                     self?.reportView?.imageDidChange(true)
                     self?.reportView?.selectSeverity(severity)
                     self?.showFloodConfirmedBanner(confidence: confidence, severity: severity)
-                } else {
 
+                } else {
+                    self?.reportView?.imageDidChange(false)
                     self?.showNotFloodAlert(confidence: confidence)
                 }
             }
@@ -196,6 +219,37 @@ extension ReportViewController: UIImagePickerControllerDelegate, UINavigationCon
                 banner.alpha = 0
             } completion: { _ in
                 banner.removeFromSuperview()
+            }
+        }
+    }
+}
+
+
+extension ReportViewController: UIDocumentPickerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let url = urls.first,
+              url.startAccessingSecurityScopedResource(),
+              let data = try? Data(contentsOf: url),
+              let image = UIImage(data: data) else { return }
+
+        url.stopAccessingSecurityScopedResource()
+
+        reportView?.uploadButton.setTitle("Analysing image...", for: .normal)
+        reportView?.uploadButton.isEnabled = false
+
+        FloodImageClassifier.shared.classify(image: image) { [weak self] isFlood, confidence, severity in
+            DispatchQueue.main.async {
+                self?.reportView?.uploadButton.setTitle("Submit Report", for: .normal)
+                self?.reportView?.uploadButton.isEnabled = true
+
+                if isFlood {
+                    self?.reportView?.imageView.image = image
+                    self?.reportView?.imageDidChange(true)
+                    self?.reportView?.selectSeverity(severity)
+                    self?.showFloodConfirmedBanner(confidence: confidence, severity: severity)
+                } else {
+                    self?.showNotFloodAlert(confidence: confidence)
+                }
             }
         }
     }

@@ -293,34 +293,33 @@ class ShelterMapViewController: UIViewController, SheltersModuleProtocol, MKMapV
     }
 
 
-
     private func showShelterActionSheet(for shelter: Shelter) {
         let distanceText = shelter.distanceKm != nil ? "\n📍 Distance: \(String(format: "%.1f", shelter.distanceKm!))km" : ""
 
         let alert = UIAlertController(
             title: shelter.name,
-            message: "\(shelter.displayAddress)\n\(shelter.lga), \(shelter.city)\(distanceText)\n\nТип: \(shelter.typeDisplayName)\nВместимость: \(shelter.capacityFormatted) человек",
+            message: "\(shelter.displayAddress)\n\(shelter.lga), \(shelter.city)\(distanceText)\n\nType: \(shelter.typeDisplayName)\nCapacity: \(shelter.capacityFormatted) people",
             preferredStyle: .actionSheet
         )
 
         // Get Directions
-        alert.addAction(UIAlertAction(title: "Проложить маршрут", style: .default) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Get directions", style: .default) { [weak self] _ in
             self?.openInAppleMaps(shelter: shelter)
         })
 
         // Call (if available)
         if let phone = shelter.phoneNumber, !phone.isEmpty {
-            alert.addAction(UIAlertAction(title: "Позвонить: \(phone)", style: .default) { [weak self] _ in
+            alert.addAction(UIAlertAction(title: "Call: \(phone)", style: .default) { [weak self] _ in
                 self?.callShelter(phone: phone)
             })
         }
 
 
-        alert.addAction(UIAlertAction(title: "Поделиться местоположением", style: .default) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Share location", style: .default) { [weak self] _ in
             self?.shareShelterLocation(shelter: shelter)
         })
 
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
 
         if let popover = alert.popoverPresentationController {

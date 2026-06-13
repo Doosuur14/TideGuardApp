@@ -18,6 +18,7 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
 
     var safetyView: SafetyView?
     let viewModel: SafetyViewModel
+    
     private var cancellables: Set<AnyCancellable> = []
 
 
@@ -30,13 +31,25 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         viewModel.loadMap()
         viewModel.loadFullFloodMap()
         viewModel.fetchWeather()
+        viewModel.fetchReports()
         viewModel.fetchFloodForecast()
         viewModel.scheduleDailyForecastReminder()
-        viewModel.isDemoMode = true
 
         edgesForExtendedLayout = .all
         extendedLayoutIncludesOpaqueBars = true
 
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshReports),
+            name: NSNotification.Name("ReportSubmitted"),
+            object: nil
+        )
+
+    }
+
+    @objc private func refreshReports() {
+        viewModel.fetchReports()
     }
 
     @objc private func openSheltersMap() {
@@ -63,7 +76,17 @@ class SafetyViewController: UIViewController, MKMapViewDelegate {
         safetyView?.mapView.delegate = self
     }
 
+
+
+
+    private var isRefreshingReports = false
+
     private func configureIO() {
+
+        viewModel.onUploadCompleted = { [weak self] in
+            self?.viewModel.fetchReports()
+        }
+
         viewModel.$state
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in

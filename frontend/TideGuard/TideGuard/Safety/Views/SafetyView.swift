@@ -52,7 +52,7 @@ class SafetyView: UIView {
         return sv
     }()
     lazy var humidityPill: WeatherDetailPill = WeatherDetailPill(icon: "💧", title: "Humidity")
-    lazy var precipPill: WeatherDetailPill   = WeatherDetailPill(icon: "🌧", title: "Rainfall")
+    lazy var precipPill: WeatherDetailPill   = WeatherDetailPill(icon: "☔", title: "Precipitation")
 
     lazy var forecastScrollView: UIScrollView = {
         let sv = UIScrollView()
@@ -371,21 +371,13 @@ class SafetyView: UIView {
     }
 
 
-    private func setupActivityIndicator() {
-        addSubview(activityIndicator)
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
-    }
 
 
     func updateWeather(description: String, temp: Double, humidity: Double, precipitation: Double, imageUrl: String?) {
         weatherTempLabel.text = "\(Int(temp))°"
         weatherConditionLabel.text = description
         humidityPill.setValue("\(Int(humidity))%")
-        precipPill.setValue("\(Int(precipitation))%")
+        precipPill.setValue("\(String(format: "%.1f", precipitation)) mm")
         updateWeatherImage(with: imageUrl)
         playWeatherAnimation(for: description)
     }
@@ -580,13 +572,29 @@ class SafetyView: UIView {
         return l
     }
 
+
+
+    private func setupActivityIndicator() {
+        addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+    }
+
+
     func showLoadingSpinner() {
+        bringSubviewToFront(activityIndicator)
+        activityIndicator.alpha = 1
         activityIndicator.startAnimating()
         isUserInteractionEnabled = false
     }
 
+
     func hideLoadingSpinner() {
         activityIndicator.stopAnimating()
+        activityIndicator.superview?.superview?.viewWithTag(999)?.removeFromSuperview()
         isUserInteractionEnabled = true
     }
 }

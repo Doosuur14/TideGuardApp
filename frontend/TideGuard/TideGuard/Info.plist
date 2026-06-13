@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TideGuard uses your location to tag flood reports to the correct area and help you find nearby emergency shelters.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>TideGuard needs your location to provide real time flood alerts and emergency notifications.</string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

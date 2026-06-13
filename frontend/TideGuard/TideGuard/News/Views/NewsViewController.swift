@@ -82,7 +82,6 @@ class NewsViewController: UIViewController, UITableViewDataSource,
         tableView.deselectRow(at: indexPath, animated: true)
         guard let urlString = viewModel.newsItems[indexPath.row].url,
               let url = URL(string: urlString) else { return }
-        let safariVC = SFSafariViewController(url: url)
-        present(safariVC, animated: true)
+        present(SFSafariViewController(url: url), animated: true)
     }
 }

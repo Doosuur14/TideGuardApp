@@ -14,7 +14,7 @@ import CoreLocation
 
 class ReportViewModel: NSObject {
 
-    var onUploadCompleted: (() -> Void)?
+//    var onUploadCompleted: (() -> Void)?
     private let locationManager = CLLocationManager()
     private var currentLocation: CLLocation?
 
@@ -33,7 +33,7 @@ class ReportViewModel: NSObject {
             return
         }
 
-        // Use current location or fallback to Lagos if unavailable (for testing)
+       
         let latitude = currentLocation?.coordinate.latitude ?? 6.5244
         let longitude = currentLocation?.coordinate.longitude ?? 3.3792
 
@@ -48,8 +48,8 @@ class ReportViewModel: NSObject {
             switch result {
             case .success(let photoUrl):
                 self?.scheduleNotification()
-                self?.onUploadCompleted?()
                 completion(.success(photoUrl))
+                NotificationCenter.default.post(name: NSNotification.Name("ReportSubmitted"), object: nil)
             case .failure(let error):
                 completion(.failure(error))
             }
@@ -65,7 +65,7 @@ class ReportViewModel: NSObject {
                 content.body = "Your flood report has been successfully uploaded, and will be looked into as soon as possible"
                 content.sound = .default
 
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false) // Increased to 2 seconds
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
                 let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
 
                 UNUserNotificationCenter.current().add(request) { error in

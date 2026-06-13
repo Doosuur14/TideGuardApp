@@ -45,11 +45,13 @@ class SafetyViewModel {
 
     var lgasCache: [LgaModel] = []
 
-    var isDemoMode: Bool = true
+    var onUploadCompleted: (() -> Void)?
 
 
     func loadMap() {
-        state = .loading
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.state = .loading
+        }
         let user = AuthService.shared.getCurrentUser()
         let userCity = user?.city ?? ""
 
@@ -82,7 +84,7 @@ class SafetyViewModel {
     }
 
     func fetchReports() {
-        ReportAPIService.shared.fetchAllReports { [weak self] result in
+        ReportService.shared.fetchAllReports { [weak self] result in
             guard let self = self else { return }
 
             switch result {
@@ -102,62 +104,34 @@ class SafetyViewModel {
     func fetchWeather() {
         let user = AuthService.shared.getCurrentUser()
         let userCity = user?.city ?? ""
-        
-        if isDemoMode {
-            // Realistic Lagos August weather
+
+        WeatherService.shared.fetchWeather(for: userCity) { [weak self] result in
+            guard let self = self else { return }
+
             DispatchQueue.main.async {
-                self.state = .weatherLoaded(
-                    description: "Heavy Rain",
-                    temp: 27.0,
-                    humidity: 89.0,
-                    precipitation: 78.0,
-                    imageUrl: nil,
-                    weeklyForecast: [
-                        WeatherData.DailyForecast(date: "Fri", maxTemp: 28.0, minTemp: 24.0, weatherCode: 63, precipitation: 15.2, description: "Heavy Rain", icon: nil),
-                        WeatherData.DailyForecast(date: "Sat", maxTemp: 27.0, minTemp: 23.0, weatherCode: 61, precipitation: 8.4,  description: "Light Rain", icon: nil),
-                        WeatherData.DailyForecast(date: "Sun", maxTemp: 29.0, minTemp: 25.0, weatherCode: 80, precipitation: 12.1, description: "Rain Showers", icon: nil),
-                        WeatherData.DailyForecast(date: "Mon", maxTemp: 30.0, minTemp: 25.0, weatherCode: 2,  precipitation: 0.0,  description: "Partly Cloudy", icon: nil),
-                        WeatherData.DailyForecast(date: "Tue", maxTemp: 28.0, minTemp: 24.0, weatherCode: 95, precipitation: 18.7, description: "Thunderstorm", icon: nil),
-                        WeatherData.DailyForecast(date: "Wed", maxTemp: 27.0, minTemp: 23.0, weatherCode: 63, precipitation: 11.3, description: "Heavy Rain", icon: nil),
-                        WeatherData.DailyForecast(date: "Thu", maxTemp: 28.0, minTemp: 24.0, weatherCode: 80, precipitation: 9.8,  description: "Rain Showers", icon: nil)
-                    ]
-                )
+                switch result {
+                case .success(let data):
+                    self.state = .weatherLoaded(
+                        description: data.description ?? "No description",
+                        temp: data.temperature ?? 0.0,
+                        humidity: data.humidity ?? 0.0,
+                        precipitation: data.precipitation ?? 0.0,
+                        imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
+                    )
+                    print("weather data: \(data)")
+                case .failure:
+                    self.state = .weatherLoaded(
+                        description: "Weather unavailable",
+                        temp: 0.0,
+                        humidity: 0.0,
+                        precipitation: 0.0,
+                        imageUrl: nil,
+                        weeklyForecast: []
+                    )
+                }
             }
-            return
         }
     }
-
-
-        //    func fetchWeather() {
-        //        let user = AuthService.shared.getCurrentUser()
-        //        let userCity = user?.city ?? ""
-        //
-        //        WeatherService.shared.fetchWeather(for: userCity) { [weak self] result in
-        //            guard let self = self else { return }
-        //
-        //            DispatchQueue.main.async {
-        //                switch result {
-        //                case .success(let data):
-        //                    self.state = .weatherLoaded(
-        //                        description: data.description ?? "No description",
-        //                        temp: data.temperature ?? 0.0,
-        //                        humidity: data.humidity ?? 0.0,
-        //                        precipitation: data.precipitation ?? 0.0,
-        //                        imageUrl: data.imageUrl, weeklyForecast: data.weeklyForecast ?? []
-        //                    )
-        //                case .failure:
-        //                    self.state = .weatherLoaded(
-        //                        description: "Weather unavailable",
-        //                        temp: 0.0,
-        //                        humidity: 0.0,
-        //                        precipitation: 0.0,
-        //                        imageUrl: nil,
-        //                        weeklyForecast: []
-        //                    )
-        //                }
-        //            }
-        //        }
-        //    }
 
 
         func loadFullFloodMap() {
@@ -224,16 +198,19 @@ class SafetyViewModel {
                 )
 
                 let prediction = try model.prediction(input: input)
-                let riskScore = prediction.floodRisk
-                let clampedScore = max(0.0, min(1.0, riskScore))
-                lga.floodProbability = Int64(clampedScore * 100)
+                let rawScore = prediction.floodRisk
 
-                let category = riskScore >= 0.6 ? 2 :
-                riskScore >= 0.3 ? 1 :
-                0
 
-                print("   riskScore: \(riskScore) → category: \(category)")
+                let probability = 1.0 / (1.0 + exp(-rawScore))
 
+                print("🤖 \(lga.lgaName): raw=\(rawScore) → probability=\(probability)")
+
+                lga.floodProbability = Int64(probability * 100)
+
+                let category = probability >= 0.6 ? 2 :
+                probability >= 0.3 ? 1 : 0
+
+                print("   category: \(category)")
                 lga.floodPrediction = category
                 return category
 
@@ -299,8 +276,16 @@ class SafetyViewModel {
                     day_of_year:     Double(day.dayOfYear),
                     state_encoded:   stateEncoding[state.lowercased()] ?? 0.0
                 )
+
+
                 let output = try model.prediction(input: input)
-                return max(0.0, min(1.0, output.floodRisk))
+                let rawScore = output.floodRisk
+
+
+                let probability = 1.0 / (1.0 + exp(-rawScore))
+
+                print("📅 \(day.dayName): raw=\(rawScore) → probability=\(probability)")
+                return probability
 
             } catch {
                 print("Forecast prediction failed: \(error)")
@@ -348,42 +333,6 @@ class SafetyViewModel {
                 }
             }
         }
-
-
-//    func enrichLgaWithComputedFeatures(lga: inout LgaModel) {
-//        if isDemoMode {
-//            print("🌧 Demo enriching: \(lga.lgaName) | lat: \(lga.latitude)")
-//
-//            lga.month        = 8.0
-//            lga.day_of_year  = 227.0
-//
-//            let latFactor = max(0, 7.0 - lga.latitude)
-//            print("   latFactor: \(latFactor)")
-//
-//            lga.tp              = 8.0  + (latFactor * 1.2)
-//            lga.ro              = 5.0  + (latFactor * 0.9)
-//            lga.t2m             = 300.15
-//            lga.swvl1           = 0.28 + (latFactor * 0.02)
-//            lga.tp_7d           = 55.0 + (latFactor * 4.0)
-//            lga.tp_14d          = 95.0 + (latFactor * 6.0)
-//            lga.tp_30d          = 180.0 + (latFactor * 8.0)
-//            lga.tp_7d_max       = 14.0 + (latFactor * 1.5)
-//            lga.ro_7d           = 35.0 + (latFactor * 3.0)
-//            lga.ro_14d          = 60.0 + (latFactor * 4.0)
-//            lga.swvl1_3d_change = 0.04 + (latFactor * 0.005)
-//
-//            print("   tp: \(lga.tp) | ro: \(lga.ro) | swvl1: \(lga.swvl1)")
-//        } else {
-//            let calendar = Calendar.current
-//            let now = Date()
-//            lga.month = Double(calendar.component(.month, from: now))
-//            let startOfYear = calendar.date(from: calendar.dateComponents([.year], from: now))!
-//            let dayOfYear = calendar.dateComponents([.day], from: startOfYear, to: now).day! + 1
-//            lga.day_of_year = Double(dayOfYear)
-//        }
-//
-//        lga.state_encoded = stateEncoding[lga.state.lowercased()] ?? 0
-//    }
 
 
     func enrichLgaWithComputedFeatures(lga: inout LgaModel) {

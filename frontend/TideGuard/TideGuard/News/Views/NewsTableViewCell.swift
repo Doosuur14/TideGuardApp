@@ -66,14 +66,14 @@ class NewsTableViewCell: UITableViewCell {
         heroImage.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         heroImage.backgroundColor = accent.withAlphaComponent(0.08)
 
-        let fallback = UIImageView(image: UIImage(systemName: "water.waves"))
-        fallback.tintColor = accent.withAlphaComponent(0.4)
-        fallback.contentMode = .scaleAspectFit
-        heroImage.addSubview(fallback)
-        fallback.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.height.equalTo(36)
-        }
+//        let fallback = UIImageView(image: UIImage(systemName: "water.waves"))
+//        fallback.tintColor = accent.withAlphaComponent(0.4)
+//        fallback.contentMode = .scaleAspectFit
+//        heroImage.addSubview(fallback)
+//        fallback.snp.makeConstraints { make in
+//            make.center.equalToSuperview()
+//            make.width.height.equalTo(36)
+//        }
 
         heroImage.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
@@ -134,32 +134,107 @@ class NewsTableViewCell: UITableViewCell {
     }
 
 
+//    func configureCell(with news: News) {
+//        titleLabel.text = news.title
+//        sourceLabel.text = news.source?.uppercased() ?? "NEWS"
+//        dateLabel.text = formatDate(news.publishedAt)
+//
+//        if let urlString = news.urlToImage, let url = URL(string: urlString) {
+//            loadImage(from: url)
+//        } else {
+//            heroImage.image = nil
+//        }
+//    }
+
+
+    private static let backendBase = "http://localhost:8080"
+
     func configureCell(with news: News) {
         titleLabel.text = news.title
         sourceLabel.text = news.source?.uppercased() ?? "NEWS"
         dateLabel.text = formatDate(news.publishedAt)
 
-        if let urlString = news.urlToImage, let url = URL(string: urlString) {
-            loadImage(from: url)
+        if let raw = news.urlToImage,
+           !raw.isEmpty,
+           let proxyURL = Self.makeProxyURL(for: raw) {
+            loadImage(from: proxyURL)
         } else {
-            heroImage.image = nil
+            heroImage.image = UIImage(systemName: "photo")
         }
     }
 
-    private func loadImage(from url: URL) {
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data = data, let image = UIImage(data: data) else { return }
-            DispatchQueue.main.async {
-                UIView.transition(
-                    with: self?.heroImage ?? UIImageView(),
-                    duration: 0.25,
-                    options: .transitionCrossDissolve
-                ) {
-                    self?.heroImage.image = image
-                }
-            }
-        }.resume()
+    private static func makeProxyURL(for imageURL: String) -> URL? {
+        var components = URLComponents(string: "\(backendBase)/news/image")
+        components?.queryItems = [URLQueryItem(name: "url", value: imageURL)]
+        return components?.url
     }
+
+
+
+
+
+
+
+
+//    private func loadImage(from url: URL) {
+//        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+//            guard let data = data, let image = UIImage(data: data) else { return }
+//            DispatchQueue.main.async {
+//                UIView.transition(
+//                    with: self?.heroImage ?? UIImageView(),
+//                    duration: 0.25,
+//                    options: .transitionCrossDissolve
+//                ) {
+//                    self?.heroImage.image = image
+//                }
+//            }
+//        }.resume()
+//    }
+
+
+
+
+    private var imageTask: URLSessionDataTask?
+    private var taskURL: URL?
+
+    private func loadImage(from url: URL) {
+        imageTask?.cancel()
+        taskURL = url
+
+        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 30)
+
+        if let cached = URLCache.shared.cachedResponse(for: request),
+           let image = UIImage(data: cached.data) {
+            heroImage.image = image
+            return
+        }
+
+        imageTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self, self.taskURL == url else { return } // ← guard against stale task
+
+            if let error = error as NSError?, error.code == NSURLErrorCancelled { return }
+
+            guard let data, let image = UIImage(data: data) else {
+                DispatchQueue.main.async { self.heroImage.image = UIImage(systemName: "photo") }
+                return
+            }
+
+            if let response {
+                URLCache.shared.storeCachedResponse(
+                    CachedURLResponse(response: response, data: data),
+                    for: request
+                )
+            }
+
+            DispatchQueue.main.async {
+                guard self.taskURL == url else { return } // ← double-check on main thread
+                self.heroImage.image = image
+            }
+        }
+        imageTask?.resume()
+    }
+
+
 
     private func formatDate(_ raw: String?) -> String {
         guard let raw = raw else { return "" }
@@ -173,9 +248,13 @@ class NewsTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        imageTask?.cancel()  
+        imageTask = nil
+        taskURL = nil
         heroImage.image = nil
         titleLabel.text = nil
         sourceLabel.text = nil
         dateLabel.text = nil
     }
+
 }

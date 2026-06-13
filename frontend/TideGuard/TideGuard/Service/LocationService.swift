@@ -101,6 +101,12 @@ final class LocationService: NSObject {
             print("LocationService: No LGAs loaded yet")
             return
         }
+//        guard !allLgas.isEmpty else {
+//            loadAllLgas {
+//                self.findNearestLga(to: coordinate)
+//            }
+//            return
+//        }
 
         let userLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
 
@@ -146,7 +152,8 @@ extension LocationService: CLLocationManagerDelegate {
         }
 
 
-        findNearestLga(to: coordinate)
+//        findNearestLga(to: coordinate)
+        retriggerLgaDetection(for: coordinate)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
